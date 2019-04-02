@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+# -*- coding: utf8 -*-
+
+from __future__ import print_function
+
+import shutil
+import sys
+import os
+
+plugins = @PLUGIN_LIST@
+qml_plugins = @QML_PLUGINS_LIST@
+libs = @LIB_LIST@
+tools = @TOOL_LIST@
+dest_dir = r'@BIN_DIR@'
+
+try:
+    os.makedirs(dest_dir)
+except:
+    pass
+
+try:
+    os.makedirs(os.path.join(dest_dir, 'plugins'))
+except:
+    pass
+
+try:
+    os.makedirs(os.path.join(dest_dir, 'qml'))
+except:
+    pass
+
+err_code = 0
+
+def link_files(files, subdir=''):
+    for f in files:
+        src = f
+        dest = os.path.join(dest_dir, subdir, os.path.basename(f))
+        if os.path.exists(dest):
+            try:
+                os.unlink(dest)
+            except:
+                print('failed to remove', dest)
+                err_code = -1
+                continue
+        try:
+            os.link(src, dest)
+        except:
+            print('failed to link', dest)
+            err_code = -1
+
+def copy_directory(dirs, subdir=''):
+    for d in dirs:
+        src = d
+        dest = os.path.join(dest_dir, subdir, os.path.basename(d))
+        try:
+            if os.path.exists(dest):
+                shutil.rmtree(dest)
+            shutil.copytree(src, dest)
+        except Exception as ex:
+            print("Failed to copy directory ", dest, ex)
+
+link_files(libs + tools)
+link_files(plugins, subdir='plugins')
+copy_directory(qml_plugins, subdir='qml')
+
+sys.exit(err_code)

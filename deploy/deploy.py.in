@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+# -*- coding: utf8 -*-
+
+import subprocess
+import platform
+import sys
+import os
+import tarfile
+
+plugins = @PLUGIN_LIST@
+qml_plugins = @QML_PLUGINS_LIST@
+libs = @LIB_LIST@
+tools = @TOOL_LIST@
+mcc_exe = @MCC_EXE@
+dest_dir = r'@BUILD_DIR@'
+
+tools += [mcc_exe]
+
+archive_name = 'mcc'
+
+archive = tarfile.open(os.path.join(dest_dir, archive_name + '.tar.xz'), mode='w:xz')
+pdb_archive = None
+
+if platform.system() == 'Windows':
+    pdb_archive = tarfile.open(os.path.join(dest_dir, archive_name + '-pdb.tar.xz'), mode='w:xz')
+
+def get_qmldir_plugin(qmldir_path):
+    f = open(qmldir_path, 'r')
+    for line in f.readlines():
+        values = line.split()
+        if len(values) < 2:
+            continue
+        if values[0] != 'plugin':
+            continue
+        if len(values) == 2:
+            return values[1]
+        else:
+            return os.path.join(values[2], values[1])
+    return None
+
+def write_file(name, dest=None):
+    p = archive_name
+    if dest is not None:
+        p = os.path.join(archive_name, dest)
+    arcname = os.path.join(p, os.path.basename(name))
+
+    print('Compressing', arcname)
+    archive.add(name, arcname=arcname)
+
+    if platform.system() == 'Windows':
+        if name.endswith('.dll') or name.endswith('.exe'):
+            pdb_name = name[:-3] + 'pdb'
+            if os.path.exists(pdb_name):
+                pdb_arcname = arcname[:-3] + 'pdb'
+                print('Compressing pdb', pdb_arcname)
+                pdb_archive.add(pdb_name, arcname=pdb_arcname)
+
+if platform.system() == 'Windows':
+    dll_ext = '.dll' # d.dll in debug mode
+    try:
+        popen = subprocess.Popen('qtpaths.exe --install-prefix', stdout=subprocess.PIPE)
+        out, err = popen.communicate()
+    except:
+        print('Failed to call qtpaths.exe')
+        sys.exit(-1)
+    if out is None:
+        print('Failed to get qt install prefix')
+        sys.exit(-1)
+    qt_prefix = out.decode().strip()
+    modules = ['Qt5Core', 'Qt5Gui', 'Qt5Network', 'Qt5OpenGL', 'Qt5Positioning', 'Qt5PrintSupport',
+               'Qt5Qml', 'Qt5Quick', 'Qt5QuickControls2', 'Qt5SerialPort', 'Qt5Svg', 'Qt5Widgets', 'Qt5Xml', 'Qt5MultimediaQuick']
+    imageformats = ['qjpeg', 'qsvg', 'qico']
+    platforms = ['qwindows']
+    printsupport = ['windowsprintersupport']
+    styles = ['qwindowsvistastyle']
+    mediaservices = ['dsengine', 'qtmedia_audioengine']
+    translations = ['assistant', 'linguist',  'qtbase', 'qtdeclarative', 'qtlocation',
+                    'qtquick1', 'qt', 'qtserialport', 'qtwebsockets', 'designer', 'qmlviewer',
+                    'qtconnectivity', 'qt_help', 'qtmultimedia', 'qtquickcontrols', 'qtscript',
+                    'qtwebengine',  'qtxmlpatterns']
+    qml_modules = ['QtGamepad', 'QtQml', 'QtQuick', 'QtQuick.2']
+
+    def deploy_qt_files(path_prefix, subpath, dll_list, ext=dll_ext):
+        for dll in dll_list:
+            path = os.path.join(qt_prefix, path_prefix, subpath, dll) + ext
+            dest = subpath
+            write_file(path, dest=dest)
+
+    def deploy_qml_plugins(modules):
+        qml_dir = os.path.join(qt_prefix, 'qml')
+        files_to_copy = []
+        filter = (".dll", ".qmlc", ".pdb")
+        for module in modules:
+            for root, dirs, files in os.walk(os.path.join(qml_dir, module)):
+                for name in files:
+                    if name.endswith(filter):
+                        continue
+                    current_path = os.path.join(root, name)
+                    files_to_copy.append(current_path)
+                    if name == 'qmldir':
+                        plugin_path = get_qmldir_plugin(current_path)
+                        if plugin_path:
+                            dll_path = os.path.join(root, plugin_path)
+                            dll_path = os.path.abspath(dll_path)
+                            files_to_copy.append(dll_path + dll_ext)
+
+        for f in files_to_copy:
+            dest = os.path.relpath(os.path.dirname(f), qt_prefix)
+            write_file(f, dest)
+
+    deploy_qt_files('bin', '', modules)
+    deploy_qt_files('plugins', 'imageformats', imageformats)
+    deploy_qt_files('plugins', 'platforms', platforms)
+    deploy_qt_files('plugins', 'printsupport', printsupport)
+    deploy_qt_files('plugins', 'styles', styles)
+    deploy_qt_files('plugins', 'mediaservice', mediaservices)
+    deploy_qt_files('', 'translations', translations, ext='_ru.qm')
+    deploy_qml_plugins(qml_modules)
+
+for l in libs:
+    if l.endswith('.a'):
+        continue
+    lname = l
+    if os.name == 'nt':
+        lname = l.replace('/', '\\')
+    write_file(lname)
+
+for p in plugins:
+    write_file(p, dest='plugins')
+
+for t in tools:
+    write_file(t)
+
+for p in qml_plugins:
+    for root, dirs, files in os.walk(p):
+        for name in files:
+            src_path = os.path.join(root, name)
+            dst_path = os.path.join('qml', os.path.basename(os.path.dirname(src_path)))
+            write_file(src_path, dst_path)
+
+print('Done')

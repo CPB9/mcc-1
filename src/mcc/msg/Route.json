@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+        "maxWaypoints": { "type": "integer"},
+        "name": { "type": "integer"},
+        "info": { "type": "string"},
+        "nextWaypoint": { "type": "integer"},
+        "waypoints": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["lat", "lon", "alt", "properties"],
+                "properties": {
+                    "lat": { "type": "number"},
+                    "lon": { "type": "number"},
+                    "alt": { "type": "number"},
+                    "properties": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [ "info", "name", "value" ],
+                            "properties": {
+                                "name" : { "type": "string"},
+                                "info" : { "type": "string"},
+                                "value": { "type": "string"},
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

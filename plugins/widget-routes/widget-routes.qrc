@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/widget-routes">
+        <file>routes_icon.png</file>
+    </qresource>
+</RCC>

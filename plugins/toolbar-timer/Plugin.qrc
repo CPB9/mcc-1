@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/toolbar-timer">
+        <file>resources/timer_icon.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,43 @@
+<RCC>
+    <qresource prefix="/net-mavlink">
+        <file>icon.svg</file>
+        <file>device/PX4ParameterFactMetaData.xml</file>
+        <file>device/AirframeFactMetaData.xml</file>
+        <file>widgets/airframes/AirframeSimulation.svg</file>
+        <file>widgets/airframes/AirframeUnknown.svg</file>
+        <file>widgets/airframes/APMode.svg</file>
+        <file>widgets/airframes/ArrowCCW.svg</file>
+        <file>widgets/airframes/ArrowCW.svg</file>
+        <file>widgets/airframes/ArrowDirection.svg</file>
+        <file>widgets/airframes/Boat.svg</file>
+        <file>widgets/airframes/FlyingWing.svg</file>
+        <file>widgets/airframes/Helicopter.svg</file>
+        <file>widgets/airframes/HelicopterCoaxial.svg</file>
+        <file>widgets/airframes/HexaRotorPlus.svg</file>
+        <file>widgets/airframes/HexaRotorX.svg</file>
+        <file>widgets/airframes/MotorComponentIcon.svg</file>
+        <file>widgets/airframes/OctoRotorPlus.svg</file>
+        <file>widgets/airframes/OctoRotorPlusCoaxial.svg</file>
+        <file>widgets/airframes/OctoRotorX.svg</file>
+        <file>widgets/airframes/OctoRotorXCoaxial.svg</file>
+        <file>widgets/airframes/Plane.svg</file>
+        <file>widgets/airframes/PlaneATail.svg</file>
+        <file>widgets/airframes/QuadRotorATail.svg</file>
+        <file>widgets/airframes/QuadRotorH.svg</file>
+        <file>widgets/airframes/QuadRotorPlus.svg</file>
+        <file>widgets/airframes/QuadRotorVTail.svg</file>
+        <file>widgets/airframes/QuadRotorWide.svg</file>
+        <file>widgets/airframes/QuadRotorX.svg</file>
+        <file>widgets/airframes/Rover.svg</file>
+        <file>widgets/airframes/StationMode.svg</file>
+        <file>widgets/airframes/VTOLDuoRotorTailSitter.svg</file>
+        <file>widgets/airframes/VTOLPlane.svg</file>
+        <file>widgets/airframes/VTOLQuadRotorTailSitter.svg</file>
+        <file>widgets/airframes/VTOLTiltRotor.svg</file>
+        <file>widgets/airframes/wifi.svg</file>
+        <file>widgets/airframes/Y6A.svg</file>
+        <file>widgets/airframes/Y6B.svg</file>
+        <file>widgets/airframes/YMinus.svg</file>
+        <file>widgets/airframes/YPlus.svg</file>
+    </qresource>
+</RCC>

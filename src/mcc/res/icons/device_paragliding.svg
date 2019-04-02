@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="48"
+   height="24"
+   viewBox="0 0 48 24"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   inkscape:export-filename="C:\Users\applmech\Desktop\иконки\параплан.png"
+   inkscape:export-xdpi="11"
+   inkscape:export-ydpi="11"
+   sodipodi:docname="paragliding.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.5179544"
+     inkscape:cx="98.782911"
+     inkscape:cy="7.2627431"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     units="px" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-1028.3622)">
+    <path
+       style="opacity:1;fill:#ffcc00;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.80587047;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 23.985121,1028.7654 0,0 c 0,0 -3.932515,3.3084 -5.94847,3.7748 -1.920112,0.4441 -3.805649,1.172 -5.662706,1.9833 -2.053672,0.897 -4.2637066,1.4877 -6.0393555,3.1803 -1.9773502,1.8847 -3.6971172,4.4868 -4.8018653,7.4458 -0.77191111,2.0674 -1.12980606,6.8099 -1.12980606,6.8099 0,0 1.38482536,-3.0823 2.32691566,-4.3122 0.801478,-1.0467 1.7591198,-1.8761 2.7573412,-2.5164 1.993201,-1.2787 4.1815493,-1.8858 6.321867,-2.563 1.958516,-0.6197 3.944156,-1.1228 5.945087,-1.3657 2.129015,-0.2585 4.273862,-0.093 6.410977,-0.093 2.137055,0 4.281861,-0.1654 6.410826,0.093 2.000932,0.2429 3.986571,0.746 5.945088,1.3657 2.140267,0.677 4.328565,1.2843 6.321737,2.563 0.998211,0.6403 1.955853,1.4697 2.757331,2.5164 0.942091,1.2299 2.326916,4.3122 2.326916,4.3122 0,0 -0.357895,-4.7425 -1.129796,-6.8099 -1.104758,-2.959 -2.824525,-5.5611 -4.801875,-7.4458 -1.7756,-1.6924 -3.985584,-2.2833 -6.039216,-3.1803 -1.857058,-0.8113 -3.742595,-1.5392 -5.662707,-1.9833 -2.015954,-0.4664 -6.271281,-3.7748 -6.271281,-3.7748 l 0,0 c 0,0 0,0 -0.01846,0 z"
+       id="rect4155"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccsssscssssssssscsssscccc" />
+    <path
+       style="opacity:1;fill:#806600;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2294084;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 24.003486,1028.7128 -1.206457,4.2588 0.874387,0 0,3.9316 0.664138,0 0,-3.9316 0.874518,0 -1.206586,-4.2588 z"
+       id="rect4161"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

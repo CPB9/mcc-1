@@ -1,0 +1,5 @@
+#pragma once
+
+#mesondefine MCC_BUILD_NUMBER
+#mesondefine MCC_BRANCH
+#mesondefine MCC_COMMIT_HASH

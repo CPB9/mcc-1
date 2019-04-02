@@ -1,0 +1,15 @@
+#pragma once
+#include "mcc/Config.h"
+#include "mcc/msg/ptr/Fwd.h"
+#include "mcc/msg/ptr/Advanced.h"
+#include "mcc/msg/ptr/Channel.h"
+#include "mcc/msg/ptr/Device.h"
+#include "mcc/msg/ptr/DeviceUi.h"
+#include "mcc/msg/ptr/Firmware.h"
+#include "mcc/msg/ptr/Protocol.h"
+#include "mcc/msg/ptr/Radar.h"
+#include "mcc/msg/ptr/Tm.h"
+#include "mcc/msg/ptr/TmSession.h"
+#include "mcc/msg/ptr/NoteVisitor.h"
+#include "mcc/msg/ptr/ReqVisitor.h"
+

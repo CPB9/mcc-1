@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/toolbar-coordinatesystem">
+        <file>resources/globe_active.png</file>
+        <file>resources/globe_passive.png</file>
+        <file>resources/converter_icon.png</file>
+        <file>resources/icons/settings.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,3 @@
+option('stacktrace', type : 'boolean', value : true)
+option('build_number', type : 'integer', value : 0)
+option('modules', type : 'string', value : 'modules-opensource.json')

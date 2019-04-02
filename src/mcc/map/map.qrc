@@ -1,0 +1,45 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/edit.png</file>
+        <file>resources/expand.png</file>
+        <file>resources/eye_closed.svg</file>
+        <file>resources/eye_open.svg</file>
+        <file>resources/flag.png</file>
+        <file>resources/folder.png</file>
+        <file>resources/hand.png</file>
+        <file>resources/lock_closed.svg</file>
+        <file>resources/lock_open.svg</file>
+        <file>resources/pin.png</file>
+        <file>resources/pin_blue.png</file>
+        <file>resources/pin_yellow.png</file>
+        <file>resources/polygon.png</file>
+        <file>resources/polyline.png</file>
+        <file>resources/rotate.png</file>
+        <file>resources/ruler.png</file>
+        <file>resources/stack_icon.png</file>
+        <file>resources/target.png</file>
+        <file>resources/target_following.png</file>
+        <file>resources/waypoints/by_heading.svg</file>
+        <file>resources/waypoints/by_height.svg</file>
+        <file>resources/waypoints/formation.svg</file>
+        <file>resources/waypoints/home.svg</file>
+        <file>resources/waypoints/interpolate.svg</file>
+        <file>resources/waypoints/landing.svg</file>
+        <file>resources/waypoints/loop.svg</file>
+        <file>resources/waypoints/more.svg</file>
+        <file>resources/waypoints/parachute.svg</file>
+        <file>resources/waypoints/pause.svg</file>
+        <file>resources/waypoints/readonly.svg</file>
+        <file>resources/waypoints/return_to_route.svg</file>
+        <file>resources/waypoints/reynolds.svg</file>
+        <file>resources/waypoints/snake.svg</file>
+        <file>resources/waypoints/switch_route.svg</file>
+        <file>resources/waypoints/switch_route1.svg</file>
+        <file>resources/waypoints/target1.svg</file>
+        <file>resources/waypoints/target2.svg</file>
+        <file>resources/waypoints/turn_back.svg</file>
+        <file>resources/waypoints/turn_forward.svg</file>
+        <file>resources/waypoints/waypoint_pin.png</file>
+        <file>resources/waypoints/waypoint_pin_active.png</file>
+    </qresource>
+</RCC>

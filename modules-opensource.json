@@ -1,0 +1,177 @@
+{
+  "extra_files" : [
+    "src/mcc/Config.h",
+    "src/mcc/DeployConfig.h.in",
+    "src/mcc/Rc.h",
+    "src/mcc/main.cpp",
+    "src/mcc/meson.build"
+  ],
+  "ignore_dirs" : [
+      "proprietary",
+      "doc",
+      "dist",
+      "scripts"
+  ],
+  "subdirs" : [
+    "src/mcc/res",
+    "src/mcc/plugin",
+    "src/mcc/crashdump",
+    "src/mcc/geo",
+    "src/mcc/path",
+    "src/mcc/msg",
+    "src/mcc/net",
+    "src/mcc/ui",
+    "src/mcc/hm",
+    "src/mcc/vis",
+    "src/mcc/uav",
+    "src/mcc/map",
+    "src/mcc/calib",
+    "src/mcc/ide",
+    "src/mcc/qml",
+    "src/mcc/3d",
+    "plugins/uiexch-net",
+    "plugins/net-mavlink",
+    "plugins/net-photon",
+    "plugins/qml",
+    "plugins/settingspage-global",
+    "plugins/settingspage-gps",
+    "plugins/toolbar-channels",
+    "plugins/toolbar-coordinatesystem",
+    "plugins/toolbar-selecteduav",
+    "plugins/toolbar-timer",
+    "plugins/uicore",
+    "plugins/widget-uavbrowser",
+    "plugins/widget-plot",
+    "plugins/widget-sessions",
+    "plugins/widget-routes",
+    "plugins/widget-logmessages",
+    "plugins/dialog-channel-add",
+    "plugins/dialog-uav-add",
+    "plugins/dialog-uav-edit",
+    "plugins/dialog-uav-remove"
+  ],
+  "modules" : [
+    {
+      "subproject": "bmcl",
+      "dep_var": "bmcl_dep",
+      "libs": ["bmcl_lib"],
+      "default_options": ["build_tests=false", "shared_lib=true"]
+    },
+    {
+      "subproject": "fmt",
+      "dep_var": "fmt_dep",
+      "libs": ["fmt_lib"],
+      "default_options": ["shared_lib=true"],
+      "ignore_dirs": ["doc", "examples", "test"]
+    },
+    {
+      "subproject": "libpredict",
+      "dep_var": "predict_dep",
+      "libs": ["predict_lib"],
+      "ignore_dirs": ["tests", "examples", "travis"]
+    },
+
+    {
+      "subproject": "libkml",
+      "dep_var": "libkml_dep",
+      "libs": ["libkml_lib"],
+      "ignore_dirs": ["doc", "support", "test", "examples"]
+    },
+    {
+      "subproject": "zpaq",
+      "dep_var": "libzpaq_dep"
+    },
+    {
+      "subproject": "caf",
+      "dep_var": "libcaf_core_dep",
+      "ignore_dirs": ["doc", "examples"]
+    },
+    {
+      "subproject": "pegtl",
+      "dep_var": "pegtl_dep",
+      "ignore_dirs": ["doc"]
+    },
+    {
+      "subproject": "toml11",
+      "dep_var": "toml11_dep"
+    },
+    {
+      "subproject": "asio",
+      "dep_var": "asio_dep",
+      "libs": ["asio_lib"]
+    },
+    {
+      "subproject": "photon",
+      "dep_var": "photon_dep"
+    },
+    {
+      "subproject": "decode",
+      "dep_var": "libdecode_dep"
+    },
+    {
+      "subproject": "lz4",
+      "dep_var": "lz4_dep",
+      "ignore_dirs": ["doc", "examples", "programs", "tests"]
+    },
+    {
+      "subproject": "qwt",
+      "dep_var": "qwt_dep",
+      "libs": ["qwt_lib"],
+      "ignore_dirs": ["doc", "designer", "examples", "playground", "textengines"]
+    },
+    {
+      "subproject": "proj4",
+      "dep_var": "proj_dep",
+      "libs": ["proj_lib"]
+    },
+    {
+      "dependency": "libcurl",
+      "subproject": "curl",
+      "dep_var": "curl_dep",
+      "libs": ["curl_lib"],
+      "ignore_dirs": ["docs", "packages", "projects", "tests"]
+    },
+    {
+      "subproject": "rapidjson",
+      "dep_var": "rapidjson_dep",
+      "ignore_dirs": ["bin", "doc", "examples", "test"]
+    },
+    {
+      "subproject": "ads",
+      "dep_var": "ads_dep",
+      "libs": ["ads_lib"]
+    },
+    {
+      "subproject": "tclap",
+      "dep_var": "tclap_dep",
+      "ignore_dirs": ["docs", "examples", "msc", "tests"]
+    },
+    {
+      "subproject": "vasnecov",
+      "dep_var": "vasnecov_dep"
+    },
+    {
+      "subproject": "xlnt",
+      "dep_var": "xlnt_dep",
+      "libs": ["xlnt_lib"],
+      "ignore_dirs": ["docs", "benchmarks", "logo", "python", "samples", "tests"]
+    },
+    {
+      "subproject": "nmealib",
+      "dep_var": "nmea_dep"
+    },
+    {
+      "subproject": "mavlink2_headers",
+      "dep_var": "mavlink2_dep"
+    },
+    {
+      "subproject": "sqlite3pp",
+      "dep_var": "sqlite3pp_dep"
+    },
+    {
+      "subproject": "sfmljoy",
+      "dep_var": "sfmljoy_dep",
+      "libs": ["sfmljoy_lib"]
+    }
+  ]
+}

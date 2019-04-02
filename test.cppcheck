@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="1">
+    <builddir>build</builddir>
+    <platform>Unspecified</platform>
+    <analyze-all-vs-configs>true</analyze-all-vs-configs>
+    <defines>
+        <define name="CAF_ALLOW_UNSAFE_MESSAGE_TYPE"/>
+    </defines>
+    <paths>
+        <dir name="plugins"/>
+        <dir name="scripts"/>
+        <dir name="src"/>
+        <dir name="subprojects/bmcl"/>
+        <dir name="subprojects/decode"/>
+        <dir name="subprojects/geoscanproxy"/>
+        <dir name="subprojects/mavlink2_headers"/>
+        <dir name="subprojects/mcc_crashdump"/>
+        <dir name="subprojects/mcc_path"/>
+        <dir name="subprojects/mcc_plugin"/>
+        <dir name="subprojects/mcc_srtm"/>
+        <dir name="subprojects/mcc_vis"/>
+        <dir name="subprojects/photon"/>
+        <dir name="subprojects/rtkproxy"/>
+        <dir name="subprojects/sbus_waterjet"/>
+        <dir name="subprojects/tclap-1.2.2-mesonwrap"/>
+        <dir name="subprojects/toml11"/>
+        <dir name="subprojects/vasnecov"/>
+    </paths>
+    <libraries>
+        <library>qt</library>
+        <library>sfml</library>
+    </libraries>
+</project>

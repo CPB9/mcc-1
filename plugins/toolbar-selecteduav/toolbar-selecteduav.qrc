@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/toolbar-selecteddevice">
+        <file>resources/add_active.png</file>
+        <file>resources/add_passive.png</file>
+        <file>resources/attention_icon.png</file>
+    </qresource>
+</RCC>
