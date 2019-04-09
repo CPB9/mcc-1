@@ -1,10 +1,10 @@
 #include "mcc/uav/GroupsController.h"
-
 #include "mcc/uav/UavController.h"
 #include "mcc/uav/Group.h"
 #include "mcc/uav/Uav.h"
-#include "mcc/msg/Objects.h"
 #include "mcc/uav/ExchangeService.h"
+#include "mcc/msg/Objects.h"
+#include "mcc/msg/exts/Position.h"
 
 #include <algorithm>
 
@@ -19,16 +19,15 @@ GroupsController::GroupsController(mccuav::UavController* uavController,
     , _exchangeService(service)
 {
 
-    connect(_exchangeService.get(), &mccuav::ExchangeService::traitGroupState,
-            this, &GroupsController::handleGroupState);
-    connect(_exchangeService.get(), &mccuav::ExchangeService::traitNavigationMotion,
-            this, &GroupsController::handleNavigationMotion);
+    connect(_exchangeService.get(), &mccuav::ExchangeService::traitGroupState, this, &GroupsController::handleGroupState);
 
     connect(uavController, &UavController::uavStateChanged, this, &GroupsController::handleUavState);
+    connect(uavController, &UavController::uavTmStorageUpdated, this, &GroupsController::handleUavStorage);
 }
 
 GroupsController::~GroupsController()
 {
+    _posHandlers.clear();
     for (auto group : _groups)
     {
         delete group;
@@ -212,44 +211,53 @@ void GroupsController::handleUavState(Uav* uav)
     }
 }
 
-void GroupsController::handleNavigationMotion(const mccmsg::TmMotionPtr& s)
+void GroupsController::handleUavPosition(const mccmsg::Device& device, const mccmsg::TmPosition* pos)
 {
-    //const mccmsg::Motion& motion = s->state();
     UavController* manager = _uavController.get();
-    for(auto group : _groups)
+    for (auto group : _groups)
     {
-        if(group->hasUav(s->device()))
+        if (!group->hasUav(device))
+            continue;
+
+        if (group->geometry().isSome() && bmcl::toMsecs(bmcl::SystemClock::now() - group->geometry()->time()).count() < 200)
+            continue;
+
+        double dt = 0.0;
+        if (group->geometry().isSome())
+            dt = bmcl::toMsecs(group->geometry()->time() - pos->updated()).count() / 1000.0;
+
+        std::vector<mccgeo::Position> positions;
+        positions.reserve(group->size());
+        for (auto devId : group->uavs())
         {
-            if (group->geometry().isSome() &&
-                bmcl::toMsecs(bmcl::SystemClock::now() - group->geometry()->time()).count() < 200)
-                continue;
-
-            double dt = 0.0;
-            if (group->geometry().isSome())
-                dt = bmcl::toMsecs(group->geometry()->time() - s->time()).count() / 1000.0;
-
-            std::vector<mccgeo::Position> positions;
-            positions.reserve(group->size());
-            for (auto devId : group->uavs())
+            auto deviceOpt = manager->uav(devId);
+            if (deviceOpt.isSome())
             {
-                auto deviceOpt = manager->uav(devId);
-                if(deviceOpt.isSome())
-                {
-                    Uav* device = deviceOpt.unwrap();
+                Uav* device = deviceOpt.unwrap();
 
-                    if (device->motion().isNone())
-                        continue;
+                if (device->position().isNone())
+                    continue;
 
-                    if(device->isAlive() && device->isActivated())
-                        positions.push_back(device->motion()->position);
-                }
+                if (device->isAlive() && device->isActivated())
+                    positions.push_back(device->position().unwrap());
             }
-
-            group->updateGeometry(_enuConverter.calcGroupParams(positions, dt));
-
-            emit groupGeometryChanged(group->id());
         }
+
+        group->updateGeometry(_enuConverter.calcGroupParams(positions, dt));
+
+        emit groupGeometryChanged(group->id());
     }
+}
+
+void GroupsController::handleUavStorage(mccuav::Uav* uav)
+{
+    auto st = uav->tmStorage();
+    auto ext = st->getExtension<mccmsg::TmPosition>();
+    if (ext.isNone())
+        return;
+
+    bmcl::Rc<mccmsg::TmPosition> pos = ext.unwrap();
+    _posHandlers[uav->device()] = pos->addHandler([this, d = uav->device(), pos](){ handleUavPosition(d, pos.get()); }, true);
 }
 
 void GroupsController::removeEmptyGroups()

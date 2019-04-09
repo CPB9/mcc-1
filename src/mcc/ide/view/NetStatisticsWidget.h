@@ -6,12 +6,9 @@
 #include "mcc/msg/Stats.h"
 #include "mcc/Rc.h"
 
-class QwtPlotTextLabel;
-class QwtText;
-
 namespace mccide {
 
-class Curve;
+class NetCurve;
 
 class MCC_IDE_DECLSPEC NetStatisticsWidget : public QWidget
 {
@@ -71,7 +68,7 @@ private:
     mccmsg::Stat                       _rcvdStat;
     mccmsg::Stat                       _badStat;
 
-    Curve*                             _curves;
+    NetCurve*                          _curves;
     QTransform                         _transform;
     bool                               _drawDetails;
     QFont                              _detailsFont;

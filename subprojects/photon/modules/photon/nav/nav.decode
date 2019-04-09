@@ -1,0 +1,170 @@
+module nav
+
+struct LatLon {
+    latitude: f64,
+    longitude: f64,
+}
+
+struct Orientation {
+    heading: f64,
+    pitch: f64,
+    roll: f64,
+}
+
+struct Position {
+    latLon: LatLon,
+    altitude: f64,
+}
+
+struct Vec3 {
+    x: f64,
+    y: f64,
+    z: f64,
+}
+
+struct FormationEntry {
+    pos: Vec3,
+    id: varuint
+}
+
+variant Action {
+    None,
+    Sleep { timeout: varuint },
+    Formation { positions: &[FormationEntry; 20] },
+    Reynolds,
+    Snake,
+    Loop,
+    Target,
+}
+
+variant OptionalF64 {
+    None,
+    Some { value: f64 },
+}
+
+struct Waypoint {
+    position: Position,
+    speed: OptionalF64,
+    action: Action,
+}
+
+enum GpsFixType {
+    NoGps = 0,
+    NoFix = 1,
+    Fix2D = 2,
+    Fix3D = 3,
+    DGps = 4,
+    Single = 5,
+    PsrDiff = 6,
+    L1Float = 7,
+    L1Int = 8,
+    Static = 9,
+}
+
+struct GpsSatellite {
+    id : u8,
+    used: bool,
+    elevation: u8,
+    azimuth: u8,
+    snr: u8,
+}
+
+struct GpsState {
+    fixType : GpsFixType,
+    hdop: f32,
+    vdop: f32,
+    satellitesVisible : u8,
+    satellitesUsed : u8,
+    satellites: &[GpsSatellite; 20],
+}
+
+variant RelativeAltitude {
+    None,
+    Some(f64),
+}
+
+type RouteId = varuint;
+type PointId = varuint;
+
+variant OptionalIndex {
+    None,
+    Some { index: varuint },
+}
+
+variant OptionalRouteId {
+    None,
+    Some { id : RouteId },
+}
+
+struct RouteInfo {
+    id: RouteId,
+    size: varuint,
+    maxSize: varuint,
+    activePoint: OptionalIndex,
+    isClosed: bool,
+    isInverted: bool,
+    isEditing: bool,
+}
+
+struct AllRoutesInfo {
+    info: &[RouteInfo; 10],
+    activeRoute: OptionalRouteId,
+}
+
+struct DeviceState {
+    isArmed : bool,
+    battery: u8,
+}
+
+struct GpsRawInt {
+    time_usec: u64,
+    fix_type: u8,
+    lat: i32,
+    lon: i32,
+    alt: i32,
+    eph: u16,
+    epv: u16,
+    vel: u16,
+    cog: u16,
+    satellites_visible: u8,
+}
+
+component {
+    variables {
+        latLon: LatLon,
+        orientation: Orientation,
+        altitude: f64,
+        relativeAltitude: OptionalF64,
+        velocity: Vec3,
+        gpsState: GpsState,
+        gpsRawInt: GpsRawInt,
+        deviceState: DeviceState,
+    }
+
+    statuses {
+        [all, 0, true]: {latLon, orientation, altitude, relativeAltitude, velocity},
+        [gpsState, 0, true]: {gpsState.fixType, gpsState.satellitesVisible, gpsState.satellitesUsed},
+        [gpsAll, 0, true]: {gpsState},
+        [gpsRawInt, 0, false]: {gpsRawInt}
+        [state, 0, true]: {deviceState},
+    }
+
+    commands {
+        fn beginRoute(routeId: RouteId, size: varuint)
+        fn clearRoute(routeId: RouteId)
+        fn setRoutePoint(routeId: RouteId, pointIndex: PointId, waypoint: Waypoint)
+        fn endRoute(routeId: RouteId)
+        fn setActiveRoute(routeId: OptionalRouteId)
+        fn setRouteActivePoint(routeId: RouteId, pointIndex: OptionalIndex)
+        fn setRouteInverted(routeId: RouteId, isInverted: bool)
+        fn setRouteClosed(routeId: RouteId, isClosed: bool)
+        fn getRouteInfo(routeId: RouteId) -> RouteInfo
+        fn getRoutePoint(routeId: RouteId, pointIndex: PointId) -> Waypoint
+        fn getRoutesInfo() -> AllRoutesInfo
+    }
+
+    impl {
+        fn init()
+        fn tick()
+    }
+}

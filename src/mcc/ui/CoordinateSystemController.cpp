@@ -38,6 +38,7 @@ static const ProjDef _projDefs[3] = {
     {"EPSG:3857 - Сферический меркатор", "Сф. меркатор", "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"},
 };
 
+/*
 static std::string createLocalSystemDef(mccgeo::Position origin, double clockwiseRotationDegrees)
 {
     std::stringstream result;
@@ -53,6 +54,7 @@ static std::string createLocalSystemDef(mccgeo::Position origin, double clockwis
     result << " +gamma=0 +units=m +no_defs";
     return result.str();
 }
+*/
 
 CoordinateSystemController::CoordinateSystemController(Settings* settings)
     : _currentSystem(0)

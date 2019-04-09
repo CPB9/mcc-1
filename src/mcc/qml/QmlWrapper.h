@@ -6,7 +6,6 @@
 #include <QUuid>
 #include <bmcl/StringView.h>
 #include "mcc/msg/FwdExt.h"
-#include "mcc/msg/Nav.h"
 #include "mcc/msg/ParamList.h"
 #include "mcc/msg/NetVariant.h"
 #include "mcc/uav/PointOfInterest.h"
@@ -94,9 +93,6 @@ signals:
 private slots:
     void onDeviceFileUploaded(const QString& device, const QString& filePath);
     void onDeviceFileUploadFailed(const QString& device, const QString& filePath, const QString& reason);
-    void onTraitNavigationMotion(const mccmsg::Motion& m);
-//     void onTmParamList(const mccmsg::TmParamListPtr& paramsList);
-//     void onTmParamList2(const mccmsg::TmParamListPtr& paramsList);
 private:
     bmcl::Option<mccuav::Uav*> _device;
     bmcl::SystemTime _startupTime;

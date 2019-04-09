@@ -60,6 +60,7 @@ class TmViewUpdatePhoton : public mccmsg::ITmViewUpdate
 public:
     TmViewUpdatePhoton(const mccmsg::Device& device);
     ~TmViewUpdatePhoton() override;
+    using mccmsg::ITmViewUpdate::visit;
     virtual void visit(ITmUpdateVisitor&) const = 0;
 private:
 };
@@ -69,6 +70,9 @@ class TmUpdateSES : public TmViewUpdatePhoton
 public:
     TmUpdateSES(const mccmsg::Device& device, const bmcl::Rc<photon::NodeViewUpdater>& statusUpdate, const bmcl::Rc<photon::NodeViewUpdater>& eventUpdate, const bmcl::Rc<photon::NodeViewUpdater>& statsUpdate);
     ~TmUpdateSES() override;
+
+    using TmViewUpdatePhoton::visit;
+
     void visit(ITmUpdateVisitor&) const override;
     const bmcl::Rc<photon::NodeViewUpdater>& statusUpdate() const;
     const bmcl::Rc<photon::NodeViewUpdater>& eventUpdate() const;
@@ -84,6 +88,9 @@ class TmUpdateSub : public TmViewUpdatePhoton
 public:
     TmUpdateSub(const mccmsg::Device& device, ::photon::NumberedSub sub, const bmcl::SharedBytes& value);
     ~TmUpdateSub() override;
+
+    using TmViewUpdatePhoton::visit;
+
     void visit(ITmUpdateVisitor&) const override;
     ::photon::NumberedSub sub() const;
     const bmcl::SharedBytes& value() const;

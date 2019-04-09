@@ -41,6 +41,7 @@ PointOfInterest::PointOfInterest()
     , _updatePending(false)
     , _isEnabled(true)
     , _isMoving(false)
+    , _baseColor(Qt::white)
 {
     connect(this, &PointOfInterest::uploadToUav, this, [this]() {_updatePending = true; emit pixmapChanged(); });
 }
@@ -48,6 +49,7 @@ PointOfInterest::PointOfInterest()
 void PointOfInterest::setIcon(int icon)
 {
     Type iconType = static_cast<Type>(icon);
+    _icon = icon;
     _kind = iconType;
     QString iconPath;
     switch (iconType)
@@ -84,6 +86,7 @@ void PointOfInterest::setIcon(int icon)
     else
         _inactivePixmap = QApplication::style()->standardPixmap(QStyle::SP_TrashIcon);
 
+    _inactivePixmap = mccui::GraphicsEffectCreator::applyColorEffect(_inactivePixmap, _baseColor, 0.9f);
     createPixmaps();
     emit pixmapChanged();
 }
@@ -135,6 +138,12 @@ void PointOfInterest::createPixmaps()
 {
     _activePixmap = mccui::GraphicsEffectCreator::applyColorEffect(_inactivePixmap, Qt::yellow, 0.8f);
     _grayPixmap = mccui::GraphicsEffectCreator::applyColorEffect(_inactivePixmap, Qt::gray);
+}
+
+void PointOfInterest::setBaseColor(const QColor& color)
+{
+    _baseColor = color;
+    setIcon(_icon);
 }
 
 const QString& PointOfInterest::info() const
@@ -191,12 +200,14 @@ void PointOfInterest::setLatitude(double lat)
 {
     latLon().setLatitude(lat);
     emit latitudeChanged();
+    emit latLonChanged();
 }
 
 void PointOfInterest::setLongitude(double lon)
 {
     latLon().setLongitude(lon);
     emit longitudeChanged();
+    emit latLonChanged();
 }
 
 void PointOfInterest::setAltitude(double alt)

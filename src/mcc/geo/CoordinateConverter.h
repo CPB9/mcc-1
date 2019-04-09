@@ -3,7 +3,6 @@
 #include "mcc/geo/Config.h"
 
 #include <bmcl/Fwd.h>
-#include <bmcl/StringView.h>
 #include <bmcl/ThreadSafeRefCountable.h>
 #include <bmcl/Utils.h>
 

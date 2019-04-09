@@ -190,7 +190,7 @@ void RoutesListWidget::setRoute(mccuav::Route* route, mccuav::Uav* uav)
 void RoutesListWidget::updateButtons(mccuav::Route* route)
 {
     bool editMode = _routesController->isEditing();
-    bool isEditEnabled = (route != nullptr);
+//    bool isEditEnabled = (route != nullptr);
     bool isClearEnabled = editMode && (route != nullptr) && (route->buffer()->waypointsCount() > 0);
 
     bool canSave = false;
@@ -289,7 +289,7 @@ void RoutesListWidget::contextMenuRequested(const QPoint& pos)
         addMenuAction(&menu, "Экспорт маршрута в KML...", [this, route]() { exportToKml(route.unwrap()); });
         menu.addSeparator();
     }
-    else 
+    else
     {
         if (uav->activeRoute() != nullptr)
         {
@@ -520,7 +520,7 @@ RoutePropertiesWidget::RoutePropertiesWidget(QWidget* parent, mccuav::RoutesCont
     layout->addStretch();
 
     connect(routesController, &mccuav::RoutesController::selectedRouteChanged, this, [this](mccuav::Route* r, mccuav::Uav*) { setRoute(r); });
-    
+
     connect(routesController, &mccuav::RoutesController::routeEditingChanged, this,
             [this, routesController](bool isEditing)
             {
@@ -679,7 +679,7 @@ WaypointsEditorWidget::WaypointsEditorWidget(QWidget* parent, const mccmap::MapR
                     setRoute(routesController->selectedRoute());
             }
     );
-    
+
     connect(_addButton,         &QPushButton::pressed, this, &WaypointsEditorWidget::addButtonPressed);
     connect(_moveUpButton,      &QPushButton::pressed, this, &WaypointsEditorWidget::moveUpButtonPressed);
     connect(_moveDownButton,    &QPushButton::pressed, this, &WaypointsEditorWidget::moveDownButtonPressed);
@@ -722,7 +722,7 @@ void WaypointsEditorWidget::contextMenuRequested(const QPoint& pos)
 {
     if (!_uavController->selectedUav() || _model->rowCount() == 0)
         return;
-    auto uav = _uavController->selectedUav();
+//    auto uav = _uavController->selectedUav();
     bool editMode = _routesController->isEditing();
     auto currentIndex = _waypointsTable->indexAt(pos);
     auto column = (MissionPlanModel::Columns)currentIndex.column();

@@ -42,7 +42,7 @@ private:
 };
 using ITmExtensionPtr = bmcl::Rc<ITmExtension>;
 
-
+class SubHolder;
 class MCC_MSG_DECLSPEC ITmSimpleExtension : public ITmExtension
 {
 public:
@@ -54,7 +54,7 @@ public:
     const bmcl::SystemTime& updated() const;
     const bmcl::SystemTime& changed() const;
     void updated(bmcl::SystemTime);
-    HandlerId addHandler(Handler&&, bool onChangeOnly);
+    SubHolder addHandler(Handler&&, bool onChangeOnly);
 protected:
     void updated_(bmcl::SystemTime, bool changed);
 
@@ -72,5 +72,7 @@ private:
     Items _updateHandler;
     Items _changeHandler;
 };
+
+
 
 }

@@ -33,13 +33,8 @@ static std::int64_t decompose(double inputDeg, double* outputMin)
 static std::string doubleToString(double value, const char* postfix = "")
 {
     std::ostringstream rv;
-    double intpart;
-    //if (std::modf(value, &intpart) >= 0.01) {
-        rv << std::setw(2) << std::setprecision(2) << std::fixed;
-        rv << value;
-    //} else {
-    //    rv << (std::int64_t)intpart;
-    //}
+    rv << std::setw(2) << std::setprecision(2) << std::fixed;
+    rv << value;
     rv << postfix;
     return rv.str();
 }

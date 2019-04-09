@@ -1,7 +1,6 @@
 #pragma once
-
 #include "mcc/msg/FwdExt.h"
-#include "mcc/msg/Nav.h"
+#include "mcc/msg/SubHolder.h"
 #include "mcc/msg/obj/Device.h"
 #include "mcc/geo/EnuPositionHandler.h"
 #include "mcc/plugin/PluginData.h"
@@ -47,7 +46,7 @@ public:
 public slots:
     void handleGroupState(const mccmsg::TmGroupStatePtr& state);
     void handleUavState(mccuav::Uav* uav);
-    void handleNavigationMotion(const mccmsg::TmMotionPtr& motion);
+    void handleUavStorage(mccuav::Uav* uav);
 
 signals:
     void groupAdded(const mccmsg::Group& groupId);
@@ -58,12 +57,14 @@ signals:
     void groupGeometryChanged(const mccmsg::Group& groupId);
 
 private:
+    void handleUavPosition(const mccmsg::Device& device, const mccmsg::TmPosition* pos);
     void removeEmptyGroups();
 
     std::vector<Group*>         _groups;
     mccgeo::EnuPositionHandler _enuConverter;
     Rc<mccuav::UavController> _uavController;
     Rc<mccuav::ExchangeService> _exchangeService;
+    std::map<mccmsg::Device, mccmsg::SubHolder> _posHandlers;
 
     Q_DISABLE_COPY(GroupsController)
 };

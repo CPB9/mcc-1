@@ -8,7 +8,7 @@ namespace mccnet {
 class ChannelInvalid : public ChannelImpl
 {
 public:
-    ChannelInvalid(asio::io_service& io_service, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings);
+    ChannelInvalid(asio::io_context& io_context, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings);
 protected:
     bool is_open_() const override;
     void connect_(OpCompletion&& f) override;

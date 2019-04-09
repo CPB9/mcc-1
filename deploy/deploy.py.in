@@ -68,7 +68,10 @@ if platform.system() == 'Windows':
         sys.exit(-1)
     qt_prefix = out.decode().strip()
     modules = ['Qt5Core', 'Qt5Gui', 'Qt5Network', 'Qt5OpenGL', 'Qt5Positioning', 'Qt5PrintSupport',
-               'Qt5Qml', 'Qt5Quick', 'Qt5QuickControls2', 'Qt5SerialPort', 'Qt5Svg', 'Qt5Widgets', 'Qt5Xml', 'Qt5MultimediaQuick']
+               'Qt5Qml', 'Qt5Quick', 'Qt5QuickControls2', 'Qt5SerialPort', 'Qt5Svg', 'Qt5Widgets',
+               'Qt5Xml', 'Qt5Multimedia', 'Qt5TextToSpeech', 'Qt5MultimediaQuick']
+    audio = ['qtaudio_wasapi', 'qtaudio_windows']
+    texttospeech = ['qtexttospeech_sapi']
     imageformats = ['qjpeg', 'qsvg', 'qico']
     platforms = ['qwindows']
     printsupport = ['windowsprintersupport']
@@ -114,6 +117,8 @@ if platform.system() == 'Windows':
     deploy_qt_files('plugins', 'printsupport', printsupport)
     deploy_qt_files('plugins', 'styles', styles)
     deploy_qt_files('plugins', 'mediaservice', mediaservices)
+    deploy_qt_files('plugins', 'audio', audio)
+    deploy_qt_files('plugins', 'texttospeech', texttospeech)
     deploy_qt_files('', 'translations', translations, ext='_ru.qm')
     deploy_qml_plugins(qml_modules)
 

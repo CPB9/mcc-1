@@ -26,7 +26,7 @@ public:
     const char* name() const override;
 
 private:
-    void on_exit();
+    void on_exit() override;
 
     void applyFirmware();
     void removeFirmware();

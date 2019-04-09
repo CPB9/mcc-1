@@ -54,7 +54,6 @@ CREATE TABLE device
     device_ui_id    integer,
     device_pixmap   blob,
     reg_first       boolean DEFAULT 0,
-    show_on_map     boolean DEFAULT 1,
     log             boolean DEFAULT 0,
 
     UNIQUE(protocol_id, protocol_value),

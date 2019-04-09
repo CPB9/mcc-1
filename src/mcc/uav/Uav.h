@@ -23,6 +23,8 @@
 #include "mcc/msg/ptr/Fwd.h"
 #include "mcc/msg/Route.h"
 
+#include "mcc/geo/Attitude.h"
+
 #include <bmcl/OptionPtr.h>
 
 namespace mccuav {
@@ -75,10 +77,7 @@ public:
     Route*            selectedRoute();
     void              setSelectedRoute(int routeId);
     void              selectRoute(Route* route);
-    double            speed()         const;
-    double            targetHeading() const;
     bmcl::Option<std::size_t>   nextWaypoint()  const;
-    double            accuracy()      const;
     void              setSourcePixmapFile(bmcl::Bytes pixmap);
     void              setColor(const QColor& color, double scale);
     void              setColor(const QColor& color);
@@ -141,11 +140,9 @@ public:
     void clearUserParams();
 
     double distanceToWaypoint(const mccmsg::Waypoint& wp, double* direction = nullptr);
-    const bmcl::Option<mccmsg::Motion>& motion() const;
     mccuav::MotionExtension* motionExtension();
 
     QString getDeviceDescriptionText() const;
-    QString getRelativeAltitude() const;
 
     bool hasFeature(UavFeatures feature) const;
 
@@ -161,18 +158,18 @@ public:
     const bmcl::Rc<mccmsg::ITmStorage>& tmStorage() const;
 
     bool isRegistered() const;
-
+    const bmcl::Option<const mccgeo::Position&> position() const;
+    const bmcl::Option<const mccgeo::Attitude&> attitude() const;
+    const bmcl::Option<double> speed() const;
+    const bmcl::Option<const mccgeo::Position&> velocity() const;
 signals:
-    void motionChanged(const mccmsg::Motion& motion);
     void activatedChanged();
     void groupIdChanged();
     void motionLimitsChanged();
     void trackSettingsChanged();
     void clearTrackRequest();
 
-    void accuracyChanged     (double accuracy);
     void pixmapChanged       (const QPixmap& pixmap);
-    void speedChanged        (double airSpeed);
     void nextWaypointChanged (int index);
     void targetHeadingChanged(double heading);
 
@@ -202,8 +199,10 @@ signals:
     void tmStorageUpdated();
     void tmViewUpdated(const bmcl::Rc<const mccmsg::ITmViewUpdate>& update);
     void showAlert(const QString& message = QString());
+
+    void positionChanged();
+    void orientationChanged();
 public slots:
-    void processNavigationMotion(const mccmsg::TmMotionPtr& motion);
     void processRouteState(const mccmsg::TmRoutePtr& route);
     void processRoutesList(const mccmsg::TmRoutesListPtr& routesList);
     void processActivated(bool activated);
@@ -245,8 +244,6 @@ protected:
     UavMotionLimits     _motionLimits;
     double              _targetHeading;
 
-    bmcl::SystemTime _lastMotionUpdate;
-    bmcl::Option<mccmsg::Motion> _lastMotion;
     mccuav::MotionExtension* _motionExtension;
 
     TrackSettings       _trackSettings;

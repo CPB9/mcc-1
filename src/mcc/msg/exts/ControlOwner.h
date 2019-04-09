@@ -15,7 +15,7 @@ public:
     ~TmControlOwner() override;
     static const TmExtension& id();
     static const char* info();
-    bmcl::Option<ControlOwner> owner() const;
+    const bmcl::Option<ControlOwner>& owner() const;
     void set(bmcl::SystemTime t, const bmcl::Option<ControlOwner>& speed);
 private:
     bmcl::Option<ControlOwner> _owner;

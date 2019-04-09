@@ -265,18 +265,6 @@ void AbstractPropertiesWidget::replaceInfoWidget(QWidget* oldWidget, QWidget* ne
     replaceWidgetInGrid(infoLayout(), oldWidget, newWidget);
 }
 
-void AbstractPropertiesWidget::setFieldValue(QLabel* label, const std::string& text, const QColor& color)
-{
-    bool hasValue = !text.empty();
-    if (hasValue)
-    {
-        setClickableLabelText(label, QString::fromStdString(text));
-        setWidgetColor(label, color);
-    }
-
-    setWidgetVisible(label, hasValue);
-}
-
 void AbstractPropertiesWidget::setFieldValue(QLabel* label, const QString& text, const QColor& color)
 {
     bool hasValue = !text.isEmpty();
@@ -310,7 +298,7 @@ void AbstractPropertiesWidget::setFieldValue(QLabel* label, const QString& text,
         l->setVisible(hasValue);
     }
 
-    adjustSize();
+    //adjustSize();
 }
 
 void AbstractPropertiesWidget::setWidgetVisible(QWidget* widget, bool visible)

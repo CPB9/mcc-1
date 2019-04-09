@@ -19,34 +19,6 @@ EmptyModel::EmptyModel(VasnecovUniverse *universe, VasnecovWorld *world) :
         BMCL_WARNING() << "Empty World!";
 }
 
-float EmptyModel::angleToRange360(float deg)
-{
-    if(deg > 0.0f)
-        deg = std::fmod(deg, 360.0f);
-    if(deg < 0.0f)
-        deg = std::fmod(deg, 360.0f) + 360.0f;
-    return deg;
-}
-
-float EmptyModel::angleToRange180(float deg)
-{
-    deg = angleToRange360(deg);
-    if((360 - deg) < 180) // (-180; 180]
-        deg = deg - 360;
-
-    return deg;
-}
-
-float EmptyModel::angleToRange90(float deg)
-{
-    deg = angleToRange180(deg);
-    if(deg < 0.0f)
-        deg = 0.0f;
-    if(deg > 90.0f)
-        deg = 90.0f;
-    return deg;
-}
-
 void EmptyModel::setVisible(bool visible)
 {
     if(_visible != visible)

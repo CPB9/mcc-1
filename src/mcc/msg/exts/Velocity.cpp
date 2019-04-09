@@ -7,8 +7,8 @@ TmVelocity::TmVelocity(const TmExtensionCounterPtr& counter) : ITmSimpleExtensio
 TmVelocity::~TmVelocity() {}
 const TmExtension& TmVelocity::id() { static auto i = TmExtension::createOrNil("{26bc2979-fd81-4dae-a14e-10e07347c0de}"); return i; }
 const char* TmVelocity::info() { return "velocity"; }
-bmcl::Option<mccgeo::Position> TmVelocity::velocity() const { return _velocity; }
-bmcl::Option<double> TmVelocity::speed() const { return _speed; }
+const bmcl::Option<mccgeo::Position>& TmVelocity::velocity() const { return _velocity; }
+const bmcl::Option<double>& TmVelocity::speed() const { return _speed; }
 void TmVelocity::set(bmcl::SystemTime t, const bmcl::Option<mccgeo::Position>& v)
 {
     bool changed = (_velocity != v);

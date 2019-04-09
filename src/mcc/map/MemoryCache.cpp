@@ -265,7 +265,6 @@ std::vector<TilePosition> MemoryCache::reloadCache()
 void MemoryCache::loadRow(int row, std::vector<TilePosition>* queue)
 {
     int y = absOffset(_globalOffsetY + row);
-    auto& cont = _cache[row];
     for (int i = 0; i < (int)_cache[0].size(); i++) {
         int x = absOffset(_globalOffsetX + i);
         queue->emplace_back(_zoomLevel, x, y);

@@ -1,6 +1,7 @@
 #include <ctime>
 #include <fmt/format.h>
 #include <bmcl/Result.h>
+#include <bmcl/OptionSize.h>
 #include "mcc/msg/obj/TmSession.h"
 
 namespace mccmsg {
@@ -86,7 +87,7 @@ bmcl::Option<CfgName> nameToUuid(bmcl::StringView text)
     auto _3 = text.findFirstOf(".", _2.unwrap()+1);
 
     bmcl::StringView str1 = text.sliceTo(_1.unwrap());//kind
-    bmcl::StringView str2 = text.slice(_1.unwrap()+1, _2.unwrap());//time
+    text.slice(_1.unwrap()+1, _2.unwrap());//time
     bmcl::StringView str3 = text.slice(_2.unwrap()+1, _3.unwrapOr(text.size()));//uuid
     bmcl::StringView str4;
     if (_3.isSome())
@@ -100,7 +101,7 @@ bmcl::Option<CfgName> nameToUuid(bmcl::StringView text)
 }
 
 std::string TmSessionDescriptionObj::genTmSessionFile(const mccmsg::TmSession& session)
-{ 
+{
     return uuidToName("session", session);
 }
 

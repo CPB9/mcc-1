@@ -88,7 +88,7 @@ bmcl::Result<bool, std::string> Device::updateSettings(ObjectId device_id, const
 
     _updateSettings.reset();
     print(binds(&_updateSettings, ":device_id", device_id));
-    print(binds(&_updateSettings, ":settings", settings, sqlite3pp::nocopy));
+    print(binds(&_updateSettings, ":settings", bmcl::StringView(settings), sqlite3pp::nocopy));
     SqlErrorX e = print(exec(&_updateSettings));
     if (e.isSome()) return e.take();
     return true;
@@ -101,7 +101,7 @@ bmcl::Result<bool, std::string> Device::updateInfo(ObjectId device_id, const mcc
 
     _updateInfo.reset();
     print(binds(&_updateInfo, ":device_id", device_id));
-    print(binds(&_updateInfo, ":info", info, sqlite3pp::nocopy));
+    print(binds(&_updateInfo, ":info", bmcl::StringView(info), sqlite3pp::nocopy));
     SqlErrorX e = print(exec(&_updateInfo));
     if (e.isSome()) return e.take();
     return true;
@@ -116,19 +116,6 @@ bmcl::Result<bool, std::string> Device::updateReg(ObjectId device_id, const mccm
     print(binds(&_updateReg, ":device_id", device_id));
     print(binds(&_updateReg, ":reg_first", reg));
     SqlErrorX e = print(exec(&_updateReg));
-    if (e.isSome()) return e.take();
-    return true;
-}
-
-bmcl::Result<bool, std::string> Device::updateShow(ObjectId device_id, const mccmsg::DeviceDescription& old, const bool& show_on_map)
-{
-    if (old->showOnMap() == show_on_map)
-        return false;
-
-    _updateShow.reset();
-    print(binds(&_updateShow, ":device_id", device_id));
-    print(binds(&_updateShow, ":show_on_map", show_on_map));
-    SqlErrorX e = print(exec(&_updateShow));
     if (e.isSome()) return e.take();
     return true;
 }
@@ -166,9 +153,8 @@ caf::result<mccmsg::device::Update_ResponsePtr> Device::execute(const mccmsg::de
         case mccmsg::Field::Firmware: res = updateFirmware(device_id, old, d->firmware()); break;
         case mccmsg::Field::Info: res = updateInfo(device_id, old, d->info()); break;
         case mccmsg::Field::Ui: res = updateUi(device_id, old, d->ui()); break;
-        case mccmsg::Field::Kind: res = updatePixmap(device_id, old, d->pixmap()); break;
+        case mccmsg::Field::Pixmap: res = updatePixmap(device_id, old, d->pixmap()); break;
         case mccmsg::Field::RegFirst: res = updateReg(device_id, old, d->registerFirst()); break;
-        case mccmsg::Field::ShowOnMap: res = updateShow(device_id, old, d->showOnMap()); break;
         case mccmsg::Field::Settings: res = updateSettings(device_id, old, d->settings()); break;
         case mccmsg::Field::Log: res = updateLog(device_id, old, d->log()); break;
         default:
@@ -194,7 +180,7 @@ caf::result<mccmsg::device::Update_ResponsePtr> Device::execute(const mccmsg::de
 }
 
 Device::Device(DbObjInternal* db)
-    : QueryObject(db, "device", "settings, protocol_id, protocol_value, reg_first, show_on_map, device_pixmap, log, device_ui_id, firmware_id"
+    : QueryObject(db, "device", "settings, protocol_id, protocol_value, reg_first, device_pixmap, log, device_ui_id, firmware_id"
                 , std::bind(&Device::get, this, std::placeholders::_1)
                 , std::bind(&Device::insert, this, std::placeholders::_1, std::placeholders::_2))
     , _queryChannels(db->db())
@@ -206,7 +192,6 @@ Device::Device(DbObjInternal* db)
     , _updateInfo(db->db())
     , _updateFirmware(db->db())
     , _updateReg(db->db())
-    , _updateShow(db->db())
     , _updateLog(db->db())
     , _deleteFromChannel(db->db())
     , _deleteFromDevice(db->db())
@@ -220,7 +205,6 @@ Device::Device(DbObjInternal* db)
     sql_prepare(_updateSettings, "update device set settings=:settings where id=:device_id;");
     sql_prepare(_updateInfo, "update device set info=:info where id=:device_id;");
     sql_prepare(_updateReg, "update device set reg_first=:reg_first where id=:device_id;");
-    sql_prepare(_updateShow, "update device set show_on_map=:show_on_map where id=:device_id;");
     sql_prepare(_updateLog, "update device set log=:log where id=:device_id;");
     sql_prepare(_deleteFromChannel, "delete from device_channel where device_id = :device_id;");
     sql_prepare(_deleteFromDevice, "delete from device where id=:device_id;");
@@ -302,14 +286,13 @@ bmcl::Option<mccmsg::DeviceDescription> Device::get(const sqlite3pp::selecter::r
     mccmsg::DeviceId protocol_value = r.get<int64_t>("protocol_value");
 
     bool device_reg = r.get<bool>("reg_first");
-    bool device_map = r.get<bool>("show_on_map");
     bool log = r.get<bool>("log");
     bmcl::SharedBytes pixmap = bmcl::SharedBytes::create(r.get<bmcl::Bytes>("device_pixmap"));
     bmcl::Option<mccmsg::DeviceUi> deviceUi = _db->deviceUi().getName(r.get<int64_t>("device_ui_id"));
     bmcl::Option<mccmsg::Firmware> firmware = _db->firmware().getName(r.get<int64_t>("firmware_id"));
     bmcl::Option<mccmsg::Protocol> protocol = _db->protocol().getName(r.get<int64_t>("protocol_id"));
     mccmsg::ProtocolId protocolId(device_name, protocol.unwrapOr(mccmsg::Protocol()), protocol_value);
-    return bmcl::makeRc<const mccmsg::DeviceDescriptionObj>(device_name, device_info, device_settings, protocolId, deviceUi, pixmap, firmware, device_reg, device_map, log);
+    return bmcl::makeRc<const mccmsg::DeviceDescriptionObj>(device_name, device_info, device_settings, protocolId, deviceUi, pixmap, firmware, device_reg, log);
 }
 
 bmcl::Result<mccmsg::Device, caf::error> Device::insert(const mccmsg::DeviceDescription& d, ObjectId& id)
@@ -321,8 +304,8 @@ bmcl::Result<mccmsg::Device, caf::error> Device::insert(const mccmsg::DeviceDesc
     mccmsg::Device name = mccmsg::Device::generate();
 
     _queryReg.reset();
-    print(binds(&_queryReg, ":name", name.toStdString(), sqlite3pp::copy));
-    print(binds(&_queryReg, ":info", d->info(), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":name", name.toStringRepr().view(), sqlite3pp::copy));
+    print(binds(&_queryReg, ":info", bmcl::StringView(d->info()), sqlite3pp::nocopy));
     print(binds(&_queryReg, ":protocol_id", protocol.unwrap()));
     print(binds(&_queryReg, ":protocol_value", (int64_t)d->protocolId().id()));
     print(binds(&_queryReg, ":device_pixmap", d->pixmap().view(), sqlite3pp::nocopy));

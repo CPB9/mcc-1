@@ -1,0 +1,48 @@
+module fwt
+
+import core::{Error, Reader, Writer}
+import exc::{DataHeader}
+
+enum State {
+    Idle = 0,
+    Transfering = 1,
+}
+
+enum CmdType {
+    RequestHash = 0,
+    RequestChunk = 1,
+    Start = 2,
+    Stop = 3,
+}
+
+enum AnswerType {
+    Hash = 0
+    Chunk = 1,
+    Start = 2,
+}
+
+struct Chunk {
+    current: *const u8,
+    end: *const u8,
+    isTransfering: bool,
+}
+
+component {
+    variables {
+        firmware: Chunk,
+        hashRequested: bool,
+        chunk: Chunk,
+        startId: varuint,
+        startRequested: bool,
+    }
+
+    impl {
+        fn init()
+        fn tick()
+        fn acceptCmd(header: *const DataHeader, src: *mut Reader, dest: *mut Writer) -> Error
+        fn genAnswer(dest: *mut Writer) -> Error
+        fn hasAnswers() -> bool
+        fn getFirmwareData() -> *const u8
+        fn getFirmwareSize() -> usize
+    }
+}

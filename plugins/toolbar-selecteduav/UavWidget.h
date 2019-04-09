@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include "mcc/msg/Fwd.h"
+#include "mcc/msg/SubHolder.h"
 #include "mcc/msg/exts/ITmExtension.h"
 #include "mcc/uav/Fwd.h"
 #include "mcc/ui/Fwd.h"
@@ -32,7 +33,7 @@ public:
                        QWidget* parent = nullptr);
     ~UavWidget() override;
 
-    mccuav::Uav* currentVehicle() const {return _currentUav;}
+    mccuav::Uav* currentUav() const {return _currentUav;}
 
     bool isSeparatedMode() const { return _separatedMode; }
     void setSeparatedMode(bool isSeparatedMode);
@@ -42,7 +43,7 @@ public:
 
 public slots:
     void updateCurrentUav(mccuav::Uav* uav);
-    void updateVehicleActivation();
+    void updateUavActivation();
 
     void updatePixmap();
     void updateName();
@@ -74,7 +75,7 @@ private:
     mccui::Rc<mccuav::UavController>        _uavController;
     mccui::Rc<mccuav::GlobalActions>        _actions;
     mccuav::Uav*                            _currentUav;
-    bmcl::Option<mccmsg::HandlerId>         _handlerState;
+    bmcl::Option<mccmsg::SubHolder>         _handlerState;
 
     UavNameWidget*                          _nameWidget;
     UavModeWidget*                          _modeWidget;

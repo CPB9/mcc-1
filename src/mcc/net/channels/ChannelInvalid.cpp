@@ -1,5 +1,5 @@
 #include <caf/error.hpp>
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 #include "mcc/msg/obj/Channel.h"
 #include "mcc/net/Error.h"
 #include "mcc/net/channels/ChannelInvalid.h"
@@ -7,8 +7,8 @@
 
 namespace mccnet {
 
-ChannelInvalid::ChannelInvalid(asio::io_service& io_service, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings)
-    : ChannelImpl(io_service, id, std::move(exch), settings)
+ChannelInvalid::ChannelInvalid(asio::io_context& io_context, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings)
+    : ChannelImpl(io_context, id, std::move(exch), settings)
 {
 }
 

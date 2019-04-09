@@ -44,9 +44,9 @@ caf::result<mccmsg::radar::Update_ResponsePtr> Radar::execute(const mccmsg::rada
 {
     const mccmsg::RadarDescription& dscr = request.data().dscr();
     _update.reset();
-    print(binds(&_update, ":name", dscr->name().toStdString(), sqlite3pp::copy));
-    print(binds(&_update, ":info", dscr->info().c_str(), sqlite3pp::nocopy));
-    print(binds(&_update, ":settings", dscr->settings().c_str(), sqlite3pp::nocopy));
+    print(binds(&_update, ":name", dscr->name().toStringRepr().view(), sqlite3pp::copy));
+    print(binds(&_update, ":info", bmcl::StringView(dscr->info()), sqlite3pp::nocopy));
+    print(binds(&_update, ":settings", bmcl::StringView(dscr->settings()), sqlite3pp::nocopy));
     auto r = print(exec(&_update));
     if (r.isSome())
         return mccmsg::make_error(mccmsg::Error::CantRegister, r.take());
@@ -95,9 +95,9 @@ bmcl::Result<mccmsg::Radar, caf::error> Radar::insert(const mccmsg::RadarDescrip
     mccmsg::Radar name = mccmsg::Radar::generate();
 
     _queryReg.reset();
-    print(binds(&_queryReg, ":name", name.toStdString(), sqlite3pp::copy));
-    print(binds(&_queryReg, ":info", d->info(), sqlite3pp::nocopy));
-    print(binds(&_queryReg, ":settings", d->settings().c_str(), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":name", name.toStringRepr().view(), sqlite3pp::copy));
+    print(binds(&_queryReg, ":info", bmcl::StringView(d->info()), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":settings", bmcl::StringView(d->settings()), sqlite3pp::nocopy));
 
     auto r = _queryReg.insert();
     if (r.isErr())

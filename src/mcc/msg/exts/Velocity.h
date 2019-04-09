@@ -14,8 +14,8 @@ public:
     ~TmVelocity() override;
     static const TmExtension& id();
     static const char* info();
-    bmcl::Option<mccgeo::Position>  velocity() const;
-    bmcl::Option<double>            speed() const;
+    const bmcl::Option<mccgeo::Position>& velocity() const;
+    const bmcl::Option<double>& speed() const;
     void set(bmcl::SystemTime t, const bmcl::Option<double>& speed);
     void set(bmcl::SystemTime t, const bmcl::Option<mccgeo::Position>& velocity);
 private:

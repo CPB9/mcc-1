@@ -1,0 +1,2 @@
+#include "libVasnecov/VasnecovProduct.h"
+#include "libVasnecov/Version.h"

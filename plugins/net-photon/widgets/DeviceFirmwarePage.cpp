@@ -9,7 +9,6 @@
 #include "mcc/msg/Cmd.h"
 #include "mcc/msg/TmView.h"
 
-#include <bmcl/PtrUtils.h>
 #include <bmcl/SharedBytes.h>
 
 #include <photon/groundcontrol/ProjectUpdate.h>

@@ -38,7 +38,6 @@ private:
     bmcl::Result<bool, std::string> updateSettings(ObjectId device_id, const mccmsg::DeviceDescription&, const std::string& settings);
     bmcl::Result<bool, std::string> updateInfo(ObjectId device_id, const mccmsg::DeviceDescription&, const std::string& info);
     bmcl::Result<bool, std::string> updateReg(ObjectId device_id, const mccmsg::DeviceDescription&, const bool& reg_first);
-    bmcl::Result<bool, std::string> updateShow(ObjectId device_id, const mccmsg::DeviceDescription&, const bool& show);
     bmcl::Result<bool, std::string> updateLog(ObjectId device_id, const mccmsg::DeviceDescription& old, const bool& log);
 
     sqlite3pp::statement _queryDisconnect;
@@ -51,7 +50,6 @@ private:
     sqlite3pp::statement _updateInfo;
     sqlite3pp::statement _updateFirmware;
     sqlite3pp::statement _updateReg;
-    sqlite3pp::statement _updateShow;
     sqlite3pp::statement _updateLog;
 
     sqlite3pp::statement _deleteFromChannel;

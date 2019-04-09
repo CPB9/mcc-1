@@ -51,6 +51,9 @@ private:
     Broker* _self;
 public:
     explicit NoteVisitorX(Broker* self) : _self(self) {}
+
+    using mccmsg::NoteVisitor::visit;
+
     void visit(const mccmsg::channel::Registered* msg) override
     {
         if (msg->data()._state)
@@ -88,6 +91,9 @@ public:
         : mccmsg::ReqVisitor([self](const mccmsg::Request*) { self->response(caf::sec::unexpected_message); }), _self(self)
     {
     }
+
+    using mccmsg::ReqVisitor::visit;
+
     void visit(const mccmsg::channel::Activate_Request* msg) override
     {
         _self->_conns->channelActivate(mccmsg::channel::Activate_RequestPtr(msg), _self->make_response_promise());

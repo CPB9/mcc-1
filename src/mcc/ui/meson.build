@@ -70,7 +70,7 @@ mcc_ui_lib = shared_library('mcc-ui',
   name_prefix : 'lib',
   sources : src + processed,
   include_directories : mcc_inc,
-  dependencies : [qt5_core_dep, qt5_widgets_dep, qt5_gui_dep, qt5_multimedia_dep, bmcl_dep, fmt_dep, mcc_geo_dep, mcc_plugin_dep, mcc_path_dep, mcc_res_dep] + ext_deps,
+  dependencies : [qt5_core_dep, qt5_widgets_dep, qt5_gui_dep, qt5_multimedia_dep, bmcl_dep, fmt_dep, mcc_geo_dep, mcc_hm_dep, mcc_plugin_dep, mcc_path_dep, mcc_res_dep] + ext_deps,
   cpp_args : '-DBUILDING_MCC_UI',
 )
 

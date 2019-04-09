@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from __future__ import print_function
 
@@ -8,36 +9,40 @@ import sys
 import subprocess
 
 tree = '''
-    ,__                   __
-    '~~****Nm_    _mZ*****~~
-            _8@mm@K_
-           W~@`  '@~W
-          ][][    ][][
-    gz    'W'W.  ,W`W`    es
-  ,Wf    gZ****MA****Ns    VW.
- gA`   ,Wf     ][     VW.   'Ms
-Wf    ,@`      ][      '@.    VW
-M.    W`  _mm_ ][ _mm_  'W    ,A
-'W   ][  i@@@@i][i@@@@i  ][   W`
- !b  @   !@@@@!][!@@@@!   @  d!
-  VWmP    ~**~ ][ ~**~    YmWf
-    ][         ][         ][
-  ,mW[         ][         ]Wm.
- ,A` @  ,gms.  ][  ,gms.  @ 'M.
- W`  Yi W@@@W  ][  W@@@W iP  'W
-d!   'W M@@@A  ][  M@@@A W`   !b
-@.    !b'V*f`  ][  'V*f`d!    ,@
-'Ms    VW.     ][     ,Wf    gA`
-  VW.   'Ms.   ][   ,gA`   ,Wf
-   'Ms    'V*mmWWmm*f`    gA`
-
+               ▄████▄
+             ▄███░░░██▄ ▄████▄
+            ▄██░░░░░░░░███░░░░██▄
+          ▄██░░░░░░░░░██░░░░░░░░█
+          ██░░░░░░░░░██░░░░░░░░░█
+          █░░░░░░░░░██░░░░░░░░░░█
+          █░░░░░░░░░█░░░░░░░░░░░█
+          ██░░░░░░░░█░░░░░░░░░░░█
+           █░░░░░░░██░░░░░░░░░░░█
+            █░░░░░░█░░░░░░░░░░░░█
+            ██░░░░░█░░░░░░░░░░░░█
+ █        █  ██░░░░█░░░░░░░░░░░█
+ █        █   █░░░░█░░░░░░░░░██
+  █      █    █░░░░█░░░░░░░███
+   █    █   ▄███░░░█░░░░█████
+ ▄████████▄ █▒▒██████████▒▒▒███
+ █░░░░░░░░███▒▒▒████▒▒▒███▒▒▒▒██
+█░░░█░░█░░░█▒▒▒▒▒███▒▒▒▒███▒▒▒▒█▄
+█░░░░░░░░░░█▒▒▒▒▒▒██▒▒▒▒▒██▒▒▒▒███
+█░░█░░░░█░░█▒▒▒▒▒▒██▒▒▒▒▒██▒▒▒▒█▀
+██░░████░░░█▒▒▒▒▒███▒▒▒▒███▒▒▒██
+ ██░░░░░░███▒▒▒▒████▒▒▒███▒▒▒██
+  ▀▀▀▀▀▀▀▀ ██▒▒████▒▒▒███▒▒▒██
+            ▀███████████████▀
 '''
 
 try:
     import colorama
     has_colorama = True
     colorama.init()
-    print(colorama.Fore.YELLOW + tree + colorama.Fore.RESET)
+    style = colorama.Style.NORMAL
+    if os.name == 'nt':
+        style = colorama.Style.BRIGHT
+    print(style + colorama.Fore.YELLOW + tree + colorama.Fore.RESET)
 except:
     has_colorama = False
 

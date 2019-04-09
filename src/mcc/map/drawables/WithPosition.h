@@ -3,9 +3,8 @@
 #include "mcc/map/MapRect.h"
 #include "mcc/ui/CoordinateSystemController.h"
 #include "mcc/ui/Fwd.h"
-#include "mcc/msg/Nav.h"
 #include "mcc/geo/Fwd.h"
-
+#include "mcc/geo/LatLon.h"
 #include <bmcl/Math.h>
 
 #include <QString>

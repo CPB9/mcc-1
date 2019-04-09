@@ -26,6 +26,7 @@ TextInformer::TextInformer(VasnecovUniverse* u, VasnecovWorld* w, const QSize& l
     assert(w != nullptr);
 
     _label = universe()->addLabel("Numerical label", world(), labelSize.width(), labelSize.height());
+    assert(_label != nullptr);
 }
 
 TextInformer::~TextInformer()
@@ -34,6 +35,16 @@ TextInformer::~TextInformer()
     assert(world() != nullptr);
 
     universe()->removeLabel(_label);
+}
+
+void TextInformer::hide()
+{
+    setVisible(false);
+}
+
+void TextInformer::show()
+{
+    setVisible(true);
 }
 
 void TextInformer::setVisible(bool visible)
@@ -62,6 +73,13 @@ void TextInformer::setCoordinates(const QVector3D& coordinates)
     _label->setCoordinates(coordinates);
 }
 
+void TextInformer::attachToElement(const VasnecovAbstractElement* element)
+{
+    if(_label == nullptr)
+        return;
+    _label->attachToElement(element);
+}
+
 QVector3D TextInformer::coordinates() const
 {
     if(_label == nullptr)
@@ -86,6 +104,21 @@ void TextInformer::setText(const QString& text)
     generateText();
 }
 
+void TextInformer::setOffset(const QPointF& offset)
+{
+    _label->setOffset(offset);
+}
+
+void TextInformer::setOffset(float x, float y)
+{
+    _label->setOffset(x, y);
+}
+
+QPointF TextInformer::offset() const
+{
+    return _label->offset().toPointF();
+}
+
 void TextInformer::generateText()
 {
     redrawText();
@@ -100,7 +133,7 @@ void TextInformer::drawText(bool bold, int size)
     if(_label == nullptr || _valueText.isEmpty())
         return;
 
-    QSize imgSize(64, 32);
+    QSize imgSize = _label->size().toSize();
     QImage image(imgSize.width(), imgSize.height(), QImage::Format_ARGB32_Premultiplied);
     image.fill(QColor(0, 0, 0, 0));
 
@@ -130,7 +163,7 @@ void TextInformer::drawText(bool bold, int size)
     painter.drawRoundedRect(newRect, r, r);
 
     painter.setPen(color());
-    painter.drawText(QRectF(0, 0, 64, 32), Qt::AlignHCenter | Qt::AlignVCenter, _valueText);
+    painter.drawText(QRectF(0, 0, imgSize.width(), imgSize.height()), Qt::AlignHCenter | Qt::AlignVCenter, _valueText);
 
     _label->setImage(image);
 }

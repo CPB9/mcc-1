@@ -1,0 +1,180 @@
+/// SDK module
+module usm
+
+import core::{Option}
+
+/// Application or project name
+type FileName       = &[char;32];
+/// Array of text strings with '\n' delimiters. If first byte is 0 text was compressed by z-lib
+type TextLinesList  = &[char;768];
+/// Date in Unix-time seconds
+type TimeStamp      = varint;
+
+enum LanguageCodes {
+    LanguageCpp     = 1,
+    LanguagePython  = 2,
+}
+
+enum Frames {
+    BuildStateFrame                 =    1,
+    ApplicationsInfoFrame           =    2,
+    CurrentApplicationInfoFrame     =    4,
+    ProjectInfoFrame                =    8,
+    SystemInfoFrame                 =   16,
+
+    BuildLogOutputFrame             =   32,
+    BuildLogErrorsFrame             =   64,
+    CurrentApplicationOutputFrame   =  128,
+    CurrentApplicationStatusFrame   =  256,
+    AppRemovingFrame                =  512,
+}
+
+enum State {
+    Empty       = 0,
+    Proccessing = 1,
+    Executed    = 2,
+    NotExecuted = 4,
+}
+
+struct BuildState {
+    file            : FileName
+    language        : LanguageCodes,
+    uploadState     : State,
+    unpackState     : State,
+    buildState      : State,
+    installState    : State,
+    uninstallState  : State,
+}
+
+enum ApplicationState {
+    NotRunning  = 0,
+    Starting    = 1,
+    Running     = 2,
+    Finished    = 3,
+    Crashed     = 4,
+}
+
+struct ApplicationsInfo {
+    language        : LanguageCodes,
+    applications    : &[FileName;16],
+}
+
+/// System loading information
+struct SystemInfo {
+    /// CPU load in percentages
+    cpuLoad         : u8,
+    /// Amount of CPU cores
+    cpuCores        : u8,
+    /// Load of each CPU core in percentages
+    cpuCoresLoad    : &[u8;128],
+    /// Used memory in bytes
+    memoryLoad      : varuint,
+    /// Whole memory size in bytes
+    memorySize      : varuint,
+    /// Used disk size in bytes
+    diskLoad        : varuint,
+    /// Whole disk size in bytes
+    diskSize        : varuint,
+}
+
+struct LogMessage {
+    /// Progamming language code
+    language        : LanguageCodes,
+    /// Unique datagram code
+    identification  : u16,
+    /// Fragment offset
+    fragmentOffset  : u16,
+    /// Text with '\n' delimiters (if first byte is zero text was compressed by z-lib)
+    data            : TextLinesList,
+}
+
+/// Main info about current application
+struct CurrentApplicationInfo {
+    language     : LanguageCodes,
+    name         : FileName,
+    state        : ApplicationState,
+    pid          : Option<varuint>,
+}
+/// Info about installed project with specified name
+struct ProjectInfo {
+    language        : LanguageCodes,
+    /// Project name
+    name            : FileName,
+    /// Installed files
+    filesList       : &[FileName;128],
+    /// Overall size at disk in bytes
+    size            : varuint,
+    /// Last project update date
+    updated         : TimeStamp,
+}
+
+component {
+    variables {
+        buildStateCpp                   : BuildState,
+        buildStatePython                : BuildState,
+
+        applicationsInfoCpp             : ApplicationsInfo,
+        applicationsInfoPython          : ApplicationsInfo,
+
+        currentApplicationInfoCpp       : CurrentApplicationInfo,
+        currentApplicationInfoPython    : CurrentApplicationInfo,
+
+        projectInfo                     : ProjectInfo,
+        systemInfo                      : SystemInfo,
+    }
+
+    statuses {
+        [buildStateCpp,                 1, true] : {buildStateCpp},
+        [buildStatePython,              1, true] : {buildStatePython},
+
+        [applicationsInfoCpp,           1, true] : {applicationsInfoCpp},
+        [applicationsInfoPython,        1, true] : {applicationsInfoPython},
+
+        [currentApplicationInfoCpp,     1, true] : {currentApplicationInfoCpp},
+        [currentApplicationInfoPython,  1, true] : {currentApplicationInfoPython},
+
+        [projectInfo,                   1, false]: {projectInfo},
+        [systemInfo,                    1, false]: {systemInfo},
+    }
+
+    events {
+        [buildLogOutput,            true]: {output : LogMessage},
+        [buildLogErrors,            true]: {errors : LogMessage},
+        [currentApplicationOutput,  true]: {output : LogMessage},
+        [currentApplicationStatus,  true]: {output : LogMessage},
+        [appRemoving,               true]: {state : State, project : FileName, files : LogMessage},
+    }
+
+    commands {
+        /// Request data frame
+        fn updateInfo(language : LanguageCodes, frame: Frames)
+        /// Request many data frames
+        fn updateInfoMultiple(language : LanguageCodes, frames : varuint)
+        /// Confirm receiving of data frame
+        fn confirmReceiving(language : LanguageCodes, frame: Frames)
+        /// Confirm receiving of many data frames
+        fn confirmReceivingMultiple(language : LanguageCodes, frames: varuint)
+
+        fn prepareFileGetting(language : LanguageCodes, fileId: varuint)
+        fn getFile(language : LanguageCodes, fileId: varuint)
+        fn unpackFile(language : LanguageCodes)
+        fn buildTarget(language : LanguageCodes)
+        fn installTarget(language : LanguageCodes)
+        fn stopBuildProcess(language : LanguageCodes, kill : bool)
+
+        fn uninstallApplication(language : LanguageCodes, appName : FileName)
+
+        fn runApplication(language : LanguageCodes, appName : FileName, args : TextLinesList)
+        fn stopApplication(language : LanguageCodes, appName : FileName)
+        fn killApplication(language : LanguageCodes, appName : FileName)
+
+        fn requestApplicationStatus(language : LanguageCodes, appName : FileName)
+        fn requestProjectOfApplication(language : LanguageCodes, appName : FileName)
+    }
+
+    impl {
+        fn init()
+        fn tick()
+        fn setDir(path: *const char)
+    }
+}

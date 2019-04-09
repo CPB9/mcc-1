@@ -8,6 +8,8 @@
 
 #include <QMimeData>
 
+#include <cstring>
+
 namespace mccui {
 
 CoordinateFormatter::CoordinateFormatter()

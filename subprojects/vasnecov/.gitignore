@@ -1,0 +1,7 @@
+build/
+subprojects/bmcl/
+Vasnecov.config
+Vasnecov.creator
+Vasnecov.creator.user
+Vasnecov.files
+Vasnecov.includes

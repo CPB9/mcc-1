@@ -13,7 +13,7 @@ namespace mccmsg {
         Packet(bmcl::Bytes data);
         Packet(const Packet& other);
         Packet(Packet&& other);
-        ~Packet();
+        ~Packet() override;
     };
 
     using PacketPtr = mcc::Rc<Packet>;

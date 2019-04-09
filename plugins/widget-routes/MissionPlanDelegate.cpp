@@ -44,9 +44,9 @@ MissionPlanDelegate::MissionPlanDelegate(mccui::Settings* settings, MissionPlanM
 //         bool isSimple = settings->read("ide/simpleMode", false).toBool();
 //         if (!isSimple)
 //             _waypointTypes.append(QPair<QString, mccuav::WaypointType>("Только для чтения", mccuav::WaypointType::ReadOnly));
-// 
+//
 //         _waypointTypes.append(QPair<QString, mccuav::WaypointType>("Цель", WaypointType::Target));
-// 
+//
 //         if (!isSimple)
 //         {
 //             _waypointTypes.append(QPair<QString, mccuav::WaypointType>("Парашют", WaypointType::Parashute));
@@ -55,10 +55,10 @@ MissionPlanDelegate::MissionPlanDelegate(mccui::Settings* settings, MissionPlanM
 //             _waypointTypes.append(QPair<QString, mccuav::WaypointType>("Ожидание", WaypointType::Waiting));
 //         }
 //         _waypointTypes.append(QPair<QString, mccuav::WaypointType>("Переход", WaypointType::SwitchRoute));
-// 
+//
 //         if (!isSimple)
 //             _waypointTypes.append(QPair<QString, mccuav::WaypointType>("Дом", WaypointType::Home));
-// 
+//
 //         _waypointTypes.append(QPair<QString, mccuav::WaypointType>("Посадка", WaypointType::Landing));
 //     }
 //     else
@@ -153,7 +153,7 @@ void MissionPlanDelegate::setModelData(QWidget* editor, QAbstractItemModel* mode
     }
     case MissionPlanModel::Columns::WaypointType:
     {
-        QComboBox* comboEditor = static_cast<QComboBox*>(editor);
+//        QComboBox* comboEditor = static_cast<QComboBox*>(editor);
 
 //         WaypointFlags flags;
 //         for (int i = 0; i < comboEditor->count(); ++i)

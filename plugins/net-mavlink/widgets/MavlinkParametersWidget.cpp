@@ -164,9 +164,6 @@ QListView::item:selected{           \
 
     setLayout(mainLayout);
 
-    auto manager = _uavController.get();
-    //connect(manager, &UavController::tmParamList, this, &MavlinkParametersWidget::tmParamList);
-
     connect(_view, &QTableView::doubleClicked, this,
             [this](QModelIndex index)
             {
@@ -238,7 +235,7 @@ void MavlinkParametersWidget::firmwareLoaded(mccuav::Uav* uav)
 //             auto mavFw = bmcl::dynamic_pointer_cast<const Firmware>(fw);
 //             if (mavFw.isNull())
 //                 return;
-// 
+//
 //             auto fsmFunc = [mavFw, uav](uint16_t state1, uint16_t state2) -> std::pair<std::string, bmcl::Option<std::string>>
 //             {
 //                 std::string s1;
@@ -273,10 +270,10 @@ void MavlinkParametersWidget::firmwareLoaded(mccuav::Uav* uav)
 // {
 //     if (!_uav)
 //         return;
-// 
+//
 //     if (_uav->device() != params->device())
 //         return;
-// 
+//
 //     for (const auto& p : params->params())
 //     {
 //         _model->setParam(p);

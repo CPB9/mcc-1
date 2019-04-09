@@ -1,4 +1,5 @@
-﻿#include "mcc/msg/exts/ITmExtension.h"
+﻿#include "mcc/msg/SubHolder.h"
+#include "mcc/msg/exts/ITmExtension.h"
 #include <bmcl/Option.h>
 #include <bmcl/Rc.h>
 #include <algorithm>
@@ -25,14 +26,14 @@ void ITmSimpleExtension::updated(bmcl::SystemTime t) { updated_(t, false); }
 ITmSimpleExtension::Item::Item(HandlerId i, Handler&& h) : i(i), h(std::move(h)) {}
 ITmSimpleExtension::Item::~Item() {}
 
-HandlerId ITmSimpleExtension::addHandler(Handler&& handler, bool onChangeOnly)
+SubHolder ITmSimpleExtension::addHandler(Handler&& handler, bool onChangeOnly)
 {
     auto id = nextCounter();
     if (onChangeOnly)
         _changeHandler.emplace_back(id, std::move(handler));
     else
         _updateHandler.emplace_back(id, std::move(handler));
-    return id;
+    return SubHolder(id, this);
 }
 
 void ITmSimpleExtension::removeHandler(const bmcl::Option<HandlerId>& id)

@@ -105,7 +105,7 @@ TmRoutesList::TmRoutesList(const Device& device, RoutesProperties&& properties, 
 {
 }
 const RoutesProperties& TmRoutesList::properties() const { return _properties; }
-bmcl::Option<RouteName> TmRoutesList::activeRoute() const { return _activeRoute; }
+const bmcl::Option<RouteName>& TmRoutesList::activeRoute() const { return _activeRoute; }
 
 bmcl::Buffer Route::encode() const
 {

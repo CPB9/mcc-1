@@ -22,6 +22,9 @@ public:
         , _cmd(std::move(cmd))
     {
     }
+
+    using mccmsg::CmdVisitor::visit;
+
     void visit(const mccmsg::CmdParamList* msg) override { _self->execute(std::move(_cmd), *msg); }
 private:
     TraitJoystick* _self;

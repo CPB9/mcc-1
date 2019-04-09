@@ -62,7 +62,7 @@ QString ToolbarUavSettingsPage::pageTitle() const
 
 QString ToolbarUavSettingsPage::pagePath() const
 {
-    return "Тулбар/Аппараты";
+    return "Строка состояния/Аппараты";
 }
 
 QIcon ToolbarUavSettingsPage::pageIcon() const

@@ -1,0 +1,120 @@
+module grp
+
+import core::{Reader, Writer, Error, Option}
+
+type UavId = varuint;
+type TermId = varuint;
+type GrpId = varuint;
+type EntryId = varuint;
+type Index = varuint;
+type Time = varuint;
+
+const MAX_GROUP_SIZE : u8 = 10;
+
+enum EntryKind {
+    User,
+    AddNonVotingNode,
+    AddNode,
+    DemoteNode,
+    RemoveNode,
+}
+
+enum Vote {
+    NodeUnknown,
+    NotGranted,
+    Granted,
+}
+
+struct LogEntry {
+    term: TermId,
+    entryId: EntryId,
+    kind: EntryKind,
+    node: Option<UavId>,
+    data: &[u8; 500],
+}
+
+enum ReqErr {
+    NotLeader,
+    NodeUnknown,
+    OneVotingChangeOnly,
+    Unknown,
+    GroupIncorrect,
+}
+
+struct ReqCfgRep {
+    err: Option<ReqErr>,
+    term: TermId,
+    id: EntryId,
+    idx: Index
+}
+
+enum MemberState {
+    Follower,
+    PreCandidate,
+    Candidate,
+    Leader,
+}
+
+struct Timeouts {
+    ping: Time,
+    election: Time,
+    election_rand: Time,
+}
+
+struct TestSharedTime {
+    device: UavId,
+    time: Time,
+    diff: varint,
+}
+
+component {
+    variables {
+        group: Option<GrpId>,
+        members: &[UavId; 10],
+        leader: Option<UavId>,
+        state: MemberState,
+        term: TermId,
+        commit: Index,
+        lastLogIdx: Index,
+        lastLogTerm: TermId,
+        votedFor: Option<UavId>,
+        timeouts: Timeouts,
+        timeout_elapsed: Time,
+        testSharedTime: Time,
+        testSharedTimes: &[TestSharedTime; 10]
+    }
+
+    statuses {
+        [all, 0, false]: {group, leader, term, state, commit, lastLogIdx, lastLogTerm, votedFor, members, timeout_elapsed, timeouts},
+        [leader, 1, false]: {group, leader, term},
+        [members, 2, false]: {group, leader, term, members},
+        [elect, 3, false]: {group, leader, state, term, commit, lastLogIdx, lastLogTerm, votedFor},
+        [testShare, 4, false]: {group, testSharedTime, testSharedTimes},
+    }
+
+    impl {
+        fn init()
+        fn tick()
+        fn genRaftData(data: *mut void, writer: *mut Writer) -> Error
+        fn addSharer(compNum: u8, generator: &Fn(*mut Writer) -> Error, receiver: &Fn(UavId, *mut Reader) -> Error)
+        fn removeSharer(compNum: u8)
+        fn isLeader() -> bool
+        fn isPacketForMe(dest: varuint) -> bool
+    }
+
+    commands {
+        fn setTimeouts(group: GrpId, ping: Time, lost: varuint)
+        fn createGroup(group: GrpId, members: &[UavId; 10])
+        fn deleteGroup(group: GrpId)
+        fn addMember(group: GrpId, member: UavId) -> ReqCfgRep
+        fn removeMember(group: GrpId, member: UavId) -> ReqCfgRep
+        fn execute(group: GrpId, cmd: &[u8; 500]) -> ReqCfgRep
+        fn shareMsgs(group: GrpId, from: UavId, cmd: &[u8; 500])
+        fn shareTest(group: GrpId, enable: bool)
+
+        fn reqVote(group: GrpId, term: TermId, lastLogIdx: Index, lastLogTerm: TermId, isPre: bool)
+        fn reqVoteRep(group: GrpId, term: TermId, vote: Vote)
+        fn reqAppendEntry(group: GrpId, term: TermId, prevLogIdx: Index, prevLogTerm: TermId, leaderCommit: Index, lastCfgSeen: Index, entries: &[LogEntry; 10])
+        fn reqAppendEntryRep(group: GrpId, term: TermId, success: bool, currentIdx: Index)
+    }
+}

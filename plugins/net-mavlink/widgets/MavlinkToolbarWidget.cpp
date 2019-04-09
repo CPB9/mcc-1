@@ -2,7 +2,7 @@
 
 #include "mcc/uav/Uav.h"
 #include "mcc/uav/UavController.h"
-
+#include "mcc/msg/SubHolder.h"
 #include "mcc/msg/ParamList.h"
 
 #include <QGridLayout>
@@ -73,7 +73,7 @@ void MavlinkToolbarWidget::uavTmStorageUpdated(mccuav::Uav* uav)
     if (_uavState.isNone())
         return;
 
-    _uavState->addHandler(std::bind(&MavlinkToolbarWidget::uavStateChanged, this), true);
+    _uavState->addHandler(std::bind(&MavlinkToolbarWidget::uavStateChanged, this), true).takeId();
     uavStateChanged();
 }
 

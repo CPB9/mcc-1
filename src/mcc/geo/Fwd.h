@@ -10,7 +10,7 @@ class LatLon;
 class Bbox;
 class Position;
 class PositionAndDistance;
-class Orientation;
+class Attitude;
 class MercatorProjection;
 class EnuPositionHandler;
 class LocalSystem;

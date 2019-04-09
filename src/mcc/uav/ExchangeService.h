@@ -19,7 +19,6 @@
 #include "mcc/msg/obj/DeviceUi.h"
 
 #include "mcc/msg/File.h"
-#include "mcc/msg/Nav.h"
 #include "mcc/msg/Route.h"
 #include "mcc/msg/TmView.h"
 #include "mcc/msg/ParamList.h"
@@ -43,7 +42,6 @@ Q_DECLARE_METATYPE(mccmsg::DeviceUi);
 Q_DECLARE_METATYPE(mccmsg::DeviceUis);
 Q_DECLARE_METATYPE(mccmsg::DeviceUiDescription);
 Q_DECLARE_METATYPE(mccmsg::DeviceUiDescriptions);
-Q_DECLARE_METATYPE(mccmsg::TmMotionPtr);
 Q_DECLARE_METATYPE(mccmsg::TmRoutePtr);
 Q_DECLARE_METATYPE(mccmsg::TmRoutesListPtr);
 Q_DECLARE_METATYPE(mccmsg::ErrorDscr);
@@ -175,7 +173,6 @@ signals:
 
     void protocolRegistered(const mccmsg::Protocol& protocol);
 
-    void traitNavigationMotion(const mccmsg::TmMotion*);
     void traitRouteState(const mccmsg::TmRoute*);
     void traitRoutesList(const mccmsg::TmRoutesList*);
     void traitGroupState(const mccmsg::TmGroupState*);

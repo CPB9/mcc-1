@@ -99,7 +99,6 @@ Device::Device(caf::actor_config& cfg, const caf::actor& core, const caf::actor&
     , _targetSystem((uint8_t)id.id())
     , _targetComponent(0)
     , _targetChannel(0)
-    , _delayedActivation(false)
     , _firstPacket(true)
     , _lastSequence(0)
 {
@@ -164,6 +163,9 @@ public:
         , _cmd(std::move(cmd))
     {
     }
+
+    using mccmsg::CmdVisitor::visit;
+
     void visit(const mccmsg::CmdParamList* msg) override { _self->execute(std::move(_cmd), msg); }
     void visit(const mccmsg::CmdCalibrationStart* msg) override { _self->execute(std::move(_cmd), msg); }
     void visit(const mccmsg::CmdCalibrationCancel* msg) override { _self->execute(std::move(_cmd), msg); }
@@ -205,7 +207,7 @@ caf::behavior Device::make_behavior()
 //            const auto& trait = msg->trait();
 //             if (trait == "Navigation.Routes")
 //             {
-//                 
+//
 //             }
 //             else if (trait == "Params")
 //             {
@@ -522,7 +524,6 @@ void Device::processMavlinkMessageHeartbeat(const MavlinkMessagePtr& mavlinkMess
     mavlink_msg_heartbeat_decode(mavlinkMessage.get(), &heartbeat);
     _lastHeartbeat = heartbeat;
     _helper.sendTrait(new TmUpdateMode(_id.device(), heartbeat.base_mode, heartbeat.custom_mode, heartbeat.system_status));
-    auto sysStatus = heartbeat.system_status;
     send(_traitReg,  heartbeat);
 }
 
@@ -612,19 +613,19 @@ void Device::processMavlinkMessageSysStatus(const MavlinkMessagePtr& mavlinkMess
 
 void Device::processMavlinkMessageAttitude(const MavlinkMessagePtr& mavlinkMessage)
 {
-    mavlink_attitude_t attitude;
-    mavlink_msg_attitude_decode(mavlinkMessage.get(), &attitude);
-
-    _motion.orientation = mccgeo::Attitude(bmcl::radiansToDegrees(attitude.yaw),
-                                              bmcl::radiansToDegrees(attitude.pitch),
-                                              bmcl::radiansToDegrees(attitude.roll));
-    _helper.sendTrait(new mccmsg::TmMotion(_id.device(), _motion));
+//     mavlink_attitude_t attitude;
+//     mavlink_msg_attitude_decode(mavlinkMessage.get(), &attitude);
+// 
+//     _motion.orientation = mccgeo::Attitude(bmcl::radiansToDegrees(attitude.yaw),
+//                                               bmcl::radiansToDegrees(attitude.pitch),
+//                                               bmcl::radiansToDegrees(attitude.roll));
+//     _helper.sendTrait(new mccmsg::TmMotion(_id.device(), _motion));
 }
 
 void Device::processMavlinkMessageGlobalPositionInt(const MavlinkMessagePtr& mavlinkMessage)
 {
-    mavlink_global_position_int_t position;
-    mavlink_msg_global_position_int_decode(mavlinkMessage.get(), &position);
+//     mavlink_global_position_int_t position;
+//     mavlink_msg_global_position_int_decode(mavlinkMessage.get(), &position);
 
 //     mavlink_gps_raw_int_t position;
 //     mavlink_msg_gps_raw_int_decode(&mavlinkMessage, &position);
@@ -632,19 +633,19 @@ void Device::processMavlinkMessageGlobalPositionInt(const MavlinkMessagePtr& mav
 //     double latitudeDeg = position.lat / 10000000.0;
 //     double longitudeDeg = position.lon / 10000000.0;
 //     double altitudeM = position.alt / 1000.0;
-    double relAlt = position.relative_alt / 1000.0;
-
-    // TODO: это три состовляющих скорости в метрах в секунду, их надо использовать
-    double vxMps = position.vx / 100.0;
-    double vyMps = position.vy / 100.0;
-    double vzMps = position.vz / 100.0;
-    double speed = std::hypot(std::hypot(vxMps, vyMps), vzMps);
-
-//    _motion.position = mccgeo::Position(latitudeDeg, longitudeDeg, altitudeM);
-    _motion.velocity = mccgeo::Position(vxMps, vyMps, vzMps);
-    _motion.speed = speed;
-    _motion.relativeAltitude = relAlt;
-    _helper.sendTrait(new mccmsg::TmMotion(_id.device(), _motion));
+//     double relAlt = position.relative_alt / 1000.0;
+// 
+//     // TODO: это три состовляющих скорости в метрах в секунду, их надо использовать
+//     double vxMps = position.vx / 100.0;
+//     double vyMps = position.vy / 100.0;
+//     double vzMps = position.vz / 100.0;
+//     double speed = std::hypot(std::hypot(vxMps, vyMps), vzMps);
+// 
+// //    _motion.position = mccgeo::Position(latitudeDeg, longitudeDeg, altitudeM);
+//     _motion.velocity = mccgeo::Position(vxMps, vyMps, vzMps);
+//     _motion.speed = speed;
+//     _motion.relativeAltitude = relAlt;
+//     _helper.sendTrait(new mccmsg::TmMotion(_id.device(), _motion));
 }
 
 void Device::processMavlinkMessageCommandAck(const MavlinkMessagePtr& mavlinkMessage)
@@ -656,31 +657,31 @@ void Device::processMavlinkMessageCommandAck(const MavlinkMessagePtr& mavlinkMes
 
 void Device::processMavlinkMessageGpsRawInt(const MavlinkMessagePtr& mavlinkMessage)
 {
-    using mccmsg::GpsFixType;
-
-    mavlink_gps_raw_int_t gps;
-    mavlink_msg_gps_raw_int_decode(mavlinkMessage.get(), &gps);
-
-    double latitudeDeg = gps.lat / 10000000.0;
-    double longitudeDeg = gps.lon / 10000000.0;
-    double altitudeM = gps.alt / 1000.0;
-
-    _motion.position = mccgeo::Position(latitudeDeg, longitudeDeg, altitudeM);
-
-    bmcl::Option<GpsFixType> fix_type;
-    switch (gps.fix_type)
-    {
-    case GPS_FIX_TYPE_NO_GPS: fix_type = GpsFixType::NoGps; break;
-    case GPS_FIX_TYPE_NO_FIX: fix_type = GpsFixType::NoFix; break;
-    case GPS_FIX_TYPE_2D_FIX: fix_type = GpsFixType::Fix2D; break;
-    case GPS_FIX_TYPE_3D_FIX: fix_type = GpsFixType::Fix3D; break;
-    case GPS_FIX_TYPE_DGPS: fix_type = GpsFixType::DGps; break;
-    case GPS_FIX_TYPE_RTK_FLOAT: fix_type = GpsFixType::L1Float; break; /* RTK float, 3D position | */
-    case GPS_FIX_TYPE_RTK_FIXED: fix_type = GpsFixType::L1Int; break; /* RTK Fixed, 3D position | */
-    case GPS_FIX_TYPE_STATIC: fix_type = GpsFixType::Static; break;
-    default:
-        BMCL_WARNING() << "Unknown gps fix type: " << gps.fix_type;
-    }
+//     using mccmsg::GpsFixType;
+// 
+//     mavlink_gps_raw_int_t gps;
+//     mavlink_msg_gps_raw_int_decode(mavlinkMessage.get(), &gps);
+// 
+//     double latitudeDeg = gps.lat / 10000000.0;
+//     double longitudeDeg = gps.lon / 10000000.0;
+//     double altitudeM = gps.alt / 1000.0;
+// 
+//     _motion.position = mccgeo::Position(latitudeDeg, longitudeDeg, altitudeM);
+// 
+//     bmcl::Option<GpsFixType> fix_type;
+//     switch (gps.fix_type)
+//     {
+//     case GPS_FIX_TYPE_NO_GPS: fix_type = GpsFixType::NoGps; break;
+//     case GPS_FIX_TYPE_NO_FIX: fix_type = GpsFixType::NoFix; break;
+//     case GPS_FIX_TYPE_2D_FIX: fix_type = GpsFixType::Fix2D; break;
+//     case GPS_FIX_TYPE_3D_FIX: fix_type = GpsFixType::Fix3D; break;
+//     case GPS_FIX_TYPE_DGPS: fix_type = GpsFixType::DGps; break;
+//     case GPS_FIX_TYPE_RTK_FLOAT: fix_type = GpsFixType::L1Float; break; /* RTK float, 3D position | */
+//     case GPS_FIX_TYPE_RTK_FIXED: fix_type = GpsFixType::L1Int; break; /* RTK Fixed, 3D position | */
+//     case GPS_FIX_TYPE_STATIC: fix_type = GpsFixType::Static; break;
+//     default:
+//         BMCL_WARNING() << "Unknown gps fix type: " << gps.fix_type;
+//     }
 }
 
 void Device::processMavlinkGpsStatus(const MavlinkMessagePtr& mavlinkMessage)
@@ -759,7 +760,7 @@ void Device::sendTm(const MavlinkMessagePtr &message)
 {
     auto messageinfo = mavlink_get_message_info(message.get());
     std::string trait = messageinfo->name;
-    uint8_t* payload = (uint8_t*)(message->payload64);
+//     uint8_t* payload = (uint8_t*)(message->payload64);
 //     mccmsg::TmParams tmParams;
 //     for (std::size_t i = 0; i < messageinfo->num_fields; ++i)
 //     {
@@ -768,7 +769,7 @@ void Device::sendTm(const MavlinkMessagePtr &message)
 //         mccmsg::NetVariant value;
 //         if (field.array_length > 0)
 //             continue;
-// 
+//
 //         switch (field.type)
 //         {
 //             case MAVLINK_TYPE_UINT8_T:
@@ -804,7 +805,7 @@ void Device::sendTm(const MavlinkMessagePtr &message)
 // //            default:
 //                 //BMCL_WARNING() << "WARNING: UNKNOWN MAVLINK TYPE";
 //         }
-// 
+//
 //         tmParams.emplace_back(mccmsg::TmParam(trait, name, value));
 //     }
 

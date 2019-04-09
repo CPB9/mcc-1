@@ -64,7 +64,6 @@ private:
     std::vector<VasnecovLabel *>    _labels;
 
     bool                            _isVisible;
-    float                           _scale;
 
     Q_DISABLE_COPY(CompasModel)
 };

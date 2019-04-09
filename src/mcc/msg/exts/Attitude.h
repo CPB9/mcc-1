@@ -14,7 +14,7 @@ public:
     ~TmAttitude() override;
     static const TmExtension& id();
     static const char* info();
-    bmcl::Option<mccgeo::Attitude> attitude() const;
+    const bmcl::Option<mccgeo::Attitude>& attitude() const;
     void set(bmcl::SystemTime t, const bmcl::Option<mccgeo::Attitude>& v);
 private:
     bmcl::Option<mccgeo::Attitude> _attitude;

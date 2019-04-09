@@ -75,8 +75,8 @@ void UavsTracker::update()
 
     for (auto& uavAndLoc : _uavsLocation)
     {
-        const auto& motion = uavAndLoc.first->motion();
-        if (motion.isNone() || !uavAndLoc.first->deviceDescription()->showOnMap())
+        const auto& motion = uavAndLoc.first->position();
+        if (motion.isNone())
         {
             uavAndLoc.second.clear();
             emit uavTrackUpdated(uavAndLoc.first, bmcl::None);
@@ -86,7 +86,7 @@ void UavsTracker::update()
         if (uavAndLoc.second.isNone())
             uavAndLoc.second.emplace();
 
-        _uavController->geod().inverse(motion->position.latLon(), _watcherLocation.unwrap(), &uavAndLoc.second->distance, 0, &uavAndLoc.second->azimuth);
+        _uavController->geod().inverse(motion->latLon(), _watcherLocation.unwrap(), &uavAndLoc.second->distance, 0, &uavAndLoc.second->azimuth);
         uavAndLoc.second->azimuth += 180;
         emit uavTrackUpdated(uavAndLoc.first, uavAndLoc.second);
     }

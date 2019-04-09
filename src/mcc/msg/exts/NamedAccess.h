@@ -16,7 +16,7 @@ public:
     ~INamedAccess() override;
     static const TmExtension& id();
     static const char* info();
-    virtual bmcl::Option<HandlerId> addHandler(bmcl::StringView name, ValueHandler&& handler) = 0;
+    virtual bmcl::Option<SubHolder> addHandler(bmcl::StringView name, ValueHandler&& handler, bool onChangeOnly) = 0;
 };
 
 }

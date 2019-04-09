@@ -40,8 +40,8 @@ void UavTrackable::connectUav(mccuav::Uav* uav)
     if (!uav) {
         return;
     }
-    connect(uav, &mccuav::Uav::motionChanged, this, [this](const mccmsg::Motion& motion) {
-        emit positionUpdated(motion.position.latLon());
+    connect(uav, &mccuav::Uav::positionChanged, this, [uav, this]() {
+        emit positionUpdated(uav->position()->latLon());
     });
 
     connect(uav, &mccuav::Uav::signalBad, this, &UavTrackable::trackingStopped);
@@ -52,15 +52,15 @@ void UavTrackable::disconnectUav(mccuav::Uav* uav)
     if (!uav) {
         return;
     }
-    disconnect(uav, &mccuav::Uav::motionChanged, this, nullptr);
+    disconnect(uav, &mccuav::Uav::positionChanged, this, nullptr);
     disconnect(uav, &mccuav::Uav::signalBad, this, nullptr);
     emit trackingStopped();
 }
 
 bmcl::Option<mccgeo::LatLon> UavTrackable::position() const
 {
-    if(_currentUav && _currentUav->motion().isSome())
-        return _currentUav->motion()->position.latLon();
+    if(_currentUav && _currentUav->position().isSome())
+        return _currentUav->position()->latLon();
 
     return bmcl::None;
 }

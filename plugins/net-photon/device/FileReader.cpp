@@ -2,6 +2,7 @@
 #include <QByteArray>
 #include <bmcl/Result.h>
 #include <bmcl/Utils.h>
+#include <bmcl/Bytes.h>
 #include "../device/FileReader.h"
 
 namespace mccphoton {

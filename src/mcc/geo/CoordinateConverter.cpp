@@ -3,13 +3,12 @@
 #include "mcc/geo/LatLon.h"
 
 #include <proj.h>
-#include <proj_api.h>
-#include <projects.h>
 
 #include <bmcl/Result.h>
 #include <bmcl/Rc.h>
 #include <bmcl/Math.h>
 #include <bmcl/Logging.h>
+#include <bmcl/StringView.h>
 
 #include <cstring>
 #include <clocale>

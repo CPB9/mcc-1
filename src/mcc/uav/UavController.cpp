@@ -9,6 +9,7 @@
 #include "mcc/msg/ptr/Advanced.h"
 #include "mcc/msg/ptr/ReqVisitor.h"
 #include "mcc/msg/Cmd.h"
+
 #include "mcc/hm/HmReader.h"
 #include "mcc/ui/HeightmapController.h"
 #include "mcc/geo/Constants.h"
@@ -86,7 +87,6 @@ UavController::UavController(mccui::Settings* settings,
     });
 
     connect(exchangePtr, &ExchangeService::log, this, &UavController::log);
-    connect(exchangePtr, &ExchangeService::traitNavigationMotion, this, &UavController::onTraitNavigationMotion);
     connect(exchangePtr, &ExchangeService::traitRouteState, this, &UavController::onTraitRouteState);
     connect(exchangePtr, &ExchangeService::traitRoutesList, this, &UavController::onTraitRoutesList);
     connect(exchangePtr, &ExchangeService::setTmView, this, &UavController::onSetTmView);
@@ -307,7 +307,7 @@ void UavController::requestFileList(Uav* device)
 
 ResponseHandle UavController::sendCmdYY(const mccmsg::DevReqPtr& cmd)
 {
-    return ResponseHandle(this, _exchangeService.get(), cmd);
+    return ResponseHandle(_exchangeService.get(), cmd);
 }
 
 void UavController::cancelRequest(mccmsg::RequestId id)
@@ -324,13 +324,13 @@ void UavController::cancelRequest(const mccmsg::RequestPtr& req)
     _exchangeService->cancel(req);
 }
 
-ResponseHandle::ResponseHandle(UavController* self, mccuav::ExchangeService* service, mccmsg::DevReqPtr&& r)
-    : _sent(false), _self(self), _service(service), _r(r)
+ResponseHandle::ResponseHandle(mccuav::ExchangeService* service, mccmsg::DevReqPtr&& r)
+    : _sent(false), _service(service), _r(r)
 {
 }
 
-ResponseHandle::ResponseHandle(UavController* self, mccuav::ExchangeService* service, const mccmsg::DevReqPtr& r)
-    : _sent(false), _self(self), _service(service), _r(r)
+ResponseHandle::ResponseHandle(mccuav::ExchangeService* service, const mccmsg::DevReqPtr& r)
+    : _sent(false), _service(service), _r(r)
 {
 }
 
@@ -409,7 +409,7 @@ void UavController::requestUavDescription(const mccmsg::Device& id)
 void UavController::requestUavUpdate(const mccmsg::Device& name, const bmcl::Option<bool>& regFirst, const bmcl::Option<std::string>& info, const bmcl::Option<bool>& logging)
 {
     auto d = bmcl::makeRc<const mccmsg::DeviceDescriptionObj>(name, info.unwrapOr(""), "", mccmsg::ProtocolId(), bmcl::None,
-                                                              bmcl::SharedBytes(), bmcl::None, regFirst.unwrapOr(false), false, logging.unwrapOr(false));
+                                                              bmcl::SharedBytes(), bmcl::None, regFirst.unwrapOr(false), logging.unwrapOr(false));
     mccmsg::Fields fs;
     if (regFirst.isSome()) fs.push_back(mccmsg::Field::RegFirst);
     if (info.isSome()) fs.push_back(mccmsg::Field::Info);
@@ -430,7 +430,7 @@ void UavController::requestUavUpdate(const mccmsg::Device& name, const bmcl::Opt
 
 void UavController::requestUavRegister(const QString& info, const mccmsg::ProtocolId& id, QWidget* parent)
 {
-    auto dscr = bmcl::makeRc<const mccmsg::DeviceDescriptionObj>(mccmsg::Device(), info.toStdString(), std::string(), id, bmcl::None, bmcl::SharedBytes(), bmcl::None);
+    auto dscr = bmcl::makeRc<const mccmsg::DeviceDescriptionObj>(mccmsg::Device(), info.toStdString(), std::string(), id, bmcl::None, bmcl::SharedBytes(), bmcl::None, false, false);
     _exchangeService->requestXX(new mccmsg::device::Register_Request(dscr)).then
     (
         [](const mccmsg::device::Register_ResponsePtr& rep)
@@ -846,10 +846,9 @@ void UavController::activateUav(Uav* device, bool isActive)
 
 void UavController::centerOnUav(const Uav* device)
 {
-    if(device == nullptr || device->motion().isNone())
+    if(!device || device->position().isNone())
         return;
-
-    emit uavCentering(device->motion()->position.latLon());
+    emit uavCentering(device->position()->latLon());
 }
 
 void UavController::tryCancelRouteEditing(Uav* device, CancelingReason reason)
@@ -899,11 +898,6 @@ void UavController::tryCancelRouteEditing(Uav* device, CancelingReason reason)
     });
 
     _messageBox->show();
-}
-
-void UavController::onTraitNavigationMotion(const mccmsg::TmMotionPtr& motion)
-{
-    forwardToUav(motion->device(), &Uav::processNavigationMotion, motion);
 }
 
 void UavController::onTraitRouteState(const mccmsg::TmRoutePtr& route)

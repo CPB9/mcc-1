@@ -1,0 +1,237 @@
+/// Module for testing generator
+module test
+
+import core::{Option, Error}
+type UavId = varuint;
+
+type FnTypedef = &Fn(&Fn(i64) -> &Fn(i32) -> i8, i16) -> &Fn(f64) -> f32;
+
+/// EnumParam short desc
+///
+/// EnumParam long desc
+enum EnumParam {
+    /// Type 1 enum
+    Type1 = 1,
+    /// Type 4 enum
+    Type2,
+    /// Type 2 enum
+    Type5 = 5,
+    /// Type 6 enum
+    Type6,
+    /// Negative enum
+    TypeNeg = -999,
+}
+
+/// VariantParam short desc
+///
+/// VariantParam long desc
+variant VariantParam {
+    /// variant of type ConstantType
+    ConstantType,
+    /// variant of type TupleType
+    TupleType(i8, u8),
+    /// variant of type StructType
+    StructType { a: i16, b: u16 },
+}
+
+/// ParamStruct short desc
+///
+/// ParamStruct long
+/// multiline desc
+struct ParamStruct {
+    /// param a
+    #[ranges(default=9, min=0, max=20)]
+    parama: u8,
+    /// param b
+    #[ranges(default=9, min=0, max=20)]
+    paramb: f64,
+}
+
+/// CmdStruct short desc
+struct CmdStruct {
+    /// param 1
+    param1: u8,
+    /// param 2
+    param2: u16,
+    /// param 3
+    param3: u32,
+    /// param 4
+    param4: u64,
+    /// param 5
+    param5: i8,
+    /// param 6
+    param6: i16,
+    /// param 7
+    param7: i32,
+    /// param 8
+    param8: i64,
+    /// param 9
+    ///
+    /// struct param
+    param9: ParamStruct,
+    /// param 10
+    param10: f32,
+    /// param 11
+    param11: f64,
+    /// param 12
+    param12: char,
+}
+
+struct ReturnStruct {
+    param1: u8,
+    param2: i64,
+    param3: VariantParam,
+}
+
+struct ArrayStruct {
+    param1: [u32; 12],
+    param2: &[u16; 2],
+    param3: [[u64; 5]; 10],
+    param4: u8,
+}
+
+struct TestGeneric<A, B, C, D> {
+    a: A,
+    b: B,
+    c: C,
+    d: D,
+}
+
+component {
+    variables {
+        /// param 1
+        #[ranges(default=1, min=0, max=20)]
+        param1: u8,
+        /// param 2
+        #[ranges(default=2, min=0, max=20)]
+        param2: u16,
+        /// param 3
+        #[ranges(default=3, min=0, max=20)]
+        param3: u32,
+        /// param 4
+        #[ranges(default=4, min=0, max=20)]
+        param4: u64,
+        /// param 5
+        #[ranges(default=5, min=0, max=20)]
+        param5: i8,
+        /// param 6
+        #[ranges(default=6, min=0, max=20)]
+        param6: i16,
+        /// param 7
+        #[ranges(default=7, min=0, max=20)]
+        param7: i32,
+        /// param 8
+        #[ranges(default=8, min=0, max=20)]
+        param8: i64,
+        /// param 9
+        param9: ParamStruct,
+        /// param 10
+        #[ranges(default=10, min=0, max=20)]
+        param10: f32,
+        /// param 11
+        #[ranges(default=11, min=0, max=20)]
+        param11: f64,
+        /// param 12
+        #[ranges(default=12, min=0, max=20)]
+        param12: char,
+        optionParam: Option<Option<Option<ParamStruct>>>,
+        optionVaruintParam: Option<varuint>,
+        genericParam: TestGeneric<u64, u16, Option<u32>, u8>,
+        dynArrayParam: &[ParamStruct; 10],
+        dynArrayParam2: &[UavId; 10],
+        arrayParam: [[u16; 10]; 5],
+        fnParam: &Fn(&Fn(u32, u16) -> ParamStruct, [u16; 5], *mut *mut *const u8) -> u64,
+        longString: &[char; 512],
+    }
+
+    statuses {
+        [p1to4, 0, false]: {param2, param1, param3, param4},
+        [p5to8, 0, false]: {param5, param6, param7, param8},
+        [p9to12, 0, false]: {param9, param10, param11, param12},
+        [darr, 0, false]: {dynArrayParam[..].parama, dynArrayParam[..].paramb, dynArrayParam2},
+        [opParam, 0, false]: {param1, optionParam, optionVaruintParam},
+        [arrTest, 0, false]: {arrayParam},
+        [strTest, 0, false]: {longString},
+        [genTest, 0, false]: {genericParam},
+    }
+
+    events {
+        [event0, true]: {},
+        [event1, true]: {param1: u8, param2: ParamStruct},
+        [big, true]: {param1: &[u8; 1024]},
+    }
+
+    impl {
+        /// init func
+        fn init()
+        fn tick()
+    }
+
+    commands {
+        /// param 1 command
+        fn setParam1(p: u8)
+        /// param 1 command
+        fn setParam1AndReturn(p: u8) -> ReturnStruct
+        /// param 2 command
+        fn setParam2(p: u16)
+        /// param 3 command
+        fn setParam3(p: u32)
+        /// param 4 command
+        fn setParam4(p: u64)
+        /// param 5 command
+        fn setParam5(p: i8)
+        /// param 6 command
+        fn setParam6(p: i16)
+        /// param 7 command
+        fn setParam7(p: i32)
+        /// param 8 command
+        fn setParam8(p: i64)
+        /// param 9 command
+        fn setParam9(p: ParamStruct)
+        /// param 10 command
+        fn setParam10(p: f32)
+        /// param 11 command
+        fn setParam11(p: f64)
+        /// param 11 command
+        fn setParam12(p: char)
+        /// all params command
+        fn setAllParams(p1: u8, p2: u16, p3: u32, p4: u64, p5: i8, p6: i16, p7: i32, p8: i64, p9: ParamStruct, p10: f32, p11: f64, p12: char)
+        /// all params in struct command
+        fn setAllParamsStruct(s: CmdStruct)
+        /// inc params command
+        fn incAllParams()
+        /// dec params command
+        fn decAllParams()
+
+        fn testError(value: Error)
+        fn testU8(p: u8) -> u8
+        fn testI8(p: i8) -> i8
+        fn testStruct(p: ParamStruct) -> ParamStruct
+        fn testVariant(p: VariantParam) -> VariantParam
+        fn testEnum(p: EnumParam) -> EnumParam
+        fn testArray(p: [u16; 4]) -> [u16; 4]
+        fn testDynArray(p: &[u32; 4]) -> &[u32; 4]
+        fn testString(p: &[char; 4]) -> &[char; 4]
+        fn testOptionU64(p: Option<u64>) -> Option<u64>
+
+        #[cmdcall(p1=value, p2=alloc, p3=ptr)]
+        fn testCmdCall(p1: ParamStruct, p2: &[u32; 10], p3: EnumParam)
+
+        fn testEvents(count: varuint)
+        fn genTestEvent()
+        fn genBigEvent()
+
+        fn testPvuScript(name: &[char; 16])
+    }
+
+    parameters {
+        {name: p1, readonly: false, callback: true, path: param1},
+        {name: p9b, path: param9.paramb},
+    }
+
+    autosave {
+        param12,
+        param10,
+        param11,
+    }
+}

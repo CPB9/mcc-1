@@ -109,14 +109,14 @@ caf::result<mccmsg::channel::Update_ResponsePtr> Channel::execute(const mccmsg::
 
     _queryUpdate.reset();
     print(binds(&_queryUpdate, ":channel_id", channel_id));
-    print(binds(&_queryUpdate, ":info", dscr->info(), sqlite3pp::nocopy));
+    print(binds(&_queryUpdate, ":info", bmcl::StringView(dscr->info()), sqlite3pp::nocopy));
     print(binds(&_queryUpdate, ":log", dscr->log()));
     print(binds(&_queryUpdate, ":isDynTimeout", dscr->isDynamicTimeout()));
     print(binds(&_queryUpdate, ":isReadOnly", dscr->isReadOnly()));
     print(binds(&_queryUpdate, ":reconnectTimeout", reconnectTimeout));
     print(binds(&_queryUpdate, ":timeout", dscr->timeout().count()));
     print(binds(&_queryUpdate, ":protocol_id", protocol_id.unwrap()));
-    print(binds(&_queryUpdate, ":settings", settings.c_str(), sqlite3pp::nocopy));
+    print(binds(&_queryUpdate, ":settings", bmcl::StringView(settings), sqlite3pp::nocopy));
     if (radar_id.isSome())
         print(binds(&_queryUpdate, ":radar_id", radar_id.unwrap()));
 
@@ -226,15 +226,15 @@ bmcl::Result<mccmsg::Channel, caf::error> Channel::insert(const mccmsg::ChannelD
         reconnectTimeout = d->reconnect()->count();
 
     _queryReg.reset();
-    print(binds(&_queryReg, ":name", name.toStdString(), sqlite3pp::copy));
-    print(binds(&_queryReg, ":info", d->info(), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":name", name.toStringRepr().view(), sqlite3pp::copy));
+    print(binds(&_queryReg, ":info", bmcl::StringView(d->info()), sqlite3pp::nocopy));
     print(binds(&_queryReg, ":log", d->log()));
     print(binds(&_queryReg, ":isDynTimeout", d->isDynamicTimeout()));
     print(binds(&_queryReg, ":isReadOnly", d->isReadOnly()));
     print(binds(&_queryReg, ":reconnectTimeout", reconnectTimeout));
     print(binds(&_queryReg, ":timeout", d->timeout().count()));
     print(binds(&_queryReg, ":protocol_id", protocol_id.unwrap()));
-    print(binds(&_queryReg, ":settings", settings.c_str(), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":settings", bmcl::StringView(settings), sqlite3pp::nocopy));
     if (radar_id.isSome())
         print(binds(&_queryReg, ":radar", radar_id.unwrap()));
 

@@ -2,6 +2,7 @@
 #include "mcc/msg/ptr/Firmware.h"
 #include "mcc/msg/ptr/Tm.h"
 #include "mcc/msg/ParamList.h"
+#include "mcc/msg/SubHolder.h"
 
 #include <bmcl/DoubleEq.h>
 #include <QColor>
@@ -122,7 +123,7 @@ void FirmwareModel::setTmStorage(const bmcl::Rc<mccmsg::ITmStorage>& v)
     if (_tmStorage.isNull())
         return;
     setFirmware(_tmStorage->firmware().unwrap());
-    _tmStorage->namedAccess().addHandler([this](const ParamValue& p) { setParam(p); });
+    _tmStorage->namedAccess().addHandler([this](const ParamValue& p) { setParam(p); }).takeId();
 }
 
 }

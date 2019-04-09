@@ -85,6 +85,8 @@ public:
     ReqVisitorDb(DbObj* self)
         : mccmsg::ReqVisitor([self](const mccmsg::DbReq*) { self->response(caf::sec::unexpected_message); }), _self(self) {}
 
+    using mccmsg::ReqVisitor::visit;
+
 #define EXEC_RET if (r.err) _self->response(r.err); else _self->response(r.value);
 #define EXEC_STANDART_SET(nmsp) \
     void visit(const mccmsg::nmsp::Register_Request* msg) override { auto r = _self->_db->nmsp().execute(*msg); EXEC_RET; }        \

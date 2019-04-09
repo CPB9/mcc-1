@@ -1,5 +1,6 @@
 #include "device/Tm.h"
 #include "device/Px4Fsm.h"
+#include "mcc/msg/SubHolder.h"
 
 namespace mccmav {
 
@@ -218,25 +219,35 @@ void NamedAccess::removeHandler(const bmcl::Option<mccmsg::HandlerId>& id)
     _handlers.erase(i);
 }
 
-bmcl::Option<mccmsg::HandlerId> NamedAccess::addHandler(bmcl::StringView name, mccmsg::ValueHandler&& handler)
+bmcl::Option<mccmsg::SubHolder> NamedAccess::addHandler(bmcl::StringView name, mccmsg::ValueHandler&& handler, bool onChangeOnly)
 {
     auto id = nextCounter();
-    _handlers.emplace_back(id, [h = std::move(handler), s = name.toStdString()](const ParamValue& p) { if (p.name == s) h(p.value, bmcl::SystemClock::now()); });
-    return id;
+
+    auto l = [onChangeOnly, h = std::move(handler), s = name.toStdString()](const ParamValue& p)
+    {
+        if (p.name != s)
+            return;
+        assert(!onChangeOnly); //нужно откуда-то взять предыдущее значение для сравнения
+        if (!onChangeOnly)
+            h(p.value, bmcl::SystemClock::now());
+    };
+
+    _handlers.emplace_back(id, std::move(l));
+    return mccmsg::SubHolder(id, this);
 }
 
-bmcl::Option<mccmsg::HandlerId> NamedAccess::addHandler(bmcl::StringView name, NativeHandler&& handler)
+bmcl::Option<mccmsg::SubHolder> NamedAccess::addHandler(bmcl::StringView name, NativeHandler&& handler)
 {
     auto id = nextCounter();
     _handlers.emplace_back(id, [h = std::move(handler), s = name.toStdString()](const ParamValue& p) { if (p.name == s) h(p); });
-    return id;
+    return mccmsg::SubHolder(id, this);
 }
 
-mccmsg::HandlerId NamedAccess::addHandler(NativeHandler&& handler)
+mccmsg::SubHolder NamedAccess::addHandler(NativeHandler&& handler)
 {
     auto id = nextCounter();
     _handlers.emplace_back(id, [h = std::move(handler)](const ParamValue& p) { h(p); });
-    return id;
+    return mccmsg::SubHolder(id, this);
 }
 
 void NamedAccess::set(const ParamValue& v)

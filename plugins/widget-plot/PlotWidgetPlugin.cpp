@@ -1,7 +1,7 @@
 #include "mcc/plugin/PluginCache.h"
 #include "mcc/ui/WidgetPlugin.h"
 #include "mcc/uav/UavController.h"
-#include "mcc/ide/view/PlotWidget.h"
+#include "PlotTool.h"
 
 class PlotWidgetPlugin : public mccui::DockWidgetPlugin {
 public:
@@ -12,7 +12,7 @@ public:
             return false;
         }
 
-        setWidget(new mccide::PlotWidget(uavData->uavController()));
+        setWidget(new PlotTool(uavData->uavController()));
         return true;
     }
 

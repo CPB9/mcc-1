@@ -11,7 +11,6 @@ DeviceDescriptionObj::DeviceDescriptionObj(const Device& name, const ProtocolId&
     : _name(name)
     , _protocolId(protocolId)
     , _registerFirst(false)
-    , _showOnMap(true)
     , _log(false)
 {
 }
@@ -24,7 +23,6 @@ DeviceDescriptionObj::DeviceDescriptionObj(const Device& name
     , const bmcl::SharedBytes& pixmap
     , const bmcl::Option<Firmware>& firmware
     , bool registerFirst
-    , bool showOnMap
     , bool log)
     : _name(name)
     , _info(info.toStdString())
@@ -34,7 +32,6 @@ DeviceDescriptionObj::DeviceDescriptionObj(const Device& name
     , _pixmap(pixmap)
     , _firmware(firmware)
     , _registerFirst(registerFirst)
-    , _showOnMap(showOnMap)
     , _log(log)
 {
 }
@@ -47,7 +44,6 @@ const bmcl::SharedBytes& DeviceDescriptionObj::pixmap() const { return _pixmap; 
 const bmcl::Option<DeviceUi>& DeviceDescriptionObj::ui() const { return _ui; }
 const bmcl::Option<Firmware>& DeviceDescriptionObj::firmware() const { return _firmware; }
 bool DeviceDescriptionObj::registerFirst() const { return _registerFirst; }
-bool DeviceDescriptionObj::showOnMap() const { return _showOnMap; }
 bool DeviceDescriptionObj::log() const { return _log; }
 
 std::string DeviceDescriptionObj::getName() const

@@ -14,7 +14,6 @@ public:
     using DefaultHandler = std::function<void(const TmAny*)>;
     TmVisitor(const DefaultHandler& handler = [](const TmAny*) {});
     virtual ~TmVisitor();
-    virtual void visit(const TmMotion& msg);
     virtual void visit(const TmRoute& msg);
     virtual void visit(const TmRoutesList& msg);
     virtual void visit(const TmCalibration& msg);

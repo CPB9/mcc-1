@@ -104,6 +104,7 @@
   "DevicePlaneIcon" : "icons/device_plane.svg",
   "DeviceQuadcopterIcon" : "icons/device_quadcopter.svg",
   "DeviceSubmarineIcon" : "icons/device_submarine.svg",
+  "DeviceRotatorIcon" : "icons/device_rotator.svg",
   "DeviceUnknownIcon" : "icons/device_unknown.svg",
 
   "UserFile": "icons/user_file.png",

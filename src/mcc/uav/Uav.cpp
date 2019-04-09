@@ -14,6 +14,9 @@
 #include "mcc/msg/ParamList.h"
 #include "mcc/msg/TmView.h"
 #include "mcc/msg/ProtocolController.h"
+#include "mcc/msg/exts/Position.h"
+#include "mcc/msg/exts/Attitude.h"
+#include "mcc/msg/exts/Velocity.h"
 
 #include <bmcl/DoubleEq.h>
 
@@ -266,24 +269,54 @@ void Uav::setLastMsgTime(const QDateTime &time)
     _lastTmMsgDateTime = time;
 }
 
-void Uav::processNavigationMotion(const mccmsg::TmMotionPtr& motion)
+const bmcl::Option<const mccgeo::Position&> Uav::position() const
 {
-    if (_lastMotion.isNone())
-    {
-        _lastMotion = motion->state();
-        _lastMotionUpdate = motion->time();
+    if(_tmStorage.isNull())
+        return bmcl::None;
+    auto ext = tmStorage()->getExtension<mccmsg::TmPosition>();
+    if(ext.isNone())
+        return bmcl::None;
 
-        emit motionChanged(*_lastMotion);
-        return;
-    }
+    if(ext->position().isNone())
+        return bmcl::None;
 
-    size_t lastUpdate = bmcl::toMsecs(motion->time() - _lastMotionUpdate).count();
-    if (lastUpdate > 200)
-    {
-        emit motionChanged(motion->state());
-        _lastMotion = motion->state();
-        _lastMotionUpdate = motion->time();
-    }
+    return ext->position().unwrap();
+}
+
+const bmcl::Option<const mccgeo::Attitude&> Uav::attitude() const
+{
+    if(_tmStorage.isNull())
+        return bmcl::None;
+    auto ext = tmStorage()->getExtension<mccmsg::TmAttitude>();
+    if(ext.isNone())
+        return bmcl::None;
+    if(ext->attitude().isNone())
+        return bmcl::None;
+    return ext->attitude().unwrap();
+}
+
+const bmcl::Option<double> Uav::speed() const
+{
+    if(_tmStorage.isNull())
+        return bmcl::None;
+    auto ext = tmStorage()->getExtension<mccmsg::TmVelocity>();
+    if(ext.isNone())
+        return bmcl::None;
+    if(ext->speed().isNone())
+        return bmcl::None;
+    return ext->speed().unwrap();
+}
+
+const bmcl::Option<const mccgeo::Position&> Uav::velocity() const
+{
+    if(_tmStorage.isNull())
+        return bmcl::None;
+    auto ext = tmStorage()->getExtension<mccmsg::TmVelocity>();
+    if(ext.isNone())
+        return bmcl::None;
+    if(ext->velocity().isNone())
+        return bmcl::None;
+    return ext->velocity().unwrap();
 }
 
 void Uav::processRouteState(const mccmsg::TmRoutePtr& routeState)
@@ -393,6 +426,11 @@ void Uav::processSetTmView(const bmcl::Rc<const mccmsg::ITmView>& view)
     _errors->setTmStorage(_tmStorage);
     emit tmStorageUpdated();
     emit _manager->uavTmStorageUpdated(this);
+    if(_tmStorage->getExtension<mccmsg::TmPosition>().isSome())
+    {
+        auto handler = [this]() {positionChanged(); };
+        _tmStorage->getExtension<mccmsg::TmPosition>()->addHandler(std::move(handler), true).takeId();
+    }
 }
 
 void Uav::processUpdateTmStatusView(const bmcl::Rc<const mccmsg::ITmViewUpdate>& update)
@@ -703,6 +741,7 @@ const PointOfInterestPtrs& Uav::pointsOfInterest() const
 void Uav::addPointOfInterest(const PointOfInterestPtr& point)
 {
     _pointsOfInterest.push_back(point);
+    point->setBaseColor(_color);
     emit pointOfInterestAdded(point);
 }
 
@@ -760,17 +799,11 @@ void Uav::clearUserParams()
 double Uav::distanceToWaypoint(const mccmsg::Waypoint& wp, double* direction)
 {
     double distance = 0.0;
-    if (_lastMotion.isNone())
+    if (position().isNone())
         return distance;
-    _manager->geod().inverse(_lastMotion->position.latLon(), wp.position.latLon(), &distance, 0, direction);
+    _manager->geod().inverse(position()->latLon(), wp.position.latLon(), &distance, 0, direction);
     return distance;
 }
-
-const bmcl::Option<mccmsg::Motion>& Uav::motion() const
-{
-    return _lastMotion;
-}
-
 
 mccuav::MotionExtension* Uav::motionExtension()
 {
@@ -780,14 +813,6 @@ mccuav::MotionExtension* Uav::motionExtension()
 QString Uav::getDeviceDescriptionText() const
 {
     return QString::number(_deviceDescription->protocolId().id());
-}
-
-
-QString Uav::getRelativeAltitude() const
-{
-    if (_lastMotion.isSome() && _lastMotion->relativeAltitude.isSome())
-        return QString::number(*_lastMotion->relativeAltitude);
-    return "-";
 }
 
 bool Uav::hasFeature(UavFeatures feature) const
@@ -847,19 +872,6 @@ bool Uav::isRegistered() const
     return _frmDescription.isSome();
 }
 
-double Uav::speed() const
-{
-    if (_lastMotion.isNone())
-        return 0.0;
-
-    return _lastMotion->speed;
-}
-
-double Uav::targetHeading() const
-{
-    return _targetHeading;
-}
-
 bmcl::Option<std::size_t> Uav::nextWaypoint() const
 {
     if (_activeRouteName.isNone())
@@ -870,14 +882,6 @@ bmcl::Option<std::size_t> Uav::nextWaypoint() const
         return selectedR->activePointIndex();
 
     return bmcl::None;
-}
-
-double Uav::accuracy() const
-{
-    if (_lastMotion.isNone())
-        return 0.0;
-
-    return _lastMotion->accuracy;
 }
 
 void Uav::setSourcePixmapFile(bmcl::Bytes pixmap)
@@ -894,6 +898,9 @@ void Uav::setColor(const QColor& color, double scale)
     _pixmap = _iconGenerator.generate(color, scale);
     _previewPixmap = _iconGenerator.generate(color, 40, 40);
     emit pixmapChanged(_pixmap);
+
+    for(auto& p : _pointsOfInterest)
+        p->setBaseColor(_color);
 }
 
 void Uav::setColor(const QColor& color)

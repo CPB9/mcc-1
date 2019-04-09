@@ -195,9 +195,10 @@ bool Route::insertWaypoint(const mccmsg::Waypoint& waypoint, int afterIndex /*= 
         afterIndex = _points.size();
 
     _points.insert(_points.begin() + afterIndex, waypoint);
-    setSelectedPoint(afterIndex);
 
     emit waypointInserted(waypoint, afterIndex);
+
+    setSelectedPoint(afterIndex);
     syncActivePoint();
 
     return true;
@@ -631,7 +632,6 @@ void Route::load(const QString& path, const mccmsg::ProtocolController* p)
     QJsonArray waypointsObj = routeObj["waypoints"].toArray();
 
     mccmsg::Waypoints wps;
-    int index = 0;
     for (const auto& wp : waypointsObj)
     {
         QJsonObject wpObj = wp.toObject();

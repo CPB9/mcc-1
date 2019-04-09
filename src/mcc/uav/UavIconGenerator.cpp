@@ -45,9 +45,9 @@ QByteArray UavIconGenerator::replaceColor(const QColor& baseColor) const
     QColor lightColor = baseColor.darker(150);
     QColor darkColor = baseColor.darker(200);
 
-    svgImg.replace(LIGHT_MARKER, baseColor.name());
-    svgImg.replace(NORMAL_MARKER, lightColor.name());
-    svgImg.replace(DARK_MARKER, darkColor.name());
+    svgImg.replace(LIGHT_MARKER, baseColor.name(), Qt::CaseInsensitive);
+    svgImg.replace(NORMAL_MARKER, lightColor.name(), Qt::CaseInsensitive);
+    svgImg.replace(DARK_MARKER, darkColor.name(), Qt::CaseInsensitive);
     return svgImg.toUtf8();
 }
 

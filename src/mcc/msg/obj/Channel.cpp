@@ -2,6 +2,7 @@
 #include <sstream>
 #include <fmt/format.h>
 #include <bmcl/MakeRc.h>
+#include <bmcl/OptionSize.h>
 #include "mcc/msg/obj/Channel.h"
 
 namespace mccmsg {
@@ -87,7 +88,7 @@ std::vector<bmcl::StringView> split(bmcl::StringView s, char delim)
 
     do
     {
-        bmcl::Option<std::size_t> end = s.findFirstOf(delim, start);
+        auto end = s.findFirstOf(delim, start);
         elems.emplace_back(s.slice(start, end.unwrapOr(s.size())));
         start = end.unwrapOr(s.size()) + 1;
     } while (start < s.size());

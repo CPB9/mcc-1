@@ -68,7 +68,6 @@ protected:
 
     void removeWidget(QWidget* widget);
 
-    void setFieldValue(QLabel* label, const std::string& text, const QColor& color = QColor());
     void setFieldValue(QLabel* label, const QString& text, const QColor& color = QColor());
     void setFieldValue(QLabel* label, const QString& text, const QString& labelText, const QColor& color = QColor());
 

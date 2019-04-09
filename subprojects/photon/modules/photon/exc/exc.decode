@@ -1,0 +1,150 @@
+module exc
+
+import core::{Reader, Writer, Error, Address, Time, Generator, RingBuf}
+import clk::{TimePoint}
+
+/// 0x9c3e
+const STREAM_SEPARATOR : u16 = 39998;
+
+enum StreamDirection {
+    Uplink = 0,
+    Downlink = 1,
+}
+
+enum StreamType {
+    Firmware = 0,
+    Cmd = 1,
+    Telem = 2,
+    User = 3,
+    Dfu = 4,
+}
+
+enum PacketType {
+    Unreliable = 0,
+    Reliable = 1,
+    Receipt = 2,
+}
+
+enum ReceiptType {
+    Ok = 0,
+    PacketError = 1,
+    PayloadError = 2,
+    CounterCorrection = 3,
+}
+
+struct ReceiptPacket {
+    recievedCounter: u16,
+    recievedChecksum: u16,
+    timeRecieved: Time,
+}
+
+impl ReceiptPacket {
+    fn encode(&mut self, dest: *mut Writer) -> Error
+}
+
+struct DataHeader {
+    srcAddress: varuint,
+    destAddress: varuint,
+    streamDirection: StreamDirection,
+    packetType: PacketType,
+    streamType: StreamType,
+    counter: u16,
+    time: TimePoint,
+}
+
+struct Msg {
+    address: u32,
+    data: *const u8,
+    size: usize,
+}
+
+struct PacketRequest {
+    gen: Generator,
+    data: *mut void,
+    header: DataHeader,
+}
+
+type StreamHandler = &Fn(*const DataHeader, *mut Reader, *mut Writer, *mut void) -> Error;
+type TmHandler = &Fn(u8, u8, *const void, *mut void);
+
+struct StreamState {
+    currentReliableDownlinkCounter: u16,
+    currentReliableUplinkCounter: u16,
+    currentUnreliableDownlinkCounter: u16,
+    expectedReliableUplinkCounter: u16,
+    expectedUnreliableUplinkCounter: u16,
+}
+
+enum DeviceKind {
+    GroundControl,
+    Uav,
+    Slave,
+}
+
+struct Device {
+    skippedBytes: varuint,
+    address: varuint,
+    incomingHeader: DataHeader,
+
+    request: PacketRequest,
+    hasDataQueued: bool,
+    dataSize: usize,
+
+    inRingBuf: RingBuf,
+    inRingBufData: [u8; 2048],
+    outData: [u8; 512],
+
+    fwtStream: StreamState,
+    cmdStream: StreamState,
+    telemStream: StreamState,
+    dfuStream: StreamState,
+    userStream: StreamState,
+    deviceKind: DeviceKind,
+
+    tmHandler: TmHandler,
+    tmUserData: *mut void,
+}
+
+impl Device {
+    fn initGroundControl(&mut self, address: varuint)
+    fn initUav(&mut self, address: varuint)
+    fn initSlave(&mut self, address: varuint, tmHandler: TmHandler, tmUserData: *mut void)
+    fn acceptInput(&mut self, src: *const void, size: usize)
+    fn genNextPacket(&mut self, dest: *mut Writer) -> Error
+    fn queueCustomCmdPacket(&mut self, data: *mut void, gen: Generator) -> Error
+}
+
+enum ClientError {
+    Ok = 0,
+    NoDescriptorsLeft = 1,
+}
+
+component {
+    variables {
+        devices: &[Device; 16],
+        address: varuint,
+        slaveAddress: varuint,
+    }
+
+    statuses {
+        [addrs, 0, true]: {address, slaveAddress},
+        [skippedBytes, 0, true]: {devices[..].skippedBytes, devices[..].address},
+    }
+
+    impl {
+        fn init()
+        fn tick()
+
+        fn selfAddress() -> varuint
+        fn setAddress(address: varuint)
+        fn selfSlaveAddress() -> varuint
+        fn registerGroundControl(id: varuint, device: *mut *mut Device) -> ClientError
+        fn registerUav(id: varuint, device: *mut *mut Device) -> ClientError
+        fn registerSlave(id: varuint, device: *mut *mut Device, tmHandler: TmHandler, tmUserData: *mut void) -> ClientError
+        fn removeClient(id: varuint) -> ClientError
+    }
+
+    commands {
+        fn setAddress(address: varuint)
+    }
+}

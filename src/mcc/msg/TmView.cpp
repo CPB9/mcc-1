@@ -14,7 +14,7 @@ ITmViewUpdate::~ITmViewUpdate() {}
 ITmStorage::ITmStorage() : _counter(new TmExtensionCounter) {}
 ITmStorage::~ITmStorage() { removeAllHandlers(); }
 TmExtensionCounterPtr& ITmStorage::counter() { return _counter; }
-bmcl::Option<Group>   ITmStorage::group() const { return bmcl::None; }
+bmcl::Option<Group> ITmStorage::group() const { return bmcl::None; }
 void ITmStorage::removeAllHandlers()
 {
     for (auto& i : _exts)

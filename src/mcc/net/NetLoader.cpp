@@ -83,6 +83,8 @@ public:
     ReqVisitorNet(const mccmsg::DbReqPtr& ptr, NetLoader* self)
         : mccmsg::ReqVisitor([ptr, self](const mccmsg::DbReq*) { self->delegate(self->_db, ptr); }), _ptr(ptr), _self(self) {}
 
+    using mccmsg::ReqVisitor::visit;
+
     void visit(const mccmsg::device::Activate_Request* req) override
     {
         const auto& i = _self->_devices.find(req->data()._name);
@@ -114,6 +116,9 @@ public:
                 route_db_and_ui(_self, _self->_ui, _ptr);
             })
         , _self(self), _ptr(ptr) {}
+
+    using mccmsg::NoteVisitor::visit;
+
     void visit(const mccmsg::device::State*) override
     {
         route_db_and_ui(_self, _self->_ui, _ptr);

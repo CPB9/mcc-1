@@ -7,7 +7,6 @@
 #include "mcc/msg/ptr/Firmware.h"
 #include "mcc/msg/ptr/Tm.h"
 #include "mcc/msg/TmView.h"
-#include "mcc/msg/Nav.h"
 #include "mcc/msg/exts/Gps.h"
 
 #include "mcc/msg/Packet.h"
@@ -97,6 +96,9 @@ public:
         , _group(group)
     {
     }
+
+    using mccmsg::CmdVisitor::visit;
+
     void visit(const mccmsg::CmdParamList* msg) override { _self->execute(_group, std::move(_cmd), *msg); }
     void visit(const mccmsg::CmdCalibrationStart* msg) override { _self->execute(_group, std::move(_cmd), *msg); }
     void visit(const mccmsg::CmdCalibrationCancel* msg) override { _self->execute(_group, std::move(_cmd), *msg); }
@@ -501,7 +503,7 @@ caf::behavior Device::make_behavior()
             (
                 [this](const mccmsg::firmware::Register_ResponsePtr& rep)
                 {
-                    mccmsg::DeviceDescription d = new mccmsg::DeviceDescriptionObj(_id.device(), "", "", _id, bmcl::None, bmcl::SharedBytes(), rep->data()->name());
+                    mccmsg::DeviceDescription d = new mccmsg::DeviceDescriptionObj(_id.device(), "", "", _id, bmcl::None, bmcl::SharedBytes(), rep->data()->name(), false, false);
                     mccmsg::device::Updater u(std::move(d), { mccmsg::Field::Firmware });
 
                     request(_core, caf::infinite, mccmsg::makeReq(new mccmsg::device::Update_Request(std::move(u)))).then
@@ -588,6 +590,9 @@ caf::behavior Device::make_behavior()
 //                         for (const auto& k : ets.entries)
 //                             formation.addEntry(mccmsg::FormationEntry(i.id, mccgeo::Vector3D(k.pos.x, k.pos.y, k.pos.z)));
                         break;
+                    case ::photon::WaypointActionKind::None:
+                        //HACK
+                        break;
                     }
 
 //                    mccmsg::Waypoint point(pos, j.speed.unwrapOr(0.0), 0.0, /*wps, sleep, formation*/);
@@ -600,7 +605,9 @@ caf::behavior Device::make_behavior()
                 _helper.sendTrait(new mccmsg::TmRoute(_id.device(), mccmsg::Route(std::move(ws), std::move(ps))));
                 break;
             }
-
+            default:
+                //HACK
+                break;
             }
         }
       , [this](const ::photon::Value& value, const std::string& path)
@@ -762,11 +769,11 @@ caf::behavior Device::make_behavior()
                 photongen::nav::statuses::All msg;
                 if (photongenDeserialize(&msg, &reader, &state))
                 {
-                    _motion.position = mccgeo::Position(msg.latLon.latitude(), msg.latLon.longitude(), msg.altitude);
-                    _motion.velocity = mccgeo::Position(msg.velocity.x(), msg.velocity.y(), msg.velocity.z());
-                    _motion.speed = std::hypot(std::hypot(msg.velocity.x(), msg.velocity.y()), msg.velocity.z());
-                    _motion.orientation = mccgeo::Attitude(msg.orientation.heading(), msg.orientation.pitch(), msg.orientation.roll());
-                    _helper.sendTrait(new mccmsg::TmMotion(_id.device(), _motion));
+//                     _motion.position = mccgeo::Position(msg.latLon.latitude(), msg.latLon.longitude(), msg.altitude);
+//                     _motion.velocity = mccgeo::Position(msg.velocity.x(), msg.velocity.y(), msg.velocity.z());
+//                     _motion.speed = std::hypot(std::hypot(msg.velocity.x(), msg.velocity.y()), msg.velocity.z());
+//                     _motion.orientation = mccgeo::Attitude(msg.orientation.heading(), msg.orientation.pitch(), msg.orientation.roll());
+//                     _helper.sendTrait(new mccmsg::TmMotion(_id.device(), _motion));
                 }
             }
             else if (sub == v->statusMsgNavGpsStateSub())

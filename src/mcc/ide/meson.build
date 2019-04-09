@@ -24,9 +24,7 @@ moc_headers = [
   'view/AbstractConnectionWidget.h',
   'view/ContainerWidget.h',
   'view/MainWindow.h',
-  'view/MccPlot.h',
   'view/NetStatisticsWidget.h',
-  'view/PlotWidget.h',
   'view/SerialConnectionWidget.h',
   'view/UavBrowserTool.h',
 ]
@@ -49,9 +47,7 @@ src = [
   'toolbar/MainToolBar.cpp',
   'view/ContainerWidget.cpp',
   'view/MainWindow.cpp',
-  'view/MccPlot.cpp',
   'view/NetStatisticsWidget.cpp',
-  'view/PlotWidget.cpp',
   'view/SerialConnectionWidget.cpp',
   'view/UavBrowserTool.cpp',
   'view/UdpConnectionWidget.cpp',
@@ -68,7 +64,7 @@ mcc_ide_lib = shared_library('mcc-ide',
   sources : src + processed,
   link_with : [],
   include_directories : mcc_inc,
-  dependencies : [bmcl_dep, fmt_dep, qt5_core_dep, qt5_gui_dep, qt5_widgets_dep, qt5_serialport_dep, qwt_dep, ads_dep, libkml_dep, mcc_msg_dep, mcc_plugin_dep, mcc_path_dep, mcc_res_dep, mcc_uav_dep],
+  dependencies : [bmcl_dep, fmt_dep, qt5_core_dep, qt5_gui_dep, qt5_widgets_dep, qt5_serialport_dep, ads_dep, libkml_dep, mcc_msg_dep, mcc_plugin_dep, mcc_path_dep, mcc_res_dep, mcc_uav_dep],
   cpp_args : '-DBUILDING_MCC_IDE',
 )
 

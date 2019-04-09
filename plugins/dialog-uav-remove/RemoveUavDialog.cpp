@@ -14,7 +14,7 @@
 #include <QCheckBox>
 #include <QVBoxLayout>
 
-constexpr const char* questionTemplate = "Удалить аппарат <b>«%1»</b>?";
+//constexpr const char* questionTemplate = "Удалить аппарат <b>«%1»</b>?";
 constexpr const char* questionEmpty = "Удалить выбранный аппарат?";
 
 RemoveUavDialog::RemoveUavDialog(mccuav::UavController* uavController,

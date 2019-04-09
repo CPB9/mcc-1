@@ -9,7 +9,7 @@ namespace mccnet {
 class ChannelUdp : public ChannelImpl
 {
 public:
-    ChannelUdp(asio::io_service& io_service, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings, const mccmsg::NetUdpPtr& params);
+    ChannelUdp(asio::io_context& io_context, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings, const mccmsg::NetUdpPtr& params);
 
 protected:
     bool is_open_() const override;

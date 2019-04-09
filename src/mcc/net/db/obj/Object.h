@@ -149,7 +149,7 @@ public:
 
         _queryOne.reset();
         std::string s = name.toStdString();
-        print(binds(&_queryOne, ":name", s, sqlite3pp::nocopy));
+        print(binds(&_queryOne, ":name", bmcl::StringView(s), sqlite3pp::nocopy));
         auto p = print(exec(&_queryOne));
         if (p.isSome())
             return mccmsg::make_error(mccmsg::Error::NotFound, p.take());
@@ -212,7 +212,7 @@ public:
     bmcl::Option<ObjectId> getId(const N& name)
     {
         _queryId.reset();
-        print(binds(&_queryId, ":name", name.toStdString(), sqlite3pp::copy));
+        print(binds(&_queryId, ":name", name.toStringRepr().view(), sqlite3pp::copy));
         print(exec(&_queryId));
 
         if (_queryId.next())
@@ -236,7 +236,7 @@ public:
         _objs.remove(name);
         _queryRemoveOne.reset();
         std::string s = name.toStdString();
-        print(binds(&_queryRemoveOne, ":name", s, sqlite3pp::nocopy));
+        print(binds(&_queryRemoveOne, ":name", bmcl::StringView(s), sqlite3pp::nocopy));
         auto p = print(exec(&_queryRemoveOne));
         if (p.isSome())
             return mccmsg::make_error(mccmsg::Error::NotFound, p.take());

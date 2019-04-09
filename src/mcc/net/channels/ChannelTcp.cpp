@@ -6,9 +6,9 @@
 
 namespace mccnet {
 
-ChannelTcp::ChannelTcp(asio::io_service& io_service, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings, const mccmsg::NetTcpPtr& params)
-    : ChannelImpl(io_service, id, std::move(exch), settings)
-    , _socket(io_service)
+ChannelTcp::ChannelTcp(asio::io_context& io_context, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings, const mccmsg::NetTcpPtr& params)
+    : ChannelImpl(io_context, id, std::move(exch), settings)
+    , _socket(io_context)
     , _params(params)
 {
 }

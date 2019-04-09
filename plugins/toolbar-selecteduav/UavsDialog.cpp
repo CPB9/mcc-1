@@ -103,9 +103,9 @@ bool UavsDialog::eventFilter(QObject* watched, QEvent* event)
         {
             if(watched == w)
             {
-                if(w->currentVehicle() != _uavController->selectedUav())
+                if(w->currentUav() != _uavController->selectedUav())
                 {
-                    _uavController->selectUav(w->currentVehicle());
+                    _uavController->selectUav(w->currentUav());
 
                     return true;
                 }
@@ -120,7 +120,7 @@ void UavsDialog::updateDeviceDescription(const mccuav::Uav* vehicle)
 {
     for(auto& widget : _uavWidgets)
     {
-        if(widget->currentVehicle() == vehicle)
+        if(widget->currentUav() == vehicle)
         {
             widget->updateName();
             return;
@@ -133,7 +133,7 @@ void UavsDialog::updateList()
     // add new
     for(auto device : _uavController->uavsList())
     {
-        bool found = std::any_of(_uavWidgets.begin(), _uavWidgets.end(), [&](const auto& w) { return w->currentVehicle() == device; });
+        bool found = std::any_of(_uavWidgets.begin(), _uavWidgets.end(), [&](const auto& w) { return w->currentUav() == device; });
 
         if(!found)
         {
@@ -152,7 +152,7 @@ void UavsDialog::updateList()
     for(auto it = _uavWidgets.begin(); it != _uavWidgets.end();)
     {
         const auto& devices = _uavController->uavsList();
-        bool has = std::any_of(devices.begin(), devices.end(), [&](const auto d) { return d == (*it)->currentVehicle(); });
+        bool has = std::any_of(devices.begin(), devices.end(), [&](const auto d) { return d == (*it)->currentUav(); });
         if(!has)
         {
             UavWidget* w = *it;
@@ -166,8 +166,8 @@ void UavsDialog::updateList()
     std::stable_sort(_uavWidgets.begin(), _uavWidgets.end(),
                      [](UavWidget* left, UavWidget* right)
     {
-        return QString::compare(left->currentVehicle()->getName(),
-                                right->currentVehicle()->getName(),
+        return QString::compare(left->currentUav()->getName(),
+                                right->currentUav()->getName(),
                                 Qt::CaseInsensitive) < 0;
     });
 

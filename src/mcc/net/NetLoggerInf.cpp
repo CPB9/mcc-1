@@ -83,7 +83,7 @@ void DefaultLogWriter::open(bmcl::StringView folder, bmcl::SystemTime time)
         close(bmcl::toMsecs(time - _time));
 
     _time = time;
-    std::time_t t = std::chrono::system_clock::to_time_t(time);
+    //std::time_t t = std::chrono::system_clock::to_time_t(time);
     fmt::string_view f(folder.data(), folder.size());
     _name = fmt::format("{}/{}/{}.bin", mccpath::getLogsPath(), f, mccmsg::TmSessionDescriptionObj::genChannelFile(_channel));
 

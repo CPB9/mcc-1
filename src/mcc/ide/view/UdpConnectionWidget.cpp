@@ -67,8 +67,6 @@ mccmsg::NetUdpPtr UdpConnectionWidget::getUdpParams() const
 
 mccmsg::ChannelDescription UdpConnectionWidget::fillNetDescription(const mccmsg::Channel& channel, const mccmsg::Protocol& protocol, const QString& info, bool log, int timeout, bool isDynamicTimeout, bool isReadOnly, const bmcl::Option<std::chrono::seconds>& reconnect) const
 {
-    bool autoReconnect = _ui->autoReconnect->isChecked();
-
     if (_transport == mccmsg::NetTransport::Tcp)
     {
         auto p = bmcl::makeRc<const mccmsg::NetTcpParams>(_ui->host->text().toStdString(), _ui->sendPort->text().toUInt());

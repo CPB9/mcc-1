@@ -1,0 +1,2 @@
+option('separate_compilation', type: 'boolean', value: true)
+option('shared_lib', type: 'boolean', value: true)

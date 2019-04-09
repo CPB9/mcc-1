@@ -57,8 +57,6 @@ struct UiFileDescriptor
     mccmsg::Request_StatePtr    cmdState;
     std::string                 path;
 
-    UiFileDescriptor() = default;
-
     UiFileDescriptor(const mccmsg::File& file, const mccmsg::Device& device, const std::string& path, mccmsg::RequestId cmdId)
         : file(file), device(device), cmdId(cmdId), path(path)
     {}
@@ -71,13 +69,12 @@ using OnState = std::function<void(const mccmsg::Request_StatePtr&)>;
 class MCC_UAV_DECLSPEC ResponseHandle
 {
 public:
-    ResponseHandle(UavController* self, mccuav::ExchangeService* service, mccmsg::DevReqPtr&& r);
-    ResponseHandle(UavController* self, mccuav::ExchangeService* service, const mccmsg::DevReqPtr& r);
+    ResponseHandle(mccuav::ExchangeService* service, mccmsg::DevReqPtr&& r);
+    ResponseHandle(mccuav::ExchangeService* service, const mccmsg::DevReqPtr& r);
     ~ResponseHandle();
     mccmsg::DevReqPtr then(OnSuccessCmd&& f = nullptr, OnError&& e = nullptr, OnState&& s = nullptr);
 private:
     bool _sent;
-    UavController* _self; //FIXME: rc
     mccuav::ExchangeService* _service; //FIXME: rc
     mccmsg::DevReqPtr _r;
 };
@@ -146,7 +143,6 @@ public slots:
 
     void onUavStatistics(const mccmsg::StatDevice& statesList);
 
-    void onTraitNavigationMotion(const mccmsg::TmMotionPtr& motion);
     void onTraitRouteState(const mccmsg::TmRoutePtr& routeState);
     void onTraitRoutesList(const mccmsg::TmRoutesListPtr& routesList);
     void onUavActivated(const mccmsg::Device& device, bool isActive);
@@ -191,7 +187,7 @@ signals:
     void uavActivated(Uav* uav, bool isActive);
     void uavStateChanged(Uav* uav);
     void uavListReordered();
-    
+
     void uavReadyForExchange(Uav* uav);
     void uavNotReadyForExchange(Uav* uav);
 

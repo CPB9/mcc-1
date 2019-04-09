@@ -20,6 +20,7 @@ class TmUpdateMavlink : public mccmsg::ITmViewUpdate
 public:
     TmUpdateMavlink(const mccmsg::Device& device);
     ~TmUpdateMavlink() override;
+    using mccmsg::ITmViewUpdate::visit;
     virtual void visit(ITmUpdateVisitor&) const = 0;
 };
 
@@ -28,6 +29,7 @@ class TmUpdateParam: public TmUpdateMavlink
 public:
     TmUpdateParam(const mccmsg::Device& device, const ParamValue& param);
     ~TmUpdateParam();
+    using TmUpdateMavlink::visit;
     void visit(ITmUpdateVisitor&) const override;
     const ParamValue& value() const;
 private:
@@ -39,6 +41,7 @@ class TmUpdateMode : public TmUpdateMavlink
 public:
     TmUpdateMode(const mccmsg::Device& device, uint8_t baseMode, uint32_t customMode, uint8_t systemState);
     ~TmUpdateMode();
+    using TmUpdateMavlink::visit;
     void visit(ITmUpdateVisitor&) const override;
     uint8_t baseMode() const;
     uint32_t customMode() const;
@@ -54,6 +57,7 @@ class TmUpdateMsg : public TmUpdateMavlink
 public:
     TmUpdateMsg(const mccmsg::Device& device, const MavlinkMessagePtr& msg);
     ~TmUpdateMsg();
+    using TmUpdateMavlink::visit;
     void visit(ITmUpdateVisitor&) const override;
     const MavlinkMessagePtr& msg() const;
 private:
@@ -123,9 +127,9 @@ public:
     void removeHandler(const bmcl::Option<mccmsg::HandlerId>&) override;
     void removeAllHandlers() override;
 
-    bmcl::Option<mccmsg::HandlerId> addHandler(bmcl::StringView name, mccmsg::ValueHandler&& handler) override;
-    bmcl::Option<mccmsg::HandlerId> addHandler(bmcl::StringView name, NativeHandler&& handler);
-    mccmsg::HandlerId addHandler(NativeHandler&& handler);
+    bmcl::Option<mccmsg::SubHolder> addHandler(bmcl::StringView name, mccmsg::ValueHandler&& handler, bool onChangeOnly) override;
+    bmcl::Option<mccmsg::SubHolder> addHandler(bmcl::StringView name, NativeHandler&& handler);
+    mccmsg::SubHolder addHandler(NativeHandler&& handler);
 private:
     void set(const ParamValue&);
     bmcl::OptionRc<const Firmware> _firmware;

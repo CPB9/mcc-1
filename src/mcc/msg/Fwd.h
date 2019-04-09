@@ -5,6 +5,8 @@
 namespace mccmsg {
 
 using RequestId = std::size_t;
+using HandlerId = std::size_t;
+class SubHolder;
 
 class Device;
 class Group;
@@ -88,7 +90,6 @@ namespace mccmsg{
 
 class TmVisitor;
 class TmAny;
-class TmMotion;
 class TmRoute;
 class TmRoutesList;
 class TmCalibration;
@@ -131,4 +132,12 @@ namespace mccmsg
     class PropertyDirection;
     class PropertySpeed;
     class PropertyFormation;
+}
+
+namespace mccmsg
+{
+    class ITmExtension;
+    class ITmSimpleExtension;
+    class TmPosition;
+    class TmAttitude;
 }

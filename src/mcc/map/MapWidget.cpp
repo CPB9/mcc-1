@@ -818,6 +818,7 @@ void MapWidget::centerOn(const mccgeo::Bbox& bbox)
     QRect newViewport = _rect->visibleMapRect().toRect();
     _layers->viewportResetEvent(oldZoom, newZoom, oldViewport, newViewport);
     updateMap();
+    emit _rect->viewChanged();
     emit zoomLevelChanged(newZoom);
 }
 

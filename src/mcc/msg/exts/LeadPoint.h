@@ -14,7 +14,7 @@ public:
     ~TmLeadPoint() override;
     static const TmExtension& id();
     static const char* info();
-    bmcl::Option<mccgeo::Position> position() const;
+    const bmcl::Option<mccgeo::Position>& position() const;
     void set(bmcl::SystemTime t, const bmcl::Option<mccgeo::Position>&);
 private:
     bmcl::Option<mccgeo::Position> _leadPoint;

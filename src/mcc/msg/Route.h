@@ -3,10 +3,10 @@
 #include <vector>
 #include <bitset>
 #include <bmcl/Option.h>
-#include "mcc/msg/Nav.h"
 #include "mcc/msg/Tm.h"
 #include "mcc/msg/Cmd.h"
 #include "mcc/msg/Property.h"
+#include "mcc/geo/Position.h"
 
 namespace mccmsg {
 
@@ -94,7 +94,7 @@ public:
     TmRoutesList(const Device& device, RoutesProperties&& properties, bmcl::Option<RouteName> activeRoute = bmcl::None);
     void visit(TmVisitor* visitor) const override;
     const RoutesProperties& properties() const;
-    bmcl::Option<RouteName> activeRoute() const;
+    const bmcl::Option<RouteName>& activeRoute() const;
 private:
     RoutesProperties _properties;
     bmcl::Option<RouteName> _activeRoute;

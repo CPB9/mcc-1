@@ -312,8 +312,8 @@ void CompasModel::updateScaleFromCamera()
         return;
 
     const float factor(0.25f);
-    float r = world()->camera().position().length();
-    for(uint i = 0; i < _labels.size(); ++i)
+    float r = (world()->cameraPosition() - world()->cameraTarget()).length();
+    for(size_t i = 0; i < _labels.size(); ++i)
     {
         float deg = 90 * i;
         _labels[i]->setCoordinates(r * factor * std::sin(bmcl::degreesToRadians(deg)),

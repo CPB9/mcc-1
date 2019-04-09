@@ -121,7 +121,7 @@ public:
     ~Request_State();
     const RequestPtr& request() const;
     uint8_t progress() const;
-    bmcl::Option<ReqResult> result() const;
+    const bmcl::Option<ReqResult>& result() const;
 private:
     RequestPtr _request;
     uint8_t    _progress;

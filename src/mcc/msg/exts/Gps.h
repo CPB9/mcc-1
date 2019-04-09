@@ -45,7 +45,7 @@ public:
     static const char* info();
     const GpsSats& satellites() const;
     uint8_t count() const;
-    bmcl::Option<GpsFixType> fixType() const;
+    const bmcl::Option<GpsFixType>& fixType() const;
 
     void set(bmcl::SystemTime t, GpsSats&& sats);
     void set(bmcl::SystemTime t, uint8_t count, bmcl::Option<GpsFixType>);

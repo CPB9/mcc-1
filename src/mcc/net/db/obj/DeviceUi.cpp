@@ -66,8 +66,8 @@ caf::result<mccmsg::deviceUi::DescriptionS_ResponsePtr> DeviceUi::execute(const 
 {
     const mccmsg::ProtocolValue& pv = request.data();
     _get_by_local.reset();
-    print(binds(&_get_by_local, ":protocol", pv.protocol().toStdString(), sqlite3pp::copy));
-    print(binds(&_get_by_local, ":info", pv.value(), sqlite3pp::copy));
+    print(binds(&_get_by_local, ":protocol", pv.protocol().toStringRepr().view(), sqlite3pp::copy));
+    print(binds(&_get_by_local, ":info", bmcl::StringView(pv.value()), sqlite3pp::copy));
     auto r = print(exec(&_get_by_local));
     if (r.isSome() || !_get_by_local.next())
         return mccmsg::Error::NotFound;
@@ -124,8 +124,8 @@ bmcl::Result<mccmsg::DeviceUi, caf::error> DeviceUi::insert(const mccmsg::Device
         return mccmsg::make_error(mccmsg::Error::ProtocolUnknown);
 
     _queryReg.reset();
-    print(binds(&_queryReg, ":name", name.toStdString(), sqlite3pp::copy));
-    print(binds(&_queryReg, ":info", d->id().value(), sqlite3pp::copy));
+    print(binds(&_queryReg, ":name", name.toStringRepr().view(), sqlite3pp::copy));
+    print(binds(&_queryReg, ":info", bmcl::StringView(d->id().value()), sqlite3pp::copy));
     print(binds(&_queryReg, ":protocol_id", protocol_id.unwrap()));
     print(binds(&_queryReg, ":binary", d->data().view(), sqlite3pp::nocopy));
 

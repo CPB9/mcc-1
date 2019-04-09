@@ -5,14 +5,15 @@
 #include "UavStatisticsWidget.h"
 
 #include "mcc/ide/toolbar/MainToolBar.h"
+#include "mcc/msg/exts/StateStorage.h"
 #include "mcc/uav/GlobalActions.h"
 #include "mcc/uav/Uav.h"
 #include "mcc/uav/UavController.h"
+#include "mcc/uav/UavErrorsFilteredModel.h"
 #include "mcc/uav/UavExecCommands.h"
 #include "mcc/ui/ClickableLabel.h"
 #include "mcc/ui/SliderCheckBox.h"
 #include "mcc/ui/TextUtils.h"
-#include "mcc/msg/exts/StateStorage.h"
 
 #include <QFrame>
 #include <QHBoxLayout>
@@ -93,13 +94,13 @@ UavWidget::UavWidget(mccuav::Uav* uav,
         _hovered = false; // Hack for QEvent::HoverLeave bug
         update();
 
-        if(currentVehicle() != nullptr)
-            emit vehicleMenuClicked(currentVehicle()->device());
+        if(currentUav() != nullptr)
+            emit vehicleMenuClicked(currentUav()->device());
     });
     connect(_slider, &mccui::OnOffSliderCheckBox::sliderStateChanged,
             this, [this](const bmcl::Uuid&, bool checked)
     {
-        _uavController->activateUav(currentVehicle(), checked);
+        _uavController->activateUav(currentUav(), checked);
     });
     connect(_uavController.get(), &mccuav::UavController::selectionChanged, this, &UavWidget::checkSelection);
 
@@ -112,10 +113,6 @@ UavWidget::~UavWidget()
 
 void UavWidget::tmStorageClear()
 {
-    if (_currentUav == nullptr || _currentUav->tmStorage().isNull())
-        return;
-    const auto& tm = _currentUav->tmStorage();
-    tm->removeHandler(_handlerState);
     _handlerState.clear();
 }
 
@@ -129,18 +126,20 @@ void UavWidget::tmStorageUpdated()
     if (s.isSome())
     {
         _handlerState = s->addHandler([this] { updateModes(); updateFailures(); }, true);
+        connect(_currentUav->filteredErrors(), &mccuav::UavErrorsFilteredModel::dataChanged, this, &UavWidget::updateFailures);
+        connect(_currentUav->filteredErrors(), &mccuav::UavErrorsFilteredModel::modelReset, this, &UavWidget::updateFailures);
     }
 }
 
 void UavWidget::updateCurrentUav(mccuav::Uav* uav)
 {
-    if(currentVehicle() == uav)
+    if(currentUav() == uav)
         return;
 
-    if(currentVehicle() != nullptr)
+    if(currentUav() != nullptr)
     {
-        currentVehicle()->disconnect(this);
-        currentVehicle()->execCommands()->disconnect(this);
+        currentUav()->disconnect(this);
+        currentUav()->execCommands()->disconnect(this);
         tmStorageClear();
     }
 
@@ -149,34 +148,35 @@ void UavWidget::updateCurrentUav(mccuav::Uav* uav)
     if(_currentUav == nullptr)
         return;
 
-    connect(currentVehicle(), &mccuav::Uav::pixmapChanged, this, &UavWidget::updatePixmap);
-    connect(currentVehicle(), &mccuav::Uav::activatedChanged, this, &UavWidget::updateVehicleActivation);
-    connect(currentVehicle()->execCommands(), &mccuav::UavExecCommands::commandsChanged, this, &UavWidget::updateCommands);
-    connect(currentVehicle(), &mccuav::Uav::uavStatisticsChanged, this, &UavWidget::updateStatistics);
-    connect(currentVehicle(), &mccuav::Uav::tmStorageUpdated, this, &UavWidget::tmStorageUpdated);
+    connect(currentUav(), &mccuav::Uav::pixmapChanged, this, &UavWidget::updatePixmap);
+    connect(currentUav(), &mccuav::Uav::activatedChanged, this, &UavWidget::updateUavActivation);
+    connect(currentUav()->execCommands(), &mccuav::UavExecCommands::commandsChanged, this, &UavWidget::updateCommands);
+    connect(currentUav(), &mccuav::Uav::uavStatisticsChanged, this, &UavWidget::updateStatistics);
+    connect(currentUav(), &mccuav::Uav::tmStorageUpdated, this, &UavWidget::tmStorageUpdated);
 
     tmStorageUpdated();
-    updateVehicleActivation();
+    updateUavActivation();
 
     updateCommands();
     updateModes();
+    updateFailures();
 
     checkSelection();
 }
 
-void UavWidget::updateVehicleActivation()
+void UavWidget::updateUavActivation()
 {
-    if(currentVehicle() == nullptr)
+    if(currentUav() == nullptr)
         return;
 
-    _slider->setChecked(currentVehicle()->isActivated());
+    _slider->setChecked(currentUav()->isActivated());
 
-    if(!currentVehicle()->isActivated())
+    if(!currentUav()->isActivated())
         _nameWidget->activateProcess(false);
 
-    _modeWidget->setVisible(currentVehicle()->isActivated() && _modeWidget->mayToShow());
-    _failureWidget->setVisible(currentVehicle()->isActivated() && _failureWidget->mayToShow());
-    _statisticsWidget->setVisible(currentVehicle()->isActivated() && _statisticsWidget->mayToShow() && isStatisticsVisible());
+    _modeWidget->setVisible(currentUav()->isActivated() && _modeWidget->mayToShow());
+    _failureWidget->setVisible(currentUav()->isActivated() && _failureWidget->mayToShow());
+    _statisticsWidget->setVisible(currentUav()->isActivated() && _statisticsWidget->mayToShow() && isStatisticsVisible());
 
     updateMinimumSize();
     updatePixmap();
@@ -185,13 +185,13 @@ void UavWidget::updateVehicleActivation()
 
 void UavWidget::updatePixmap()
 {
-    if(currentVehicle() == nullptr)
+    if(currentUav() == nullptr)
         return;
 
     // FIXME: HDPI pixmaps
     constexpr QSize size(32, 32);
-    QPixmap pixmap = currentVehicle()->pixmapGenerator().generate(currentVehicle()->color(), size.width(), size.height());
-    if(!currentVehicle()->isActivated())
+    QPixmap pixmap = currentUav()->pixmapGenerator().generate(currentUav()->color(), size.width(), size.height());
+    if(!currentUav()->isActivated())
     {
         QImage img(pixmap.size(), QImage::Format_ARGB32_Premultiplied);
         img.fill(QColor(0,0,0,0));
@@ -206,36 +206,36 @@ void UavWidget::updatePixmap()
 
 void UavWidget::updateName()
 {
-    if(currentVehicle() == nullptr)
+    if(currentUav() == nullptr)
         return;
 
-    _nameWidget->setName(currentVehicle()->getName());
+    _nameWidget->setName(currentUav()->getName());
 }
 
 void UavWidget::updateCommands()
 {
-    if(currentVehicle() == nullptr)
+    if(currentUav() == nullptr)
         return;
 
-    _nameWidget->activateProcess(!currentVehicle()->execCommands()->commands().empty());
+    _nameWidget->activateProcess(!currentUav()->execCommands()->commands().empty());
 
-    if(!currentVehicle()->execCommands()->commands().empty())
+    if(!currentUav()->execCommands()->commands().empty())
     {
         int value(0);
-        for(const auto& command : currentVehicle()->execCommands()->commands())
+        for(const auto& command : currentUav()->execCommands()->commands())
         {
             value += command.progress();
         }
-        value /= currentVehicle()->execCommands()->commands().size();
+        value /= currentUav()->execCommands()->commands().size();
     }
 }
 
 void UavWidget::updateModes()
 {
-    if(currentVehicle() == nullptr)
+    if(currentUav() == nullptr)
         return;
 
-    const auto& s = currentVehicle()->tmStorage();
+    const auto& s = currentUav()->tmStorage();
     if (!s.isNull())
     {
         const auto st = s->getExtension<mccmsg::IStateStorage>();
@@ -251,24 +251,41 @@ void UavWidget::updateModes()
         _modeWidget->setSubmode(QString());
     }
 
-    _modeWidget->setVisible(currentVehicle()->isActivated() && _modeWidget->mayToShow());
+    _modeWidget->setVisible(currentUav()->isActivated() && _modeWidget->mayToShow());
     updateMinimumSize();
 }
 
 void UavWidget::updateFailures()
 {
-    if(currentVehicle() == nullptr)
+    if(currentUav() == nullptr)
         return;
-    _failureWidget->setVisible(currentVehicle()->isActivated() && _failureWidget->mayToShow());
+
+    if(_currentUav->filteredErrors()->rowCount() > 0)
+    {
+        QString text;
+        for(int i = 0; i < _currentUav->filteredErrors()->rowCount(); ++i)
+        {
+            if(i > 0)
+                text += "\n";
+            text += _currentUav->filteredErrors()->data(_currentUav->filteredErrors()->index(i, 0)).toString();
+        }
+
+        _failureWidget->setText(text);
+    }
+    else
+        _failureWidget->setText(QString());
+
+    _failureWidget->setVisible(currentUav()->isActivated() && _failureWidget->mayToShow());
+
     updateMinimumSize();
 }
 
 void UavWidget::updateStatistics()
 {
-    if(currentVehicle() == nullptr)
+    if(currentUav() == nullptr)
         return;
 
-    _statisticsWidget->setStatistics(currentVehicle()->statDevice());
+    _statisticsWidget->setStatistics(currentUav()->statDevice());
 }
 
 bool UavWidget::event(QEvent* event)
@@ -289,7 +306,7 @@ bool UavWidget::event(QEvent* event)
 
 void UavWidget::paintEvent(QPaintEvent* event)
 {
-    bool currentInList = _uavController->isUavSelected(currentVehicle()) && !isSeparatedMode();
+    bool currentInList = _uavController->isUavSelected(currentUav()) && !isSeparatedMode();
     if(_hovered || currentInList)
     {
         QColor c;
@@ -328,14 +345,14 @@ void UavWidget::updateMinimumSize()
 
     if(isSeparatedMode())
     {
-        if(currentVehicle() == nullptr)
+        if(currentUav() == nullptr)
             minW = 0;
         else
             minW = layoutMargin * 2 +
                    _nameWidget->width() +
-                   (currentVehicle()->isActivated() && _statisticsWidget->mayToShow() && isStatisticsVisible() ? _statisticsWidget->minimumWidth() : 0) +
-                   (currentVehicle()->isActivated() && _modeWidget->mayToShow() ? _modeWidget->minimumWidth() : 0) +
-                   (currentVehicle()->isActivated() && _failureWidget->mayToShow() ?  _failureWidget->minimumWidth() : 0) +
+                   (currentUav()->isActivated() && _statisticsWidget->mayToShow() && isStatisticsVisible() ? _statisticsWidget->minimumWidth() : 0) +
+                   (currentUav()->isActivated() && _modeWidget->mayToShow() ? _modeWidget->minimumWidth() : 0) +
+                   (currentUav()->isActivated() && _failureWidget->mayToShow() ?  _failureWidget->minimumWidth() : 0) +
                    _slider->minimumWidth() + actionsMargin;
     }
     else
@@ -348,6 +365,9 @@ void UavWidget::updateMinimumSize()
                _slider->minimumWidth() + actionsMargin;
     }
     setMinimumWidth(minW);
+    resize(minW, height());
+
+    update();
 }
 
 void UavWidget::setSeparatedMode(bool separatedMode)
@@ -370,8 +390,8 @@ void UavWidget::setStatisticsVisible(bool visible)
 
     _isStatisticsVisible = visible;
 
-    _statisticsWidget->setVisible(currentVehicle() != nullptr &&
-                                  currentVehicle()->isActivated() &&
+    _statisticsWidget->setVisible(currentUav() != nullptr &&
+                                  currentUav()->isActivated() &&
                                   _statisticsWidget->mayToShow() &&
                                   isStatisticsVisible());
     updateMinimumSize();

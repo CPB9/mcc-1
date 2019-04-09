@@ -1,0 +1,210 @@
+module core
+
+variant Option<T> {
+    None,
+    Some(T),
+}
+
+enum Error {
+    Ok,
+    PacketNotFound,
+    InvalidBerLength,
+    UnexpectedEndOfBerStream,
+    NotEnoughSpace,
+    NotEnoughData,
+    InvalidSize,
+    InvalidDataHe,
+    InvalidPacketHeader,
+    InvalidDataSize,
+    InvalidAddressType,
+    InvalidReservedFieldValue,
+    InvalidStreamType,
+    InvalidErrorControlType,
+    InvalidWindowSize,
+    InvalidChecksum,
+    InvalidSequenceCounter,
+    InvalidTimeValue,
+    EventIsDenied,
+    InvalidTimeType,
+    InvalidComponentId,
+    InvalidCmdId,
+    InvalidMessageId,
+    InvalidValue,
+    NoSuchStatusMsg,
+    MaximumOnceRequestsReached,
+    WouldBlock,
+    BlockingCmdOutsidePvu,
+    ScriptNameConflict,
+    InvalidDeviceId,
+    NoDataAvailable,
+    InternalError,
+    NotImplemented,
+}
+
+struct Reader {
+    current: *const u8,
+    start: *const u8,
+    end: *const u8,
+}
+
+impl Reader {
+    fn init(&mut self, data: *const void, size: usize)
+    fn isAtEnd(&self) -> bool
+    fn currentPtr(&self) -> *const u8
+    fn readableSize(&self) -> usize
+    fn skip(&mut self, size: usize)
+    fn read(&mut self, dest: *mut void, size: usize)
+
+    fn peekU8(&self) -> u8
+    fn peekU16Be(&self) -> u16
+
+    fn readU8(&mut self) -> u8
+
+    fn readU16Be(&mut self) -> u16
+    fn readU32Be(&mut self) -> u32
+    fn readU64Be(&mut self) -> u64
+
+    fn readU16Le(&mut self) -> u16
+    fn readU32Le(&mut self) -> u32
+    fn readU64Le(&mut self) -> u64
+
+    fn readF32Le(&mut self) -> f32
+    fn readF64Le(&mut self) -> f64
+
+    fn readUSizeLe(&mut self) -> usize
+    fn readUSizeBe(&mut self) -> usize
+
+    fn readPtrLe(&mut self) -> *mut void
+    fn readPtrBe(&mut self) -> *mut void
+
+    fn readChar(&mut self) -> char
+
+    fn readVaruint(&mut self, dest: *mut varuint) -> Error
+    fn readVarint(&mut self, dest: *mut varint) -> Error
+
+    fn slice(&mut self, length: usize, dest: *mut Reader)
+    fn sliceToEnd(&mut self, dest: *mut Reader)
+}
+
+struct Writer {
+    current: *mut u8,
+    start: *mut u8,
+    end: *const u8,
+}
+
+impl Writer {
+    fn init(&mut self, dest: *mut void, size: usize)
+
+    fn currentPtr(&self) -> *mut u8
+    fn isAtEnd(&self) -> bool
+    fn writableSize(&self) -> usize
+
+    fn setCurrentPtr(&mut self, ptr: *mut u8)
+    fn sliceFromBack(&mut self, length: usize, dest: *mut Writer)
+
+    fn write(&mut self, src: *const void, size: usize)
+    fn skip(&mut self, size: usize)
+
+    fn writeU8(&mut self, value: u8)
+
+    fn writeU16Be(&mut self, value: u16)
+    fn writeU32Be(&mut self, value: u32)
+    fn writeU64Be(&mut self, value: u64)
+
+    fn writeU16Le(&mut self, value: u16)
+    fn writeU32Le(&mut self, value: u32)
+    fn writeU64Le(&mut self, value: u64)
+
+    fn writeF32Le(&mut self, value: f32)
+    fn writeF64Le(&mut self, value: f64)
+
+    fn writeUSizeLe(&mut self, value: usize)
+    fn writeUSizeBe(&mut self, value: usize)
+
+    fn writePtrLe(&mut self, value: *const void)
+    fn writePtrBe(&mut self, value: *const void)
+
+    fn writeChar(&mut self, value: char)
+
+    fn writeVaruint(&mut self, value: varuint) -> Error
+    fn writeVarint(&mut self, value: varint) -> Error
+}
+
+type Generator = &Fn(*mut void, *mut Writer) -> Error;
+type StatelessGenerator = &Fn(*mut Writer) -> Error;
+
+variant Time {
+    Secs { seconds: u32 },
+    SecsMsecs { seconds: u32, milliseconds: u16 },
+    SecsUsecs { seconds: u32, microseconds: u32 },
+    SecsNsecs { seconds: u32, nanoseconds: u32 },
+}
+
+enum ErrorControlType {
+    Crc16 = 1,
+    ReedSolomon = 2,
+}
+
+struct Address {
+    srcAddress: varuint,
+    destAddress: varuint,
+}
+
+struct CmdHeader {
+    componentNumber: varuint,
+    commandNumber: varuint,
+}
+
+struct SliceOfU8 {
+    data: *mut u8,
+    size: usize,
+}
+
+struct MemChunks {
+    first: SliceOfU8,
+    second: SliceOfU8,
+}
+
+struct RingBuf {
+    data: *mut u8,
+    readOffset: usize,
+    writeOffset: usize,
+    size: usize,
+    freeSpace: usize,
+}
+
+impl RingBuf {
+    fn init(&mut self, data: *mut void, size: usize)
+    fn peek(&self, dest: *mut void, size: usize, offset: usize)
+    fn peekU8(&self, offset: usize) -> u8
+    fn read(&mut self, dest: *mut void, size: usize)
+    fn currentReadPtr(&self) -> *const u8
+    fn readableSize(&self) -> usize
+    fn writableSize(&self) -> usize
+    fn linearReadableSize(&self) -> usize
+    fn erase(&mut self, size: usize)
+    fn clear(&mut self)
+
+    fn write(&mut self, src: *const void, size: usize)
+    fn linearWritableSize(&self) -> usize
+    fn currentWritePtr(&self) -> *mut u8
+
+    fn readableChunks(&self) -> MemChunks
+
+    fn advanceWritePtr(&mut self, size: usize)
+    fn advanceReadPtr(&mut self, size: usize)
+}
+
+struct EventMessageHeader {
+    componentNumber: varuint,
+    messageNumber: varuint,
+    eventNumber: varuint,
+    timestamp: Time
+}
+
+component {
+    impl {
+        fn init()
+        fn tick()
+    }
+}

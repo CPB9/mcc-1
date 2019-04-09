@@ -23,6 +23,7 @@
 #include <QPainter>
 
 #include "mcc/msg/ParamList.h"
+#include "mcc/msg/SubHolder.h"
 #include "mcc/ui/FlowLayout.h"
 
 #include "mcc/uav/UavController.h"
@@ -146,7 +147,7 @@ void AirframeWidget::selectionChanged(mccuav::Uav* uav)
         setAirframeId(p.value.toInt());
     };
 
-    _tmStorage->namedAccess().addHandler(std::move(updater));
+    _tmStorage->namedAccess().addHandler(std::move(updater)).takeId();
     auto af = _tmStorage->valueByName("SYS_AUTOSTART");
     if (af.isSome())
     {

@@ -18,7 +18,7 @@ constexpr size_t REFRESH_RATE = 10;           // 1/10 s chart update
 constexpr size_t HISTORY = 10 * REFRESH_RATE; // curves history
 constexpr size_t WATCH_DOG = 2;               // 2 s watchdog
 
-class Curve
+class NetCurve
 {
 public:
     enum Kind
@@ -32,7 +32,7 @@ public:
         Count
     };
 
-    Curve()
+    NetCurve()
         : _offset(0)
         , _lastValue(0.0)
         , _speed(0.0)
@@ -42,7 +42,7 @@ public:
         clearData();
     }
 
-    virtual ~Curve() //WTF??
+    virtual ~NetCurve() //WTF??
     {
     }
 
@@ -158,16 +158,16 @@ NetStatisticsWidget::NetStatisticsWidget(QWidget* parent)
     , _maxValue(0.0)
     , _drawDetails(true)
 {
-    _curves = new Curve[CURVE_COUNT];
+    _curves = new NetCurve[CURVE_COUNT];
 
-    _curves[Curve::SentBytes].setStyle(QPen(QColor("#e68a5c"), 1.0, Qt::DashLine), QColor(255, 255, 255, 0));
-    _curves[Curve::SentPackets].setStyle(QPen(QColor("#e68a5c"), 1.0, Qt::DashLine), QColor(255, 255, 255, 0));
+    _curves[NetCurve::SentBytes].setStyle(QPen(QColor("#e68a5c"), 1.0, Qt::DashLine), QColor(255, 255, 255, 0));
+    _curves[NetCurve::SentPackets].setStyle(QPen(QColor("#e68a5c"), 1.0, Qt::DashLine), QColor(255, 255, 255, 0));
 
-    _curves[Curve::ReceivedBytes].setStyle(QPen(QColor("#55aa00"), 2.0), QColor(255, 255, 255, 0));
-    _curves[Curve::ReceivedPackets].setStyle(QPen(QColor("#55aa00"), 2.0), QColor(255, 255, 255, 0));
+    _curves[NetCurve::ReceivedBytes].setStyle(QPen(QColor("#55aa00"), 2.0), QColor(255, 255, 255, 0));
+    _curves[NetCurve::ReceivedPackets].setStyle(QPen(QColor("#55aa00"), 2.0), QColor(255, 255, 255, 0));
 
-    _curves[Curve::ReceivedBadBytes].setStyle(QPen(Qt::red, 1.0, Qt::DashDotDotLine), QColor(255, 255, 255, 0));
-    _curves[Curve::ReceivedBadPackets].setStyle(QPen(Qt::red, 1.0, Qt::DashDotDotLine), QColor(255, 255, 255, 0));
+    _curves[NetCurve::ReceivedBadBytes].setStyle(QPen(Qt::red, 1.0, Qt::DashDotDotLine), QColor(255, 255, 255, 0));
+    _curves[NetCurve::ReceivedBadPackets].setStyle(QPen(Qt::red, 1.0, Qt::DashDotDotLine), QColor(255, 255, 255, 0));
 
     _detailsFont.setPointSize(8);
     _detailsFont.setBold(true);
@@ -209,13 +209,13 @@ void NetStatisticsWidget::clear()
     _badStat  = _sentStat;
 
     bmcl::SystemTime now = bmcl::SystemClock::now();
-    _curves[Curve::SentBytes         ].clearData(now);
-    _curves[Curve::ReceivedBytes     ].clearData(now);
-    _curves[Curve::ReceivedBadBytes  ].clearData(now);
+    _curves[NetCurve::SentBytes         ].clearData(now);
+    _curves[NetCurve::ReceivedBytes     ].clearData(now);
+    _curves[NetCurve::ReceivedBadBytes  ].clearData(now);
 
-    _curves[Curve::SentPackets       ].clearData(now);
-    _curves[Curve::ReceivedPackets   ].clearData(now);
-    _curves[Curve::ReceivedBadPackets].clearData(now);
+    _curves[NetCurve::SentPackets       ].clearData(now);
+    _curves[NetCurve::ReceivedPackets   ].clearData(now);
+    _curves[NetCurve::ReceivedBadPackets].clearData(now);
 }
 
 void NetStatisticsWidget::setTextColor(const QColor& textColor)
@@ -230,12 +230,12 @@ void NetStatisticsWidget::setTextFont(const QFont& textFont)
     update();
 }
 
-double NetStatisticsWidget::sentBytesSpeed()          const { return _curves[Curve::SentBytes].speed();         }
-double NetStatisticsWidget::sentPacketsSpeed()        const { return _curves[Curve::SentPackets].speed();       }
-double NetStatisticsWidget::receivedBytesSpeed()      const { return _curves[Curve::ReceivedBytes].speed();     }
-double NetStatisticsWidget::receivedPacketsSpeed()    const { return _curves[Curve::ReceivedPackets].speed();   }
-double NetStatisticsWidget::receivedBadBytesSpeed()   const { return _curves[Curve::ReceivedBadBytes].speed();  }
-double NetStatisticsWidget::receivedBadPacketsSpeed() const { return _curves[Curve::ReceivedBadPackets].speed();}
+double NetStatisticsWidget::sentBytesSpeed()          const { return _curves[NetCurve::SentBytes].speed();         }
+double NetStatisticsWidget::sentPacketsSpeed()        const { return _curves[NetCurve::SentPackets].speed();       }
+double NetStatisticsWidget::receivedBytesSpeed()      const { return _curves[NetCurve::ReceivedBytes].speed();     }
+double NetStatisticsWidget::receivedPacketsSpeed()    const { return _curves[NetCurve::ReceivedPackets].speed();   }
+double NetStatisticsWidget::receivedBadBytesSpeed()   const { return _curves[NetCurve::ReceivedBadBytes].speed();  }
+double NetStatisticsWidget::receivedBadPacketsSpeed() const { return _curves[NetCurve::ReceivedBadPackets].speed();}
 
 QString NetStatisticsWidget::formatSpeed(double speed)
 {
@@ -260,13 +260,13 @@ void NetStatisticsWidget::showDetails(bool showDetails)
 void NetStatisticsWidget::timerEvent(QTimerEvent*)
 {
     auto now = bmcl::SystemClock::now();
-    _curves[Curve::SentBytes         ].update(_sentStat._time, now, _sentStat._bytes);
-    _curves[Curve::ReceivedBytes     ].update(_rcvdStat._time, now, _rcvdStat._bytes);
-    _curves[Curve::ReceivedBadBytes  ].update(_badStat._time, now,  _badStat._bytes);
+    _curves[NetCurve::SentBytes         ].update(_sentStat._time, now, _sentStat._bytes);
+    _curves[NetCurve::ReceivedBytes     ].update(_rcvdStat._time, now, _rcvdStat._bytes);
+    _curves[NetCurve::ReceivedBadBytes  ].update(_badStat._time, now,  _badStat._bytes);
 
-    _curves[Curve::SentPackets       ].update(_sentStat._time, now, _sentStat._packets);
-    _curves[Curve::ReceivedPackets   ].update(_rcvdStat._time, now, _rcvdStat._packets);
-    _curves[Curve::ReceivedBadPackets].update(_badStat._time, now,  _badStat._packets);
+    _curves[NetCurve::SentPackets       ].update(_sentStat._time, now, _sentStat._packets);
+    _curves[NetCurve::ReceivedPackets   ].update(_rcvdStat._time, now, _rcvdStat._packets);
+    _curves[NetCurve::ReceivedBadPackets].update(_badStat._time, now,  _badStat._packets);
 
     rescalePlot();
     update();
@@ -285,12 +285,12 @@ void NetStatisticsWidget::paintEvent(QPaintEvent* event)
     p.setRenderHint(QPainter::TextAntialiasing, false);
     p.save();
     p.setTransform(_transform);
-    for (const Curve* curve = &_curves[0]; curve < &_curves[CURVE_COUNT]; curve++) {
+    for (const NetCurve* curve = &_curves[0]; curve < &_curves[CURVE_COUNT]; curve++) {
         curve->draw(&p);
     }
     p.restore();
-    double sentSpeed = _curves[Curve::SentBytes].speed();
-    double recvSpeed = _curves[Curve::ReceivedBytes].speed();
+    double sentSpeed = _curves[NetCurve::SentBytes].speed();
+    double recvSpeed = _curves[NetCurve::ReceivedBytes].speed();
 
     QString detailsText;
 
@@ -311,7 +311,7 @@ void NetStatisticsWidget::rescalePlot()
 {
     unsigned int maxValue = 0;
 
-    for (const Curve* curve = &_curves[0]; curve < &_curves[CURVE_COUNT]; curve++)
+    for (const NetCurve* curve = &_curves[0]; curve < &_curves[CURVE_COUNT]; curve++)
     {
         if (!curve->isVisible())
             continue;
@@ -348,23 +348,23 @@ void NetStatisticsWidget::setStatView(StatView view)
 {
     if (view == StatView::Bytes)
     {
-        _curves[Curve::SentBytes].setVisible(true);
-        _curves[Curve::ReceivedBytes].setVisible(true);
-        _curves[Curve::ReceivedBadBytes].setVisible(true);
+        _curves[NetCurve::SentBytes].setVisible(true);
+        _curves[NetCurve::ReceivedBytes].setVisible(true);
+        _curves[NetCurve::ReceivedBadBytes].setVisible(true);
 
-        _curves[Curve::SentPackets].setVisible(false);
-        _curves[Curve::ReceivedPackets].setVisible(false);
-        _curves[Curve::ReceivedBadPackets].setVisible(false);
+        _curves[NetCurve::SentPackets].setVisible(false);
+        _curves[NetCurve::ReceivedPackets].setVisible(false);
+        _curves[NetCurve::ReceivedBadPackets].setVisible(false);
     }
     else if (view == StatView::Packets)
     {
-        _curves[Curve::SentBytes].setVisible(false);
-        _curves[Curve::ReceivedBytes].setVisible(false);
-        _curves[Curve::ReceivedBadBytes].setVisible(false);
+        _curves[NetCurve::SentBytes].setVisible(false);
+        _curves[NetCurve::ReceivedBytes].setVisible(false);
+        _curves[NetCurve::ReceivedBadBytes].setVisible(false);
 
-        _curves[Curve::SentPackets].setVisible(true);
-        _curves[Curve::ReceivedPackets].setVisible(true);
-        _curves[Curve::ReceivedBadPackets].setVisible(true);
+        _curves[NetCurve::SentPackets].setVisible(true);
+        _curves[NetCurve::ReceivedPackets].setVisible(true);
+        _curves[NetCurve::ReceivedBadPackets].setVisible(true);
     }
 
     _statView = view;

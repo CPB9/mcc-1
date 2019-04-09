@@ -49,7 +49,6 @@ using StatChannels = std::vector<StatChannel>;
 using CmdParams = std::vector<CmdParam>;
 
 using TmAnyPtr = bmcl::Rc<const TmAny>;
-using TmMotionPtr = bmcl::Rc<const TmMotion>;
 using TmRoutePtr = bmcl::Rc<const TmRoute>;
 using TmRoutesListPtr = bmcl::Rc<const TmRoutesList>;
 using TmCommonCalibrationStatusPtr = bmcl::Rc<const TmCommonCalibrationStatus>;

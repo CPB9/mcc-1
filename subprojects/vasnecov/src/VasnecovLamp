@@ -1,0 +1,2 @@
+#include "libVasnecov/VasnecovLamp.h"
+#include "libVasnecov/Version.h"

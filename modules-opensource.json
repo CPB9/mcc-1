@@ -7,10 +7,10 @@
     "src/mcc/meson.build"
   ],
   "ignore_dirs" : [
-      "proprietary",
-      "doc",
-      "dist",
-      "scripts"
+    "proprietary",
+    "doc",
+    "dist",
+    "scripts"
   ],
   "subdirs" : [
     "src/mcc/res",
@@ -20,8 +20,8 @@
     "src/mcc/path",
     "src/mcc/msg",
     "src/mcc/net",
-    "src/mcc/ui",
     "src/mcc/hm",
+    "src/mcc/ui",
     "src/mcc/vis",
     "src/mcc/uav",
     "src/mcc/map",
@@ -56,6 +56,11 @@
       "dep_var": "bmcl_dep",
       "libs": ["bmcl_lib"],
       "default_options": ["build_tests=false", "shared_lib=true"]
+    },
+    {
+      "subproject": "exprtk",
+      "dep_var": "exprtk_dep",
+      "default_options": ["build_tests=false"]
     },
     {
       "subproject": "fmt",

@@ -121,7 +121,7 @@ void SelectedUavWidget::updateDeviceDescription(const mccuav::Uav* vehicle)
     if(vehicle == nullptr)
         return;
 
-    if(_currentVehicleWidget->currentVehicle() == vehicle)
+    if(_currentVehicleWidget->currentUav() == vehicle)
         _currentVehicleWidget->updateName();
 }
 

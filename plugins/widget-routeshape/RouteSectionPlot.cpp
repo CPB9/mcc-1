@@ -88,7 +88,7 @@ public:
 
         setVisible(true);
         setXValue(onRouteDist);
-        setYValue(device->motion()->position.altitude());
+        setYValue(device->position()->altitude());
         setStatusLabel(device, fromRouteDist);
     }
 
@@ -96,7 +96,7 @@ public:
     {
         QString x;
         //x += QString("Имя: %1\n").arg(device->getInfo(), -10);
-        x += QString("Высота: %2м\n").arg(QString::number(device->motion()->position.altitude(), 'f', 2), 0);
+        x += QString("Высота: %2м\n").arg(QString::number(device->position()->altitude(), 'f', 2), 0);
         x += QString("Удаленность: %1км\n").arg(QString::number(fromRouteDist, 'f', 2), 0);
         setLabel(x);
     }
@@ -213,6 +213,8 @@ RouteSectionPlot::RouteSectionPlot(mccui::Settings* settings,
     {
         setRoute(_routesController->selectedRoute());
     });
+
+    startTimer(200);
 }
 
 RouteSectionPlot::~RouteSectionPlot()
@@ -638,18 +640,16 @@ void RouteSectionPlot::reconnectDevice()
     if (_currentUav)
         disconnect(_currentUav, 0, this, 0);
     _currentUav = curDevice;
-    if (_currentUav)
-        connect(_currentUav, &mccuav::Uav::motionChanged, this, &RouteSectionPlot::drawDevice);
 }
 
 void RouteSectionPlot::drawDevice()
 {
-    if (!_currentUav || !_route || _currentUav->motion().isNone())
+    if (!_currentUav || !_route || _currentUav->position().isNone())
         return;
-    if (_lastPosition == _currentUav->motion()->position)
+    if (_lastPosition == _currentUav->position())
         return;
 
-    _lastPosition = _currentUav->motion()->position;
+    _lastPosition = _currentUav->position();
     if (_lastPosition.isNone())
         return;
 
@@ -679,7 +679,7 @@ void RouteSectionPlot::relativeProfileDistanses(const mccgeo::Position& p, const
 {
     double minDist = std::numeric_limits<double>::max();
     double additionalDist = 0;
-    const mcchm::HmReader* reader = _hmReader.get();
+//    const mcchm::HmReader* reader = _hmReader.get();
     for (int k = 1; k < r.waypointsCount(); k++) {
         const mccmsg::Waypoint &wp1 = r.waypointAt(k - 1);
         const mccmsg::Waypoint &wp2 = r.waypointAt(k);
@@ -755,6 +755,13 @@ void RouteSectionPlot::hideEvent(QHideEvent *event)
 {
     _recalc = false;
     setRoute(const_cast<mccuav::Route*>(_route));
+}
+
+void RouteSectionPlot::timerEvent(QTimerEvent *event)
+{
+    if(!_currentUav)
+        return;
+    drawDevice();
 }
 
 void RouteSectionPlot::setRadarController(const bmcl::Option<std::shared_ptr<mccvis::RadarGroup>>& radarController)

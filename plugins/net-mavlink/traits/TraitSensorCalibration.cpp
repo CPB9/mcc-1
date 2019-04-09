@@ -222,6 +222,7 @@ void TraitSensorCalibration::execute(const mccmsg::CmdCalibrationStart& msg)
     case CalibrationSensor::Level: accelCal = 2; sensor = "level"; break;
     case CalibrationSensor::Radio: radioCal = 1; sensor = "radio"; break;
     case CalibrationSensor::Esc: escCal = 1; sensor = "esc"; break;
+    case CalibrationSensor::FlightModes: break; //HACK
     }
 
     MavlinkMessageRc* mavMsg = new MavlinkMessageRc;
@@ -311,8 +312,6 @@ void TraitSensorCalibration::handleTextMessage(const std::string& text)
     const std::regex CAL_ERROR_APPLY_CAL_MSG          ("\\[cal\\] calibration failed: to apply calibration, sensor ([\\d]+)");  // "[cal] calibration failed: to apply calibration, sensor %u"
     const std::regex CAL_ERROR_SET_PARAMS_MSG         ("\\[cal\\] calibration failed: to set parameters, sensor ([\\d]+)");     // "[cal] calibration failed: to set parameters, sensor %u"
     const std::regex CAL_ERROR_SAVE_PARAMS_MSG        ("\\[cal\\] calibration failed: failed to save parameters");              // "[cal] calibration failed: failed to save parameters"
-
-    const int supportedFwVersion = 2;
 
     if (!startsWith(text, CAL_PREFIX_MSG))
         return;

@@ -9,7 +9,7 @@ namespace mccnet {
 class ChannelTcp : public ChannelImpl
 {
 public:
-    ChannelTcp(asio::io_service& io_service, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings, const mccmsg::NetTcpPtr& params);
+    ChannelTcp(asio::io_context& io_context, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings, const mccmsg::NetTcpPtr& params);
 
 protected:
     bool is_open_() const override;

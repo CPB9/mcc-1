@@ -11,7 +11,7 @@ namespace mccnet {
 class ChannelCom : public ChannelImpl
 {
 public:
-    ChannelCom(asio::io_service& io_service, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings, const mccmsg::NetSerialPtr& params);
+    ChannelCom(asio::io_context& io_context, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings, const mccmsg::NetSerialPtr& params);
 
 protected:
     bool is_open_() const override;

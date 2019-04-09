@@ -9,7 +9,8 @@ all_qml_plugins = []
 
 global_args_c = []
 global_args_cpp = []
-proj_args = []
+proj_args_c = []
+proj_args_cpp = []
 global_link_args = []
 
 if cc.get_id() == 'clang' or cc.get_id() == 'gcc'
@@ -27,7 +28,27 @@ else
 endif
 
 if cc.get_id() == 'clang' or cc.get_id() == 'gcc'
-  foreach arg : ['-Werror=invalid-source-encoding', '-Wno-unused-lambda-capture', '-Werror=return-local-addr', '-Werror=return-stack-address']
+  foreach arg : ['-Werror=invalid-source-encoding',
+                 '-Werror=return-local-addr',
+                 '-Werror=return-stack-address',
+                 '-Werror=return-std-move',
+                 '-Werror=delete-incomplete',
+                 '-Werror=pessimizing-move',
+                 '-Werror=inconsistent-missing-override',
+                 '-Werror=switch',
+                 '-Werror=pragma-once-outside-header',
+                 '-Werror=overloaded-virtual',
+                 '-Werror=unused-variable',
+                 '-Werror=unused-value',
+                 '-Werror=unused-private-field'
+                 ]
+    if cc.has_argument(arg)
+      proj_args_c += arg
+      proj_args_cpp += arg
+    endif
+  endforeach
+  foreach arg : ['-Wno-unused-lambda-capture'
+                ]
     if cc.has_argument(arg)
       global_args_c += arg
       global_args_cpp += arg
@@ -35,7 +56,8 @@ if cc.get_id() == 'clang' or cc.get_id() == 'gcc'
   endforeach
 endif
 
-add_project_arguments(proj_args, language : ['c', 'cpp'])
+add_project_arguments(proj_args_c, language : ['c'])
+add_project_arguments(proj_args_cpp, language : ['cpp'])
 add_global_arguments(global_args_c, language : ['c'])
 add_global_arguments(global_args_cpp, language : ['cpp'])
 add_global_link_arguments(global_link_args, language : ['c', 'cpp'])

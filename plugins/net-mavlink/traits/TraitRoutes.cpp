@@ -152,6 +152,7 @@ void TraitRoutes::provideTm()
         for (const auto& i : _route.points())
         {
             mccmsg::Properties properties;
+            (void)i;
 //             switch (i.command)
 //             {
 //             case MAV_CMD_NAV_TAKEOFF:
@@ -161,7 +162,7 @@ void TraitRoutes::provideTm()
 //                 properties.set(mccmsg::WaypointProperties::Landing, true);
 //                 break;
 //             }
-// 
+//
 //             auto x = properties.to_uint();
 
 //            points.push_back(mccmsg::Waypoint(0, 0, properties));

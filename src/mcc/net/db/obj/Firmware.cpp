@@ -74,7 +74,7 @@ caf::result<mccmsg::firmware::DescriptionS_ResponsePtr> Firmware::execute(const 
 caf::result<mccmsg::firmware::UnRegister_ResponsePtr> Firmware::execute(const mccmsg::firmware::UnRegister_Request& request)
 {
     _devices_by_firmware.reset();
-    print(binds(&_devices_by_firmware, ":firmware", request.data().toStdString(), sqlite3pp::copy));
+    print(binds(&_devices_by_firmware, ":firmware", request.data().toStringRepr().view(), sqlite3pp::copy));
     auto r = print(exec(&_devices_by_firmware));
     if (r.isSome())
         return mccmsg::make_error(mccmsg::Error::CantUnRegister, r.take());
@@ -88,7 +88,7 @@ caf::result<mccmsg::firmware::UnRegister_ResponsePtr> Firmware::execute(const mc
     }
 
     _clean_firmware.reset();
-    print(binds(&_clean_firmware, ":firmware", request.data().toStdString(), sqlite3pp::copy));
+    print(binds(&_clean_firmware, ":firmware", request.data().toStringRepr().view(), sqlite3pp::copy));
     r = print(exec(&_clean_firmware));
     assert(devices.size() == (std::size_t)_db->db().changes().unwrapOr(0));
     if (r.isSome())
@@ -98,7 +98,7 @@ caf::result<mccmsg::firmware::UnRegister_ResponsePtr> Firmware::execute(const mc
         _db->device().updated(i);
 
     _delete_firmware.reset();
-    print(binds(&_delete_firmware, ":firmware", request.data().toStdString(), sqlite3pp::copy));
+    print(binds(&_delete_firmware, ":firmware", request.data().toStringRepr().view(), sqlite3pp::copy));
     r = print(exec(&_delete_firmware));
     if (r.isSome())
         return mccmsg::make_error(mccmsg::Error::CantUnRegister, r.take());
@@ -130,8 +130,8 @@ caf::result<mccmsg::firmware::Register_ResponsePtr> Firmware::execute(const mccm
 mccmsg::FirmwareDescription Firmware::getbyLocal(const mccmsg::ProtocolValue& pv)
 {
     _firmware_by_local.reset();
-    print(binds(&_firmware_by_local, ":info", pv.value(), sqlite3pp::nocopy));
-    print(binds(&_firmware_by_local, ":protocol", pv.protocol().toStdString(), sqlite3pp::copy));
+    print(binds(&_firmware_by_local, ":info", bmcl::StringView(pv.value()), sqlite3pp::nocopy));
+    print(binds(&_firmware_by_local, ":protocol", pv.protocol().toStringRepr().view(), sqlite3pp::copy));
     auto r = print(exec(&_firmware_by_local));
     if (r.isSome() || !_firmware_by_local.next())
         return nullptr;
@@ -204,8 +204,8 @@ bmcl::Result<mccmsg::Firmware, caf::error> Firmware::insert(const mccmsg::Firmwa
         return mccmsg::make_error(mccmsg::Error::ProtocolUnknown);
 
     _queryReg.reset();
-    print(binds(&_queryReg, ":name", name.toStdString(), sqlite3pp::copy));
-    print(binds(&_queryReg, ":info", d->id().value(), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":name", name.toStringRepr().view(), sqlite3pp::copy));
+    print(binds(&_queryReg, ":info", bmcl::StringView(d->id().value()), sqlite3pp::nocopy));
     print(binds(&_queryReg, ":protocol_id", protocol_id.unwrap()));
     print(binds(&_queryReg, ":binary", buffer.asBytes(), sqlite3pp::nocopy));
 

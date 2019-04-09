@@ -1,0 +1,60 @@
+[project]
+name = "default"
+master = "master"
+common_modules = ["core", "exc", "clk"]
+mcc_id = 0
+module_dirs = [
+  "modules/photon/asv",
+  "modules/photon/blog",
+  "modules/photon/core",
+  "modules/photon/tm",
+  "modules/photon/fwt",
+  "modules/photon/test",
+  "modules/photon/exc",
+  "modules/photon/clk",
+  "modules/photon/nav",
+  "modules/photon/pvu",
+  "modules/photon/fl",
+  "modules/photon/grp",
+  "modules/photon/usm",
+  "modules/photon/param",
+  "modules/photon/fcu",
+  "modules/photon/dfu",
+]
+
+[component_numbers]
+core = 0
+clk = 1
+param = 2
+tm = 3
+pvu = 4
+exc = 5
+fwt = 6
+asv = 7
+fcu = 8
+
+[[devices]]
+name = "master"
+id = 1
+cmd_targets = ["slave1", "master"]
+tm_sources = ["slave1", "master"]
+modules = ["test", "fl", "grp", "usm", "nav", "dfu", "asv", "tm", "fwt", "pvu", "param", "fcu", "blog"]
+
+[[devices]]
+name = "slave1"
+tm_sources = ["master"]
+cmd_targets = ["slave1"]
+modules = ["tm", "pvu", "fwt"]
+id = 2
+
+[[devices]]
+name = "slave2"
+tm_sources = ["master"]
+cmd_targets = ["slave2"]
+modules = ["test", "tm", "pvu", "fwt"]
+id = 3
+
+[[devices]]
+name = "bootloader"
+modules = ["dfu"]
+id = 4

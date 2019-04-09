@@ -104,11 +104,11 @@ bmcl::Option<mccmsg::ProtocolDescription> Protocol::get(const sqlite3pp::selecte
 bmcl::Result<mccmsg::Protocol, caf::error> Protocol::insert(const mccmsg::ProtocolDescription& d, ObjectId& id)
 {
     _queryReg.reset();
-    print(binds(&_queryReg, ":name", d->name().toStdString(), sqlite3pp::copy));
+    print(binds(&_queryReg, ":name", d->name().toStringRepr().view(), sqlite3pp::copy));
     print(binds(&_queryReg, ":shareable", d->shareable()));
     print(binds(&_queryReg, ":logging", d->logging()));
-    print(binds(&_queryReg, ":info", d->info(), sqlite3pp::nocopy));
-    print(binds(&_queryReg, ":param_info", d->param_info(), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":info", bmcl::StringView(d->info()), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":param_info", bmcl::StringView(d->param_info()), sqlite3pp::nocopy));
     print(binds(&_queryReg, ":timeout", d->timeout().count()));
     print(binds(&_queryReg, ":pixmap", d->pixmap().asBytes(), sqlite3pp::nocopy));
 

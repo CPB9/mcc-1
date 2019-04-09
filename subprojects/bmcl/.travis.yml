@@ -1,0 +1,30 @@
+language: cpp
+sudo: false
+compiler:
+  - gcc
+  - clang
+dist: trusty
+env:
+  global:
+      - secure: "WO7Bs89KG+TemRpZqkRBtGGf3CRKXJpBFpZXyE8xwakE2EtEdCd4/ljaBMjMa0pR1t7mp8sR8UOczkBdyxNft7CKBEuhByWI1F4zhZenWFSBP/JRdzglL8HIShmvJJeMnUhYLQt2GhbyMwYoKQJKTGTUGDC9fH6qQsc2n2Ajr+I="
+script: ls && mkdir -p build && cd build && cmake -GNinja ../ && ninja && ctest --output-on-failure
+
+addons:
+  coverity_scan:
+    project:
+      name: CPB9/bmcl
+      version: 0.1
+      description: bmcl
+    notification_email: dndanik@gmail.com
+    build_command_prepend: mkdir build && cd build && cmake ..
+    build_command: make
+    branch_pattern: coverity_scan
+  apt:
+    packages:
+      - cmake
+      - ninja-build
+      - gcc
+      - g++
+      - clang
+      - uuid-dev
+

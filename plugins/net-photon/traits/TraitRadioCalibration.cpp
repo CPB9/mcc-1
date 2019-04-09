@@ -36,10 +36,6 @@ namespace mccphoton {
 
 constexpr const std::chrono::milliseconds _stickDetectSettle = std::chrono::milliseconds(500);
 
-static const char* _imageFilePrefix("calibration/");
-static const char* _imageFileMode1Dir("mode1/");
-static const char* _imageFileMode2Dir("mode2/");
-static const char* _imageCenter("radioCenter.png");
 static const char* _imageHome("radioHome.png");
 static const char* _imageThrottleUp("radioThrottleUp.png");
 static const char* _imageThrottleDown("radioThrottleDown.png");
@@ -141,9 +137,6 @@ const TraitRadioCalibration::stateMachineEntry* TraitRadioCalibration::_getState
     static const char* msgBeginPX4 = "Lower the Throttle stick all the way down as shown in diagram.\n\n"
         "It is recommended to disconnect all motors for additional safety, however, the system is designed to not arm during the calibration.\n\n"
         "Click Next to continue";
-    static const char* msgBeginAPM = "Lower the Throttle stick all the way down as shown in diagram.\nReset all transmitter trims to center.\n\n"
-        "Please ensure all motor power is disconnected AND all props are removed from the vehicle.\n\n"
-        "Click Next to continue";
     static const char* msgThrottleUp = "Move the Throttle stick all the way up and hold it there...";
     static const char* msgThrottleDown = "Move the Throttle stick all the way down and leave it there...";
     static const char* msgYawLeft = "Move the Yaw stick all the way to the left and hold it there...";
@@ -207,9 +200,6 @@ void TraitRadioCalibration::_advanceState(void)
 
 void TraitRadioCalibration::_setupCurrentState(void)
 {
-    static const char* msgBeginAPMRover = "Center the Throttle stick as shown in diagram.\nReset all transmitter trims to center.\n\n"
-        "Please ensure all motor power is disconnected from the vehicle.\n\n"
-        "Click Next to continue";
     const stateMachineEntry* state = _getStateMachineEntry(_currentStep);
 
     auto instructions = state->instructions;

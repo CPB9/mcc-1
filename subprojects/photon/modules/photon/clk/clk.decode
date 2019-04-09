@@ -1,0 +1,42 @@
+module clk
+
+import core::{Reader, Writer, Error}
+
+/// Unix time * 1000 + milliseconds.
+type TimePoint = varuint;
+
+/// Duration in milliseconds.
+type Duration = varint;
+
+component {
+    variables {
+        /// corrected time at tick start
+        tickTime: TimePoint,
+        /// raw system time correction
+        correction: Duration,
+    }
+
+    statuses {
+        [time, 0, true]: {tickTime, correction},
+    }
+
+    impl {
+        fn init()
+        fn tick()
+
+        /// get raw system time
+        fn getRawSystemTime() -> Duration
+        /// get corrected time
+        fn getTime() -> TimePoint
+        /// get corrected time at tick start
+        fn getTickTime() -> TimePoint
+    }
+
+    commands {
+        fn setTimeCorrection(delta: Duration)
+    }
+
+    events {
+        [timeCorrected, true]: {rawTime: Duration, oldTime: TimePoint, newTime: TimePoint},
+    }
+}

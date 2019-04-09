@@ -20,10 +20,6 @@ public:
 
     virtual ~EmptyModel(){}
 
-    static float angleToRange360(float deg);
-    static float angleToRange180(float deg);
-    static float angleToRange90(float deg);
-
     void setTools(VasnecovUniverse *universe, VasnecovWorld *world);
 
     void setUniverse(VasnecovUniverse *universe);

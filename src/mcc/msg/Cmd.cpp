@@ -6,7 +6,6 @@
 #include "mcc/msg/Calibration.h"
 #include "mcc/msg/File.h"
 #include "mcc/msg/GroupState.h"
-#include "mcc/msg/Nav.h"
 #include "mcc/msg/Route.h"
 #include "mcc/msg/ParamList.h"
 #include "mcc/msg/TmView.h"

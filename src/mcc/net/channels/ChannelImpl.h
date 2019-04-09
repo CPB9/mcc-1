@@ -6,7 +6,7 @@
 #include "mcc/msg/Stats.h"
 #include "mcc/msg/obj/Channel.h"
 
-namespace asio { class io_service; }
+namespace asio { class io_context; }
 
 namespace mccnet {
 
@@ -30,7 +30,7 @@ public:
     ChannelImpl(const ChannelImpl&) = delete;
     ChannelImpl& operator=(const ChannelImpl&) = delete;
 
-    ChannelImpl(asio::io_service& io_service, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings);
+    ChannelImpl(asio::io_context& io_context, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings);
     virtual ~ChannelImpl();
 
     void send(std::size_t req_id, mccmsg::PacketPtr&& pkt) override final;
@@ -65,7 +65,7 @@ private:
     void updateStats(mccmsg::Stat& stat, std::size_t bytes, std::size_t packets);
     void sendStats();
     struct Timer;
-    asio::io_service& _io_service;
+    asio::io_context& _io_context;
     mccmsg::StatChannel _stats;
     bmcl::SystemTime _statsSentTime;
     std::shared_ptr<Timer> _reconnectTimer;

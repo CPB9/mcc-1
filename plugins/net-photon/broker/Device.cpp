@@ -22,7 +22,7 @@ void DItem::addChannel(const CItemPtr& c)
 {
     if (!hasChannels())
         _self->send(_a, mccnet::connected_atom::value);
-    cs.emplace(c->name(), c).second;
+    cs.emplace(c->name(), c);
 }
 
 void DItem::removeChannel(const mccmsg::Channel& c)

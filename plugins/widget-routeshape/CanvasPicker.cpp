@@ -245,7 +245,7 @@ bool CanvasPicker::eventFilter(QObject *object, QEvent *event)
     {
         const QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
-        const int delta = 5;
+//        const int delta = 5;
         switch (keyEvent->key())
         {
         case Qt::Key_Right:
@@ -383,7 +383,7 @@ void CanvasPicker::moveBy(int dx, int dy, int pointIndex)
 //     const QPointF sample = _selectedCurve->sample(_selectedPoint);
 //     const double x = plot()->transform(_selectedCurve->xAxis(), sample.x());
 //     const double y = plot()->transform(_selectedCurve->yAxis(), sample.y());
-// 
+//
 //     move(QPoint(qRound(x + dx), qRound(y + dy)), pointIndex);
 }
 
@@ -392,11 +392,11 @@ void CanvasPicker::move(const QPoint &pos, int pointIndex)
 {
 //     if (!_selectedCurve)
 //         return;
-// 
+//
 //     QVector<double> xData((int)_selectedCurve->dataSize());
 //     QVector<double> yData((int)_selectedCurve->dataSize());
-// 
-// 
+//
+//
 //     for (size_t i = 0; i < _selectedCurve->dataSize(); i++)
 //     {
 //         const QPointF sample = _selectedCurve->sample(i);
@@ -407,7 +407,7 @@ void CanvasPicker::move(const QPoint &pos, int pointIndex)
 //         }
 //         else
 //         {
-//             
+//
 //             xData[i] = sample.x();
 //             yData[i] = sample.y();
 //         }
@@ -425,7 +425,7 @@ void CanvasPicker::move(const QPoint& pos, const std::vector<size_t>& indexes)
         xData[i] = sample.x();
         yData[i] = sample.y();
     }
-    
+
     double newY = plot()->invTransform(_selectedCurve->yAxis(), pos.y());
     double dy = newY - _selectedCurve->sample(_movingPointIndex).y();
 
@@ -453,7 +453,7 @@ void CanvasPicker::shiftPointCursor(bool up)
 
 //     int index = _selectedPoint + (up ? 1 : -1);
 //     index = (index + (int)_selectedCurve->dataSize()) % (int)_selectedCurve->dataSize();
-// 
+//
 //     if (index != _selectedPoint)
 //     {
 //         _selectedPoint = index;

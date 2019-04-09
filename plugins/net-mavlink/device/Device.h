@@ -11,9 +11,7 @@
 #include <bmcl/Option.h>
 #include <bmcl/Logging.h>
 
-
 #include "mcc/msg/FwdExt.h"
-#include "mcc/msg/Nav.h"
 #include "mcc/msg/obj/Channel.h"
 #include "mcc/msg/Stats.h"
 
@@ -90,8 +88,6 @@ private:
     uint8_t _targetComponent;
     uint8_t _targetChannel;
 
-    mccmsg::Motion _motion;
-
     void sendCommand(uint16_t cmdId, uint8_t confirmation = 0, float param1 = 0.f, float param2 = 0.f,
                      float param3 = 0.f, float param4 = 0.f, float param5 = 0.f, float param6 = 0.f, float param7 = 0.f);
 
@@ -112,7 +108,6 @@ private:
 private:
     mavlink_heartbeat_t _lastHeartbeat;
 
-    bool _delayedActivation;
     FirmwarePtr _firmware;
 
     bool _firstPacket;

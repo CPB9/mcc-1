@@ -1,3 +1,5 @@
+rc_file = 'settingspage-gps.qrc'
+
 ui_files = [
   'GpsSettingsPage.ui',
 ]
@@ -12,6 +14,7 @@ src = [
 
 processed = qt5_mod.preprocess(
   moc_headers : moc_headers,
+  qresources : rc_file,
   ui_files : ui_files,
   include_directories : mcc_inc,
 )

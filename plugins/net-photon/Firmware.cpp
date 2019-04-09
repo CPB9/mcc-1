@@ -139,9 +139,7 @@ void TmStorage::visit(const TmUpdateSub* u)
         photongen::nav::statuses::State msg;
         if (photongenDeserialize(&msg, &reader, &state))
         {
-//             _armed = msg.deviceState.isArmed();
-//             _battery = msg.deviceState.battery();
-            _uavstate->set(u->time());
+            _uavstate->set(u->time(), msg.deviceState.isArmed(), msg.deviceState.battery());
         }
     }
 }

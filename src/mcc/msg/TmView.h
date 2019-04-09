@@ -33,7 +33,7 @@ public:
     ITmStorage();
     ~ITmStorage() override;
 
-    virtual bmcl::Option<Group>   group() const;
+    virtual bmcl::Option<Group> group() const;
 
     virtual void set(const mccmsg::ITmView*) = 0;
     virtual void update(const ITmViewUpdate*) = 0;

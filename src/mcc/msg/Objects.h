@@ -49,7 +49,7 @@ public:
     DeviceOrGroup(const Device& device);
     DeviceOrGroup(const Group& group);
     bmcl::Option<Device> device() const;
-    bmcl::Option <Group> group() const;
+    bmcl::Option<Group> group() const;
     bool isDevice() const;
     bool isGroup() const;
 private:

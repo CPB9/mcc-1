@@ -3,7 +3,6 @@
 #include "mcc/map/drawables/Label.h"
 #include "mcc/ui/CoordinateSystemController.h"
 #include "mcc/ui/CoordinateSystemController.h"
-#include "mcc/uav/Structs.h"
 
 #include <QPointF>
 #include <QWidget>

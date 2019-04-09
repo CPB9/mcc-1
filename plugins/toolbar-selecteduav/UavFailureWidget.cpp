@@ -20,6 +20,8 @@ UavFailureWidget::UavFailureWidget(QWidget* separator, QWidget *parent)
     _image->setFixedSize(iconSize, iconSize);
     _image->setPixmap(QPixmap::fromImage(QImage(":/toolbar-selecteddevice/resources/attention_icon.png").
                                          scaled(QSize(iconSize, iconSize), Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    _image->setStyleSheet("background-color: transparent;");
+
     setMinimumWidth(iconSize + margin);
 }
 

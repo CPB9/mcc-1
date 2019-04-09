@@ -10,7 +10,6 @@
 #include "mcc/uav/Fwd.h"
 #include "mcc/vis/Fwd.h"
 #include "mcc/hm/Fwd.h"
-#include "mcc/msg/Nav.h"
 #include "mcc/geo/Geod.h"
 
 #include <bmcl/Option.h>
@@ -99,7 +98,7 @@ private:
     double _currentDistance;
     int _trackLen;
     bool _recalc;
-    bmcl::Option<mccgeo::Position> _lastPosition;
+    bmcl::Option<const mccgeo::Position&> _lastPosition;
 
     QwtPlotMarker* _currentPos;
     CanvasPicker* _picker;
@@ -118,5 +117,8 @@ private:
 protected:
     virtual void showEvent(QShowEvent *event) override;
     virtual void hideEvent(QHideEvent *event) override;
+
+
+    virtual void timerEvent(QTimerEvent *event) override;
 
 };

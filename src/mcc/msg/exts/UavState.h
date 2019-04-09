@@ -13,9 +13,9 @@ public:
     ~TmUavState() override;
     static const TmExtension& id();
     static const char* info();
-    bmcl::Option<bool> armed() const;
-    bmcl::Option<uint8_t> battery() const;
-    void set(bmcl::SystemTime t);
+    const bmcl::Option<bool>& armed() const;
+    const bmcl::Option<uint8_t>& battery() const;
+    void set(bmcl::SystemTime t, bool armed, uint8_t battery);
 private:
     bmcl::Option<bool> _armed;
     bmcl::Option<uint8_t> _battery;

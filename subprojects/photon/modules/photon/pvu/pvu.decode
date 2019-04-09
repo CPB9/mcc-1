@@ -1,0 +1,70 @@
+module pvu
+
+import core::{Error, Reader, Writer}
+import clk::{TimePoint, Duration}
+import exc::{DataHeader}
+
+type ScriptName = &[char; 16];
+type ScriptBody = &[u8; 1024];
+
+struct ScriptDesc {
+    name: ScriptName,
+    autoremove: bool,
+    autostart: bool,
+}
+
+struct Script {
+    memOffset: varuint,
+    readOffset: varuint,
+    size: varuint,
+    isSleeping: bool,
+    isFinished: bool,
+    isExecuting: bool,
+    sleepUntil: TimePoint,
+    desc: ScriptDesc,
+}
+
+const SCRIPT_NUM: usize = 10;
+const TOTAL_SCRIPTS_SIZE: usize = 2048;
+
+enum ExecutionMode {
+    None,
+    Packet,
+    Script,
+}
+
+component {
+    variables {
+        scripts: &[Script; 10],
+        numScripts: usize,
+        totalScriptsSize: usize,
+        currentScript: *mut Script,
+        currentHeader: *const DataHeader,
+    }
+
+    impl {
+        fn addScript(desc: *const ScriptDesc, body: *const ScriptBody) -> Error
+        fn init()
+        fn tick()
+        fn executeFrom(header: *const DataHeader, src: *mut Reader, results: *mut Writer) -> Error
+        fn currentHeader() -> *const DataHeader
+    }
+
+    commands {
+        fn sleepFor(delta: Duration)
+        fn sleepUntil(time: TimePoint)
+        fn addScript(desc: ScriptDesc, body: ScriptBody)
+        fn removeScript(name: ScriptName)
+        fn startScript(name: ScriptName)
+    }
+
+    events {
+        [packetExecFailed, true]: {err: Error, header: DataHeader},
+        [scriptExecFailed, true]: {err: Error, name: ScriptName},
+    }
+
+    statuses {
+        [totalSize, 0, true]: {totalScriptsSize},
+        [scripts, 0, true]: {scripts},
+    }
+}

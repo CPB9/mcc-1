@@ -1,0 +1,19 @@
+================================================================================
+Vasnecov (v. 1.1.3-dev)
+================================================================================
+
+Simple C++/Qt wrapper for OpenGL-based 3D graphics.
+
+================================================================================
+
+It uses Qt Graphics View Framework for rendering. Qt5 is required.
+
+Main abilities:
+ - Controlling scene objects from other threads;
+ - Preparing a viewport (Universe) with several scenes (Worlds);
+ - Creating and manipulation scene elements with tree-structure;
+ - Using diffuse materials with textures (from QImage) and lights for shading;
+ - Drawing simple figures by point-to-point method;
+ - Typing text and raster images at billboards (labels);
+ - Loading meshes from Wavefront OBJ format.
+ - Order sorting for transparent objects.

@@ -49,6 +49,7 @@ public:
     const QPixmap   activePixmap() const;
     const QPixmap   inactivePixmap() const;
     void            createPixmaps();
+    void setBaseColor(const QColor& color);
     const QString&  info() const;
     bool            useAzimuth() const;
     bool            useElevation() const;
@@ -120,7 +121,7 @@ private:
     QPixmap _inactivePixmap;
     QPixmap _activePixmap;
     QPixmap _grayPixmap;
-
+    QColor  _baseColor;
     QString _info;
     Type    _kind;
 };

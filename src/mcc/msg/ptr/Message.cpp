@@ -24,7 +24,7 @@ Request_State::Request_State(const Request* request, ReqResult result) : _reques
 Request_State::~Request_State() {}
 const RequestPtr& Request_State::request() const { return _request; }
 uint8_t Request_State::progress() const { return _progress; }
-bmcl::Option<ReqResult> Request_State::result() const { return _result; }
+const bmcl::Option<ReqResult>& Request_State::result() const { return _result; }
 
 Notification::Notification() {}
 Notification::~Notification() {}

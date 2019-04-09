@@ -5,6 +5,7 @@
 #include <bmcl/Option.h>
 #include <bmcl/OptionRc.h>
 
+#include "mcc/msg/SubHolder.h"
 #include "mcc/msg/TmView.h"
 #include "mcc/msg/exts/ErrStorage.h"
 
@@ -26,7 +27,7 @@ public:
 
 private:
     bmcl::OptionRc<mccmsg::IErrStorage> _errorsStorage;
-    bmcl::Option<mccmsg::HandlerId> _handler;
+    bmcl::Option<mccmsg::SubHolder> _handler;
 };
 
 }

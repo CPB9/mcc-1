@@ -56,7 +56,7 @@ QString GpsSettingsPage::pagePath() const
 
 QIcon GpsSettingsPage::pageIcon() const
 {
-    return QIcon(":/rtk/icon.png");
+    return QIcon(":/settingspage-gps/icon.png");
 }
 
 void GpsSettingsPage::load()

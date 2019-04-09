@@ -132,7 +132,7 @@ TmSession::TmSession(DbObjInternal* db)
 void TmSession::closeAllSessions()
 {
     _closeSessions.reset();
-    print(binds(&_closeSessions, ":finished", serializeTime(bmcl::SystemClock::now()), sqlite3pp::copy));
+    print(binds(&_closeSessions, ":finished", bmcl::StringView(serializeTime(bmcl::SystemClock::now())), sqlite3pp::copy));
     auto r = print(exec(&_closeSessions));
     if (r.isSome())
     {
@@ -217,8 +217,8 @@ caf::result<mccmsg::tmSession::Update_ResponsePtr> TmSession::execute(const mccm
 {
     const mccmsg::TmSessionDescription& dscr = request.data().dscr();
     _update.reset();
-    print(binds(&_update, ":name", dscr->name().toStdString(), sqlite3pp::copy));
-    print(binds(&_update, ":info", dscr->info().c_str(), sqlite3pp::nocopy));
+    print(binds(&_update, ":name", dscr->name().toStringRepr().view(), sqlite3pp::copy));
+    print(binds(&_update, ":info", bmcl::StringView(dscr->info()), sqlite3pp::nocopy));
     auto r = print(exec(&_update));
     if (r.isSome())
         return mccmsg::make_error(mccmsg::Error::CantUpdate, r.take());
@@ -269,12 +269,12 @@ bmcl::Option<mccmsg::TmSessionDescription> TmSession::get(const sqlite3pp::selec
 bmcl::Result<mccmsg::TmSession, caf::error> TmSession::insert(const mccmsg::TmSessionDescription& d, ObjectId& id)
 {
     _queryReg.reset();
-    print(binds(&_queryReg, ":name", d->name().toStdString(), sqlite3pp::copy));
-    print(binds(&_queryReg, ":info", d->info(), sqlite3pp::nocopy));
-    print(binds(&_queryReg, ":folder", d->folder(), sqlite3pp::nocopy));
-    print(binds(&_queryReg, ":started", serializeTime(d->started()), sqlite3pp::copy));
+    print(binds(&_queryReg, ":name", d->name().toStringRepr().view(), sqlite3pp::copy));
+    print(binds(&_queryReg, ":info", bmcl::StringView(d->info()), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":folder", bmcl::StringView(d->folder()), sqlite3pp::nocopy));
+    print(binds(&_queryReg, ":started", bmcl::StringView(serializeTime(d->started())), sqlite3pp::copy));
     if (d->finished().isSome())
-        print(binds(&_queryReg, ":finished", serializeTime(d->finished().unwrap()), sqlite3pp::copy));
+        print(binds(&_queryReg, ":finished", bmcl::StringView(serializeTime(d->finished().unwrap())), sqlite3pp::copy));
 
     auto r = _queryReg.insert();
     if (r.isErr())

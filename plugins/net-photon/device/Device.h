@@ -2,7 +2,6 @@
 #include "mcc/Config.h"
 #include "mcc/msg/obj/Channel.h"
 #include "mcc/msg/Calibration.h"
-#include "mcc/msg/Nav.h"
 #include "mcc/msg/ptr/Fwd.h"
 #include "mcc/net/Cmd.h"
 #include "mcc/net/TmHelper.h"
@@ -76,8 +75,6 @@ private:
     std::string _name;
     mccmsg::ProtocolId _id;
     mccmsg::StatDevice _stats;
-    mccmsg::Motion     _motion;
-
     mccnet::TmHelper _helper;
 
     bool _isConnected;

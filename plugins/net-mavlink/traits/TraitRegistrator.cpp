@@ -212,8 +212,8 @@ const char* TraitRegistrator::name() const
 
 void TraitRegistrator::update_device(const mccmsg::FirmwareDescription& tmp)
 {
-    mccmsg::DeviceDescription d = new mccmsg::DeviceDescriptionObj(_id.device(), "", "", _id, bmcl::None, toPixmap(_autopilotType), tmp->name());
-    mccmsg::device::Updater updater(std::move(d), {mccmsg::Field::Kind, mccmsg::Field::Firmware});
+    mccmsg::DeviceDescription d = new mccmsg::DeviceDescriptionObj(_id.device(), "", "", _id, bmcl::None, toPixmap(_autopilotType), tmp->name(), false, false);
+    mccmsg::device::Updater updater(std::move(d), {mccmsg::Field::Pixmap, mccmsg::Field::Firmware});
     request(_core, caf::infinite, mccmsg::makeReq(new mccmsg::device::Update_Request(std::move(updater)))).then
     (
         [this, tmp](const mccmsg::device::Update_ResponsePtr& resp) mutable { registered(tmp); }
@@ -411,7 +411,7 @@ void TraitRegistrator::removeFirmware()
     if (_mccFirmware.isNull())
         return;
 
-    mccmsg::DeviceDescription d = new mccmsg::DeviceDescriptionObj(_id.device(), "", "", _id, bmcl::None, bmcl::SharedBytes(), bmcl::None);
+    mccmsg::DeviceDescription d = new mccmsg::DeviceDescriptionObj(_id.device(), "", "", _id, bmcl::None, bmcl::SharedBytes(), bmcl::None, false, false);
     mccmsg::device::Updater u(std::move(d), {mccmsg::Field::Firmware});
     request(_core, caf::infinite, mccmsg::makeReq(new mccmsg::device::Update_Request(std::move(u))));
 

@@ -80,8 +80,8 @@ struct EventErr: public QEvent
 struct EventNote : public QEvent
 {
     static constexpr const int EventId = BaseEventId + 3;
-    mccmsg::NotificationPtr note;
-    inline explicit EventNote(const mccmsg::NotificationPtr& note) : QEvent(static_cast<QEvent::Type>(EventId)), note(note) {}
+    std::vector<mccmsg::NotificationPtr> notes;
+    inline explicit EventNote(std::vector<mccmsg::NotificationPtr>&& notes) : QEvent(static_cast<QEvent::Type>(EventId)), notes(std::move(notes)) {}
 };
 
 class ReqRepHelper : public caf::event_based_actor
@@ -97,6 +97,8 @@ private:
     CafService* _self;
     std::string _name;
     caf::actor _core;
+
+    std::vector<mccmsg::NotificationPtr> _notes;
 };
 
 ReqRepHelper::ReqRepHelper(caf::actor_config& cfg, const caf::actor& core, const std::string& name, CafService* self)
@@ -136,11 +138,28 @@ caf::behavior ReqRepHelper::make_behavior()
         destroy(_core);
         quit();
     });
+
+    send(this, caf::atom("tick"));
     using namespace mccmsg;
     return{
-        [this](const mccmsg::DbRequestPtr& req)
+        [this](const mccmsg::NotificationPtr& note)
+        {
+            _notes.emplace_back(note);
+            //qApp->postEvent(_self, new EventNote(note));
+        }
+      , [this](const mccmsg::Request_StatePtr& state)
+        {
+            qApp->postEvent(_self, new EventReqState(state));
+        }
+      , [this](const mccmsg::DbRequestPtr& req)
         {
             make_visitor_call(req);
+        }
+      , [this](const caf::atom_constant<caf::atom("tick")>&)
+        {
+            if (!_notes.empty())
+                qApp->postEvent(_self, new EventNote(std::move(_notes)));
+            delayed_send(this, std::chrono::milliseconds(100), caf::atom("tick"));
         }
       , [this](const mccmsg::DevReqPtr& req)
         {
@@ -168,14 +187,6 @@ caf::behavior ReqRepHelper::make_behavior()
                 {
                 }
             );
-        }
-      , [this](const mccmsg::Request_StatePtr& state)
-        {
-            qApp->postEvent(_self, new EventReqState(state));
-        }
-      , [this](const mccmsg::NotificationPtr& note)
-        {
-            qApp->postEvent(_self, new EventNote(note));
         }
       , [this](caf::error& e)
         {
@@ -254,7 +265,6 @@ private:
     CafService * service;
 public:
     explicit TmVisitor(CafService* service, const mccmsg::tm::TmAnyPtr& tm) : service(service){}
-    void visit(const mccmsg::TmMotion& tm) override { service->traitNavigationMotion(&tm); }
     void visit(const mccmsg::TmRoute& tm) override { service->traitRouteState(&tm); }
     void visit(const mccmsg::TmRoutesList& tm) override { service->traitRoutesList(&tm); }
     void visit(const mccmsg::TmCalibration& tm) override { service->traitCalibration(&tm); }
@@ -269,9 +279,11 @@ class NoteVisitorX : public mccmsg::NoteVisitor
 {
 private:
     CafService* _self;
-    mccmsg::NotificationPtr msg;
 public:
-    NoteVisitorX(CafService* self, const mccmsg::NotificationPtr& msg) : _self(self), msg(msg) {}
+    NoteVisitorX(CafService* self) : _self(self) {}
+
+    using mccmsg::NoteVisitor::visit;
+
     void visit(const mccmsg::tm::Item* note) override
     {
         TmVisitor visitor(_self, note->data());
@@ -336,7 +348,6 @@ CafService::CafService()
     qRegisterMetaType<mccmsg::FirmwareDescription>();
     qRegisterMetaType<mccmsg::FirmwareDescriptions>();
 
-    qRegisterMetaType<mccmsg::TmMotionPtr>();
     qRegisterMetaType<mccmsg::TmRoutePtr>();
     qRegisterMetaType<mccmsg::TmRoutesListPtr>();
     qRegisterMetaType<mccmsg::ErrorDscr>();
@@ -485,8 +496,11 @@ bool CafService::event(QEvent* event)
         auto ptr = dynamic_cast<EventNote*>(event);
         if (!ptr)
             return QObject::event(event);
-        NoteVisitorX visitor(this, ptr->note);
-        ptr->note->visit(visitor);
+        NoteVisitorX visitor(this);
+        for (const auto& i : ptr->notes)
+        {
+            i->visit(visitor);
+        }
         return true;
     }
     default:

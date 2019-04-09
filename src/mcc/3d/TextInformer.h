@@ -3,6 +3,9 @@
 #include "mcc/3d/BasicModels.h"
 
 class QSize;
+class QPointF;
+
+class VasnecovAbstractElement;
 
 namespace mcc3d
 {
@@ -12,16 +15,23 @@ public:
     TextInformer(VasnecovUniverse *u, VasnecovWorld *w, const QSize& labelSize);
     virtual ~TextInformer();
 
+    void hide();
+    void show();
     virtual void setVisible(bool visible);
     bool isVisible() const {return _isVisible;}
     virtual void setColor(const QColor &c);
     QColor color() const {return _color;}
     virtual void setCoordinates(const QVector3D& coordinates);
+    virtual void attachToElement(const VasnecovAbstractElement* element);
     QVector3D coordinates() const;
     void setRounded(bool rounded);
     bool isRounded() const {return _isRounded;}
 
     void setText(const QString& text);
+
+    void setOffset(const QPointF& offset);
+    void setOffset(float x, float y);
+    QPointF offset() const;
 
 protected:
     virtual void generateText();

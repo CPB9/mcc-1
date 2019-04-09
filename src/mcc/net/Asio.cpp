@@ -1,6 +1,6 @@
 #include <thread>
 
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 #include <asio/error_code.hpp>
 #include <asio/thread_pool.hpp>
 
@@ -31,23 +31,23 @@ public:
     {
         if (_work)
             return;
-        _work = std::make_unique<asio::io_service::work>(_io_service);
-        _thread = std::thread(std::move([&] { _io_service.run(); }));
+        _work = std::make_unique<asio::io_context::work>(_io_context);
+        _thread = std::thread([&] { _io_context.run(); });
     }
     void stop()
     {
         if (!_work)
             return;
         _work.reset();
-        _io_service.stop();
+        _io_context.stop();
         _thread.join();
-        assert(_io_service.stopped());
+        assert(_io_context.stopped());
     }
-    inline asio::io_service& io_service() { return _io_service; };
+    inline asio::io_context& io_context() { return _io_context; };
 private:
-    asio::io_service _io_service;
+    asio::io_context _io_context;
     std::thread _thread;
-    std::unique_ptr<asio::io_service::work> _work;
+    std::unique_ptr<asio::io_context::work> _work;
 };
 
 Asio::Asio()
@@ -114,7 +114,7 @@ std::set<ChannelId> Asio::list() const
 class NetTrVisitor : public mccmsg::INetVisitor
 {
 public:
-    NetTrVisitor(asio::io_service& io, std::size_t id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& d) : _id(id), _exch(std::move(exch)), _d(d), _io(io){}
+    NetTrVisitor(asio::io_context& io, std::size_t id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& d) : _id(id), _exch(std::move(exch)), _d(d), _io(io){}
     void visit(const mccmsg::NetTcpParams& params) override { _channel = std::make_shared<ChannelTcp>(_io, _id, std::move(_exch), _d, bmcl::wrapRc(&params));}
     void visit(const mccmsg::NetUdpParams& params) override { _channel = std::make_shared<ChannelUdp>(_io, _id, std::move(_exch), _d, bmcl::wrapRc(&params)); }
     void visit(const mccmsg::NetSerialParams& params) override { _channel = std::make_shared<ChannelCom>(_io, _id, std::move(_exch), _d, bmcl::wrapRc(&params)); }
@@ -124,12 +124,12 @@ private:
     ChannelPtr      _channel;
     ExchangerPtr    _exch;
     mccmsg::ChannelDescription _d;
-    asio::io_service& _io;
+    asio::io_context& _io;
 };
 
 ChannelPtr Asio::makeChannel(ExchangerPtr&& exch, const mccmsg::ChannelDescription& d)
 {
-    NetTrVisitor visitor(_asio->io_service(), _counter++, std::move(exch), d);
+    NetTrVisitor visitor(_asio->io_context(), _counter++, std::move(exch), d);
     d->params()->visit(visitor);
     return visitor.channel();
 }

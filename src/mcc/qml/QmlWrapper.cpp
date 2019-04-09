@@ -236,8 +236,6 @@ void QmlWrapper::setDevice(mccuav::Uav* device)
     {
         (*_device)->addPointOfInterest(it);
     }
-
-    connect(device, &mccuav::Uav::motionChanged, this, &QmlWrapper::onTraitNavigationMotion);
 }
 
 QObject* QmlWrapper::registerVideoStream(const QString& boundary, const QString& address, int port, const QString& name, bool dropConnection)
@@ -293,51 +291,4 @@ void QmlWrapper::onDeviceFileUploadFailed(const QString& device, const QString& 
 {
     emit fileUploadError(device, filePath, reason);
 }
-
-void QmlWrapper::onTraitNavigationMotion(const mccmsg::Motion& m)
-{
-    if (!_motion)
-        return;
-
-    _motion->setProperty("latitude", m.position.latitude());
-    _motion->setProperty("longitude", m.position.latitude());
-    _motion->setProperty("heading", m.orientation.heading());
-    _motion->setProperty("pitch", m.orientation.pitch());
-    _motion->setProperty("roll", m.orientation.roll());
-}
-
-// void QmlWrapper::onTmParamList(const mccmsg::TmParamListPtr& paramsList)
-// {
-//     if (_uavController->selectedUav() == nullptr ||
-//         paramsList->device() != _uavController->selectedUav()->device())
-//         return;
-// 
-//     for (const auto& p : paramsList->params())
-//     {
-//         if (_params.find(p) == _params.end())
-//             continue;
-//         _params[p].time = paramsList->time();
-//         _params[p].value = p.value();
-//     }
-// }
-
-// void QmlWrapper::onTmParamList2(const mccmsg::TmParamListPtr& paramsList)
-// {
-//     for (const auto& p : paramsList->params())
-//     {
-//         if (p.trait() == "Mavlink.Params")
-//         {
-//             //qDebug() << QDateTime::currentDateTime() << "Mavlink.Params";
-//             emit mavlinkParamChanged(paramsList->device().toQString(), p.status().c_str(), p.value().toQVariant(), 0);
-//         }
-// 
-//         auto it = std::find_if(_params2.begin(), _params2.end(), [&paramsList, &p](const ParamHelperWithDevice& one) { return one.device == paramsList->device().toQUuid() && one.tm == p; });
-//         if (it == _params2.end())
-//             continue;
-// 
-//         it->time = paramsList->time();
-//         it->tm.set_value(p.value());
-//     }
-// }
-
 }

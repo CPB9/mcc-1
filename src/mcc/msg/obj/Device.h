@@ -18,9 +18,8 @@ public:
         , const bmcl::Option<DeviceUi>& ui
         , const bmcl::SharedBytes& pixmap
         , const bmcl::Option<Firmware>& firmware
-        , bool registerFirst = false
-        , bool showOnMap = true
-        , bool log = false);
+        , bool registerFirst
+        , bool log);
     ~DeviceDescriptionObj() override;
 
     const Device& name() const;
@@ -31,7 +30,6 @@ public:
     const bmcl::SharedBytes& pixmap() const;
     const bmcl::Option<Firmware>& firmware() const;
     bool registerFirst() const;
-    bool showOnMap() const;
     bool log() const;
 
     std::string getName() const;
@@ -44,7 +42,6 @@ private:
     bmcl::SharedBytes _pixmap;
     bmcl::Option<Firmware> _firmware;
     bool _registerFirst;
-    bool _showOnMap;
     bool _log;
 };
 

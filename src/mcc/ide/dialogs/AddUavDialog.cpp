@@ -299,7 +299,7 @@ void AddUavDialog::addDevice()
     }
 
     bmcl::SharedBytes pixmap = bmcl::SharedBytes::create(mccres::loadResource(mccres::ResourceKind::DeviceUnknownIcon));
-    mccmsg::DeviceDescription device_params = new mccmsg::DeviceDescriptionObj(dev, deviceName.toStdString(), "", mccmsg::ProtocolId{ dev, protocol, _protocolId->text().toUInt() }, bmcl::None, pixmap, bmcl::None );
+    mccmsg::DeviceDescription device_params = new mccmsg::DeviceDescriptionObj(dev, deviceName.toStdString(), "", mccmsg::ProtocolId{ dev, protocol, _protocolId->text().toUInt() }, bmcl::None, pixmap, bmcl::None, false, false);
     _uavController->requestUavAndChannelRegister(device_params, channel_params, this);
 }
 

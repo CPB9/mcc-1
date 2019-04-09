@@ -6,17 +6,10 @@ namespace mccuav {
 
 void UavErrors::setTmStorage(const bmcl::Rc<mccmsg::ITmStorage>& tmStorage)
 {
-    if (_errorsStorage.isSome() && _handler.isSome())
-    {
-        _errorsStorage->removeHandler(*_handler);
-    }
+    _handler.clear();
     _errorsStorage = tmStorage->getExtension<mccmsg::IErrStorage>();
     if (_errorsStorage.isNone())
-    {
-//        assert(false);
-        _handler = bmcl::None;
         return;
-    }
 
     auto errHandler = [this]() {
         //emit dataChanged(index(0,0), index(rowCount(), 0));
@@ -68,7 +61,8 @@ QVariant UavErrors::data(const QModelIndex &index, int role /*= Qt::DisplayRole*
             case bmcl::LogLevel::Critical:  return QColor(Qt::red);
             case bmcl::LogLevel::Warning:   return QColor(Qt::yellow);
             case bmcl::LogLevel::Info:      return QColor(Qt::white);
-            case bmcl::LogLevel::Debug:     return QColor(Qt::gray);
+            case bmcl::LogLevel::Debug:
+            case bmcl::LogLevel::None:     return QColor(Qt::gray);
         }
     }
 

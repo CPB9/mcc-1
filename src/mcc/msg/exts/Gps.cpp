@@ -18,7 +18,7 @@ const char* TmGps::info() { return "gps"; }
 
 const GpsSats& TmGps::satellites() const { return _sats; }
 uint8_t TmGps::count() const { return _count; }
-bmcl::Option<GpsFixType> TmGps::fixType() const { return _fixType; }
+const bmcl::Option<GpsFixType>& TmGps::fixType() const { return _fixType; }
 
 void TmGps::set(bmcl::SystemTime t, GpsSats&& sats)
 {

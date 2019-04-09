@@ -84,7 +84,7 @@ inline SqlErrorX binds(sqlite3pp::statement* stmt, const char* name, const mccms
     case mccmsg::NetVariantType::Int:
     case mccmsg::NetVariantType::Uint:   return binds(stmt, name, value.toInt());
     case mccmsg::NetVariantType::QString:
-    case mccmsg::NetVariantType::String: return binds(stmt, name, value.stringify(), sqlite3pp::copy);
+    case mccmsg::NetVariantType::String: return binds(stmt, name, bmcl::StringView(value.stringify()), sqlite3pp::copy);
     case mccmsg::NetVariantType::None:   return binds(stmt, name, nullptr);
     default:
         break;

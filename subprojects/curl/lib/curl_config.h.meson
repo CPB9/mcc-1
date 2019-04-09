@@ -1,0 +1,1002 @@
+/* lib/curl_config.h.in.  Generated somehow by cmake.  */
+
+/* when building libcurl itself */
+#mesondefine BUILDING_LIBCURL 
+
+/* Location of default ca bundle */
+#mesondefine CURL_CA_BUNDLE 
+
+/* define "1" to use built-in ca store of TLS backend */
+#mesondefine CURL_CA_FALLBACK 
+
+/* Location of default ca path */
+#mesondefine CURL_CA_PATH 
+
+/* to disable cookies support */
+#mesondefine CURL_DISABLE_COOKIES 
+
+/* to disable cryptographic authentication */
+#mesondefine CURL_DISABLE_CRYPTO_AUTH 
+
+/* to disable DICT */
+#mesondefine CURL_DISABLE_DICT 
+
+/* to disable FILE */
+#mesondefine CURL_DISABLE_FILE 
+
+/* to disable FTP */
+#mesondefine CURL_DISABLE_FTP 
+
+/* to disable GOPHER */
+#mesondefine CURL_DISABLE_GOPHER 
+
+/* to disable IMAP */
+#mesondefine CURL_DISABLE_IMAP 
+
+/* to disable HTTP */
+#mesondefine CURL_DISABLE_HTTP 
+
+/* to disable LDAP */
+#mesondefine CURL_DISABLE_LDAP 
+
+/* to disable LDAPS */
+#mesondefine CURL_DISABLE_LDAPS 
+
+/* to disable POP3 */
+#mesondefine CURL_DISABLE_POP3 
+
+/* to disable proxies */
+#mesondefine CURL_DISABLE_PROXY 
+
+/* to disable RTSP */
+#mesondefine CURL_DISABLE_RTSP 
+
+/* to disable SMB */
+#mesondefine CURL_DISABLE_SMB 
+
+/* to disable SMTP */
+#mesondefine CURL_DISABLE_SMTP 
+
+/* to disable TELNET */
+#mesondefine CURL_DISABLE_TELNET 
+
+/* to disable TFTP */
+#mesondefine CURL_DISABLE_TFTP 
+
+/* to disable verbose strings */
+#mesondefine CURL_DISABLE_VERBOSE_STRINGS 
+
+/* to make a symbol visible */
+#mesondefine CURL_EXTERN_SYMBOL 
+/* Ensure using CURL_EXTERN_SYMBOL is possible */
+#ifndef CURL_EXTERN_SYMBOL
+#define CURL_EXTERN_SYMBOL
+#endif
+
+/* Use Windows LDAP implementation */
+#mesondefine USE_WIN32_LDAP 
+
+/* when not building a shared library */
+#mesondefine CURL_STATICLIB 
+
+/* your Entropy Gathering Daemon socket pathname */
+#mesondefine EGD_SOCKET 
+
+/* Define if you want to enable IPv6 support */
+#mesondefine ENABLE_IPV6 
+
+/* Define to the type qualifier of arg 1 for getnameinfo. */
+#mesondefine GETNAMEINFO_QUAL_ARG1 
+
+/* Define to the type of arg 1 for getnameinfo. */
+#mesondefine GETNAMEINFO_TYPE_ARG1 
+
+/* Define to the type of arg 2 for getnameinfo. */
+#mesondefine GETNAMEINFO_TYPE_ARG2 
+
+/* Define to the type of args 4 and 6 for getnameinfo. */
+#mesondefine GETNAMEINFO_TYPE_ARG46 
+
+/* Define to the type of arg 7 for getnameinfo. */
+#mesondefine GETNAMEINFO_TYPE_ARG7 
+
+/* Specifies the number of arguments to getservbyport_r */
+#mesondefine GETSERVBYPORT_R_ARGS 
+
+/* Specifies the size of the buffer to pass to getservbyport_r */
+#mesondefine GETSERVBYPORT_R_BUFSIZE 
+
+/* Define to 1 if you have the alarm function. */
+#mesondefine HAVE_ALARM 
+
+/* Define to 1 if you have the <alloca.h> header file. */
+#mesondefine HAVE_ALLOCA_H 
+
+/* Define to 1 if you have the <arpa/inet.h> header file. */
+#mesondefine HAVE_ARPA_INET_H 
+
+/* Define to 1 if you have the <arpa/tftp.h> header file. */
+#mesondefine HAVE_ARPA_TFTP_H 
+
+/* Define to 1 if you have the <assert.h> header file. */
+#mesondefine HAVE_ASSERT_H 
+
+/* Define to 1 if you have the `basename' function. */
+#mesondefine HAVE_BASENAME 
+
+/* Define to 1 if bool is an available type. */
+#mesondefine HAVE_BOOL_T 
+
+/* Define to 1 if you have the clock_gettime function and monotonic timer. */
+#mesondefine HAVE_CLOCK_GETTIME_MONOTONIC 
+
+/* Define to 1 if you have the `closesocket' function. */
+#mesondefine HAVE_CLOSESOCKET 
+
+/* Define to 1 if you have the `CRYPTO_cleanup_all_ex_data' function. */
+#mesondefine HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 
+
+/* Define to 1 if you have the <crypto.h> header file. */
+#mesondefine HAVE_CRYPTO_H 
+
+/* Define to 1 if you have the <des.h> header file. */
+#mesondefine HAVE_DES_H 
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#mesondefine HAVE_DLFCN_H 
+
+/* Define to 1 if you have the `ENGINE_load_builtin_engines' function. */
+#mesondefine HAVE_ENGINE_LOAD_BUILTIN_ENGINES 
+
+/* Define to 1 if you have the <errno.h> header file. */
+#mesondefine HAVE_ERRNO_H 
+
+/* Define to 1 if you have the <err.h> header file. */
+#mesondefine HAVE_ERR_H 
+
+/* Define to 1 if you have the fcntl function. */
+#mesondefine HAVE_FCNTL 
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#mesondefine HAVE_FCNTL_H 
+
+/* Define to 1 if you have a working fcntl O_NONBLOCK function. */
+#mesondefine HAVE_FCNTL_O_NONBLOCK 
+
+/* Define to 1 if you have the fdopen function. */
+#mesondefine HAVE_FDOPEN 
+
+/* Define to 1 if you have the `fork' function. */
+#mesondefine HAVE_FORK 
+
+/* Define to 1 if you have the freeaddrinfo function. */
+#mesondefine HAVE_FREEADDRINFO 
+
+/* Define to 1 if you have the freeifaddrs function. */
+#mesondefine HAVE_FREEIFADDRS 
+
+/* Define to 1 if you have the ftruncate function. */
+#mesondefine HAVE_FTRUNCATE 
+
+/* Define to 1 if you have a working getaddrinfo function. */
+#mesondefine HAVE_GETADDRINFO 
+
+/* Define to 1 if you have the `geteuid' function. */
+#mesondefine HAVE_GETEUID 
+
+/* Define to 1 if you have the gethostbyaddr function. */
+#mesondefine HAVE_GETHOSTBYADDR 
+
+/* Define to 1 if you have the gethostbyaddr_r function. */
+#mesondefine HAVE_GETHOSTBYADDR_R 
+
+/* gethostbyaddr_r() takes 5 args */
+#mesondefine HAVE_GETHOSTBYADDR_R_5 
+
+/* gethostbyaddr_r() takes 7 args */
+#mesondefine HAVE_GETHOSTBYADDR_R_7 
+
+/* gethostbyaddr_r() takes 8 args */
+#mesondefine HAVE_GETHOSTBYADDR_R_8 
+
+/* Define to 1 if you have the gethostbyname function. */
+#mesondefine HAVE_GETHOSTBYNAME 
+
+/* Define to 1 if you have the gethostbyname_r function. */
+#mesondefine HAVE_GETHOSTBYNAME_R 
+
+/* gethostbyname_r() takes 3 args */
+#mesondefine HAVE_GETHOSTBYNAME_R_3 
+
+/* gethostbyname_r() takes 5 args */
+#mesondefine HAVE_GETHOSTBYNAME_R_5 
+
+/* gethostbyname_r() takes 6 args */
+#mesondefine HAVE_GETHOSTBYNAME_R_6 
+
+/* Define to 1 if you have the gethostname function. */
+#mesondefine HAVE_GETHOSTNAME 
+
+/* Define to 1 if you have a working getifaddrs function. */
+#mesondefine HAVE_GETIFADDRS 
+
+/* Define to 1 if you have the getnameinfo function. */
+#mesondefine HAVE_GETNAMEINFO 
+
+/* Define to 1 if you have the `getpass_r' function. */
+#mesondefine HAVE_GETPASS_R 
+
+/* Define to 1 if you have the `getppid' function. */
+#mesondefine HAVE_GETPPID 
+
+/* Define to 1 if you have the `getprotobyname' function. */
+#mesondefine HAVE_GETPROTOBYNAME 
+
+/* Define to 1 if you have the `getpwuid' function. */
+#mesondefine HAVE_GETPWUID 
+
+/* Define to 1 if you have the `getrlimit' function. */
+#mesondefine HAVE_GETRLIMIT 
+
+/* Define to 1 if you have the getservbyport_r function. */
+#mesondefine HAVE_GETSERVBYPORT_R 
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#mesondefine HAVE_GETTIMEOFDAY 
+
+/* Define to 1 if you have a working glibc-style strerror_r function. */
+#mesondefine HAVE_GLIBC_STRERROR_R 
+
+/* Define to 1 if you have a working gmtime_r function. */
+#mesondefine HAVE_GMTIME_R 
+
+/* if you have the gssapi libraries */
+#mesondefine HAVE_GSSAPI 
+
+/* Define to 1 if you have the <gssapi/gssapi_generic.h> header file. */
+#mesondefine HAVE_GSSAPI_GSSAPI_GENERIC_H 
+
+/* Define to 1 if you have the <gssapi/gssapi.h> header file. */
+#mesondefine HAVE_GSSAPI_GSSAPI_H 
+
+/* Define to 1 if you have the <gssapi/gssapi_krb5.h> header file. */
+#mesondefine HAVE_GSSAPI_GSSAPI_KRB5_H 
+
+/* if you have the GNU gssapi libraries */
+#mesondefine HAVE_GSSGNU 
+
+/* if you have the Heimdal gssapi libraries */
+#mesondefine HAVE_GSSHEIMDAL 
+
+/* if you have the MIT gssapi libraries */
+#mesondefine HAVE_GSSMIT 
+
+/* Define to 1 if you have the `idna_strerror' function. */
+#mesondefine HAVE_IDNA_STRERROR 
+
+/* Define to 1 if you have the `idn_free' function. */
+#mesondefine HAVE_IDN_FREE 
+
+/* Define to 1 if you have the <idn-free.h> header file. */
+#mesondefine HAVE_IDN_FREE_H 
+
+/* Define to 1 if you have the <ifaddrs.h> header file. */
+#mesondefine HAVE_IFADDRS_H 
+
+/* Define to 1 if you have the `inet_addr' function. */
+#mesondefine HAVE_INET_ADDR 
+
+/* Define to 1 if you have the inet_ntoa_r function. */
+#mesondefine HAVE_INET_NTOA_R 
+
+/* inet_ntoa_r() takes 2 args */
+#mesondefine HAVE_INET_NTOA_R_2 
+
+/* inet_ntoa_r() takes 3 args */
+#mesondefine HAVE_INET_NTOA_R_3 
+
+/* Define to 1 if you have a IPv6 capable working inet_ntop function. */
+#mesondefine HAVE_INET_NTOP 
+
+/* Define to 1 if you have a IPv6 capable working inet_pton function. */
+#mesondefine HAVE_INET_PTON 
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#mesondefine HAVE_INTTYPES_H 
+
+/* Define to 1 if you have the ioctl function. */
+#mesondefine HAVE_IOCTL 
+
+/* Define to 1 if you have the ioctlsocket function. */
+#mesondefine HAVE_IOCTLSOCKET 
+
+/* Define to 1 if you have the IoctlSocket camel case function. */
+#mesondefine HAVE_IOCTLSOCKET_CAMEL 
+
+/* Define to 1 if you have a working IoctlSocket camel case FIONBIO function.
+   */
+#mesondefine HAVE_IOCTLSOCKET_CAMEL_FIONBIO 
+
+/* Define to 1 if you have a working ioctlsocket FIONBIO function. */
+#mesondefine HAVE_IOCTLSOCKET_FIONBIO 
+
+/* Define to 1 if you have a working ioctl FIONBIO function. */
+#mesondefine HAVE_IOCTL_FIONBIO 
+
+/* Define to 1 if you have a working ioctl SIOCGIFADDR function. */
+#mesondefine HAVE_IOCTL_SIOCGIFADDR 
+
+/* Define to 1 if you have the <io.h> header file. */
+#mesondefine HAVE_IO_H 
+
+/* if you have the Kerberos4 libraries (including -ldes) */
+#mesondefine HAVE_KRB4 
+
+/* Define to 1 if you have the `krb_get_our_ip_for_realm' function. */
+#mesondefine HAVE_KRB_GET_OUR_IP_FOR_REALM 
+
+/* Define to 1 if you have the <krb.h> header file. */
+#mesondefine HAVE_KRB_H 
+
+/* Define to 1 if you have the lber.h header file. */
+#mesondefine HAVE_LBER_H 
+
+/* Define to 1 if you have the ldapssl.h header file. */
+#mesondefine HAVE_LDAPSSL_H 
+
+/* Define to 1 if you have the ldap.h header file. */
+#mesondefine HAVE_LDAP_H 
+
+/* Use LDAPS implementation */
+#mesondefine HAVE_LDAP_SSL 
+
+/* Define to 1 if you have the ldap_ssl.h header file. */
+#mesondefine HAVE_LDAP_SSL_H 
+
+/* Define to 1 if you have the `ldap_url_parse' function. */
+#mesondefine HAVE_LDAP_URL_PARSE 
+
+/* Define to 1 if you have the <libgen.h> header file. */
+#mesondefine HAVE_LIBGEN_H 
+
+/* Define to 1 if you have the `idn' library (-lidn). */
+#mesondefine HAVE_LIBIDN 
+
+/* Define to 1 if you have the `resolv' library (-lresolv). */
+#mesondefine HAVE_LIBRESOLV 
+
+/* Define to 1 if you have the `resolve' library (-lresolve). */
+#mesondefine HAVE_LIBRESOLVE 
+
+/* Define to 1 if you have the `socket' library (-lsocket). */
+#mesondefine HAVE_LIBSOCKET 
+
+/* Define to 1 if you have the `ssh2' library (-lssh2). */
+#mesondefine HAVE_LIBSSH2 
+
+/* Define to 1 if libssh2 provides `libssh2_version'. */
+#mesondefine HAVE_LIBSSH2_VERSION 
+
+/* Define to 1 if libssh2 provides `libssh2_init'. */
+#mesondefine HAVE_LIBSSH2_INIT 
+
+/* Define to 1 if libssh2 provides `libssh2_exit'. */
+#mesondefine HAVE_LIBSSH2_EXIT 
+
+/* Define to 1 if libssh2 provides `libssh2_scp_send64'. */
+#mesondefine HAVE_LIBSSH2_SCP_SEND64 
+
+/* Define to 1 if libssh2 provides `libssh2_session_handshake'. */
+#mesondefine HAVE_LIBSSH2_SESSION_HANDSHAKE 
+
+/* Define to 1 if you have the <libssh2.h> header file. */
+#mesondefine HAVE_LIBSSH2_H 
+
+/* Define to 1 if you have the `ssl' library (-lssl). */
+#mesondefine HAVE_LIBSSL 
+
+/* if zlib is available */
+#mesondefine HAVE_LIBZ 
+
+/* if your compiler supports LL */
+#mesondefine HAVE_LL 
+
+/* Define to 1 if you have the <locale.h> header file. */
+#mesondefine HAVE_LOCALE_H 
+
+/* Define to 1 if you have a working localtime_r function. */
+#mesondefine HAVE_LOCALTIME_R 
+
+/* Define to 1 if the compiler supports the 'long long' data type. */
+#mesondefine HAVE_LONGLONG 
+
+/* Define to 1 if you have the malloc.h header file. */
+#mesondefine HAVE_MALLOC_H 
+
+/* Define to 1 if you have the <memory.h> header file. */
+#mesondefine HAVE_MEMORY_H 
+
+/* Define to 1 if you have the MSG_NOSIGNAL flag. */
+#mesondefine HAVE_MSG_NOSIGNAL 
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#mesondefine HAVE_NETDB_H 
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#mesondefine HAVE_NETINET_IN_H 
+
+/* Define to 1 if you have the <netinet/tcp.h> header file. */
+#mesondefine HAVE_NETINET_TCP_H 
+
+/* Define to 1 if you have the <net/if.h> header file. */
+#mesondefine HAVE_NET_IF_H 
+
+/* Define to 1 if NI_WITHSCOPEID exists and works. */
+#mesondefine HAVE_NI_WITHSCOPEID 
+
+/* if you have an old MIT gssapi library, lacking GSS_C_NT_HOSTBASED_SERVICE */
+#mesondefine HAVE_OLD_GSSMIT 
+
+/* Define to 1 if you have the <openssl/crypto.h> header file. */
+#mesondefine HAVE_OPENSSL_CRYPTO_H 
+
+/* Define to 1 if you have the <openssl/engine.h> header file. */
+#mesondefine HAVE_OPENSSL_ENGINE_H 
+
+/* Define to 1 if you have the <openssl/err.h> header file. */
+#mesondefine HAVE_OPENSSL_ERR_H 
+
+/* Define to 1 if you have the <openssl/pem.h> header file. */
+#mesondefine HAVE_OPENSSL_PEM_H 
+
+/* Define to 1 if you have the <openssl/pkcs12.h> header file. */
+#mesondefine HAVE_OPENSSL_PKCS12_H 
+
+/* Define to 1 if you have the <openssl/rsa.h> header file. */
+#mesondefine HAVE_OPENSSL_RSA_H 
+
+/* Define to 1 if you have the <openssl/ssl.h> header file. */
+#mesondefine HAVE_OPENSSL_SSL_H 
+
+/* Define to 1 if you have the <openssl/x509.h> header file. */
+#mesondefine HAVE_OPENSSL_X509_H 
+
+/* Define to 1 if you have the <pem.h> header file. */
+#mesondefine HAVE_PEM_H 
+
+/* Define to 1 if you have the `perror' function. */
+#mesondefine HAVE_PERROR 
+
+/* Define to 1 if you have the `pipe' function. */
+#mesondefine HAVE_PIPE 
+
+/* Define to 1 if you have a working poll function. */
+#mesondefine HAVE_POLL 
+
+/* If you have a fine poll */
+#mesondefine HAVE_POLL_FINE 
+
+/* Define to 1 if you have the <poll.h> header file. */
+#mesondefine HAVE_POLL_H 
+
+/* Define to 1 if you have a working POSIX-style strerror_r function. */
+#mesondefine HAVE_POSIX_STRERROR_R 
+
+/* Define to 1 if you have the <pthread.h> header file */
+#mesondefine HAVE_PTHREAD_H 
+
+/* Define to 1 if you have the <pwd.h> header file. */
+#mesondefine HAVE_PWD_H 
+
+/* Define to 1 if you have the `RAND_egd' function. */
+#mesondefine HAVE_RAND_EGD 
+
+/* Define to 1 if you have the `RAND_screen' function. */
+#mesondefine HAVE_RAND_SCREEN 
+
+/* Define to 1 if you have the `RAND_status' function. */
+#mesondefine HAVE_RAND_STATUS 
+
+/* Define to 1 if you have the recv function. */
+#mesondefine HAVE_RECV 
+
+/* Define to 1 if you have the recvfrom function. */
+#mesondefine HAVE_RECVFROM 
+
+/* Define to 1 if you have the <rsa.h> header file. */
+#mesondefine HAVE_RSA_H 
+
+/* Define to 1 if you have the select function. */
+#mesondefine HAVE_SELECT 
+
+/* Define to 1 if you have the send function. */
+#mesondefine HAVE_SEND 
+
+/* Define to 1 if you have the 'fsetxattr' function. */
+#mesondefine HAVE_FSETXATTR 
+
+/* fsetxattr() takes 5 args */
+#mesondefine HAVE_FSETXATTR_5 
+
+/* fsetxattr() takes 6 args */
+#mesondefine HAVE_FSETXATTR_6 
+
+/* Define to 1 if you have the <setjmp.h> header file. */
+#mesondefine HAVE_SETJMP_H 
+
+/* Define to 1 if you have the `setlocale' function. */
+#mesondefine HAVE_SETLOCALE 
+
+/* Define to 1 if you have the `setmode' function. */
+#mesondefine HAVE_SETMODE 
+
+/* Define to 1 if you have the `setrlimit' function. */
+#mesondefine HAVE_SETRLIMIT 
+
+/* Define to 1 if you have the setsockopt function. */
+#mesondefine HAVE_SETSOCKOPT 
+
+/* Define to 1 if you have a working setsockopt SO_NONBLOCK function. */
+#mesondefine HAVE_SETSOCKOPT_SO_NONBLOCK 
+
+/* Define to 1 if you have the <sgtty.h> header file. */
+#mesondefine HAVE_SGTTY_H 
+
+/* Define to 1 if you have the sigaction function. */
+#mesondefine HAVE_SIGACTION 
+
+/* Define to 1 if you have the siginterrupt function. */
+#mesondefine HAVE_SIGINTERRUPT 
+
+/* Define to 1 if you have the signal function. */
+#mesondefine HAVE_SIGNAL 
+
+/* Define to 1 if you have the <signal.h> header file. */
+#mesondefine HAVE_SIGNAL_H 
+
+/* Define to 1 if you have the sigsetjmp function or macro. */
+#mesondefine HAVE_SIGSETJMP 
+
+/* Define to 1 if sig_atomic_t is an available typedef. */
+#mesondefine HAVE_SIG_ATOMIC_T 
+
+/* Define to 1 if sig_atomic_t is already defined as volatile. */
+#mesondefine HAVE_SIG_ATOMIC_T_VOLATILE 
+
+/* Define to 1 if struct sockaddr_in6 has the sin6_scope_id member */
+#mesondefine HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 
+
+/* Define to 1 if you have the `socket' function. */
+#mesondefine HAVE_SOCKET 
+
+/* Define to 1 if you have the `SSL_get_shutdown' function. */
+#mesondefine HAVE_SSL_GET_SHUTDOWN 
+
+/* Define to 1 if you have the <ssl.h> header file. */
+#mesondefine HAVE_SSL_H 
+
+/* Define to 1 if you have the <stdbool.h> header file. */
+#mesondefine HAVE_STDBOOL_H 
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#mesondefine HAVE_STDINT_H 
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#mesondefine HAVE_STDIO_H 
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#mesondefine HAVE_STDLIB_H 
+
+/* Define to 1 if you have the strcasecmp function. */
+#mesondefine HAVE_STRCASECMP 
+
+/* Define to 1 if you have the strcasestr function. */
+#mesondefine HAVE_STRCASESTR 
+
+/* Define to 1 if you have the strcmpi function. */
+#mesondefine HAVE_STRCMPI 
+
+/* Define to 1 if you have the strdup function. */
+#mesondefine HAVE_STRDUP 
+
+/* Define to 1 if you have the strerror_r function. */
+#mesondefine HAVE_STRERROR_R 
+
+/* Define to 1 if you have the stricmp function. */
+#mesondefine HAVE_STRICMP 
+
+/* Define to 1 if you have the <strings.h> header file. */
+#mesondefine HAVE_STRINGS_H 
+
+/* Define to 1 if you have the <string.h> header file. */
+#mesondefine HAVE_STRING_H 
+
+/* Define to 1 if you have the strlcat function. */
+#mesondefine HAVE_STRLCAT 
+
+/* Define to 1 if you have the `strlcpy' function. */
+#mesondefine HAVE_STRLCPY 
+
+/* Define to 1 if you have the strncasecmp function. */
+#mesondefine HAVE_STRNCASECMP 
+
+/* Define to 1 if you have the strncmpi function. */
+#mesondefine HAVE_STRNCMPI 
+
+/* Define to 1 if you have the strnicmp function. */
+#mesondefine HAVE_STRNICMP 
+
+/* Define to 1 if you have the <stropts.h> header file. */
+#mesondefine HAVE_STROPTS_H 
+
+/* Define to 1 if you have the strstr function. */
+#mesondefine HAVE_STRSTR 
+
+/* Define to 1 if you have the strtok_r function. */
+#mesondefine HAVE_STRTOK_R 
+
+/* Define to 1 if you have the strtoll function. */
+#mesondefine HAVE_STRTOLL 
+
+/* if struct sockaddr_storage is defined */
+#mesondefine HAVE_STRUCT_SOCKADDR_STORAGE 
+
+/* Define to 1 if you have the timeval struct. */
+#mesondefine HAVE_STRUCT_TIMEVAL 
+
+/* Define to 1 if you have the <sys/filio.h> header file. */
+#mesondefine HAVE_SYS_FILIO_H 
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#mesondefine HAVE_SYS_IOCTL_H 
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#mesondefine HAVE_SYS_PARAM_H 
+
+/* Define to 1 if you have the <sys/poll.h> header file. */
+#mesondefine HAVE_SYS_POLL_H 
+
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#mesondefine HAVE_SYS_RESOURCE_H 
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#mesondefine HAVE_SYS_SELECT_H 
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#mesondefine HAVE_SYS_SOCKET_H 
+
+/* Define to 1 if you have the <sys/sockio.h> header file. */
+#mesondefine HAVE_SYS_SOCKIO_H 
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#mesondefine HAVE_SYS_STAT_H 
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#mesondefine HAVE_SYS_TIME_H 
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#mesondefine HAVE_SYS_TYPES_H 
+
+/* Define to 1 if you have the <sys/uio.h> header file. */
+#mesondefine HAVE_SYS_UIO_H 
+
+/* Define to 1 if you have the <sys/un.h> header file. */
+#mesondefine HAVE_SYS_UN_H 
+
+/* Define to 1 if you have the <sys/utime.h> header file. */
+#mesondefine HAVE_SYS_UTIME_H 
+
+/* Define to 1 if you have the <termios.h> header file. */
+#mesondefine HAVE_TERMIOS_H 
+
+/* Define to 1 if you have the <termio.h> header file. */
+#mesondefine HAVE_TERMIO_H 
+
+/* Define to 1 if you have the <time.h> header file. */
+#mesondefine HAVE_TIME_H 
+
+/* Define to 1 if you have the <tld.h> header file. */
+#mesondefine HAVE_TLD_H 
+
+/* Define to 1 if you have the `tld_strerror' function. */
+#mesondefine HAVE_TLD_STRERROR 
+
+/* Define to 1 if you have the `uname' function. */
+#mesondefine HAVE_UNAME 
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#mesondefine HAVE_UNISTD_H 
+
+/* Define to 1 if you have the `utime' function. */
+#mesondefine HAVE_UTIME 
+
+/* Define to 1 if you have the <utime.h> header file. */
+#mesondefine HAVE_UTIME_H 
+
+/* Define to 1 if compiler supports C99 variadic macro style. */
+#mesondefine HAVE_VARIADIC_MACROS_C99 
+
+/* Define to 1 if compiler supports old gcc variadic macro style. */
+#mesondefine HAVE_VARIADIC_MACROS_GCC 
+
+/* Define to 1 if you have the winber.h header file. */
+#mesondefine HAVE_WINBER_H 
+
+/* Define to 1 if you have the windows.h header file. */
+#mesondefine HAVE_WINDOWS_H 
+
+/* Define to 1 if you have the winldap.h header file. */
+#mesondefine HAVE_WINLDAP_H 
+
+/* Define to 1 if you have the winsock2.h header file. */
+#mesondefine HAVE_WINSOCK2_H 
+
+/* Define to 1 if you have the winsock.h header file. */
+#mesondefine HAVE_WINSOCK_H 
+
+/* Define this symbol if your OS supports changing the contents of argv */
+#mesondefine HAVE_WRITABLE_ARGV 
+
+/* Define to 1 if you have the writev function. */
+#mesondefine HAVE_WRITEV 
+
+/* Define to 1 if you have the ws2tcpip.h header file. */
+#mesondefine HAVE_WS2TCPIP_H 
+
+/* Define to 1 if you have the <x509.h> header file. */
+#mesondefine HAVE_X509_H 
+
+/* Define if you have the <process.h> header file. */
+#mesondefine HAVE_PROCESS_H 
+
+/* if you have the zlib.h header file */
+#mesondefine HAVE_ZLIB_H 
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#mesondefine LT_OBJDIR 
+
+/* If you lack a fine basename() prototype */
+#mesondefine NEED_BASENAME_PROTO 
+
+/* Define to 1 if you need the lber.h header file even with ldap.h */
+#mesondefine NEED_LBER_H 
+
+/* Define to 1 if you need the malloc.h header file even with stdlib.h */
+#mesondefine NEED_MALLOC_H 
+
+/* Define to 1 if _REENTRANT preprocessor symbol must be defined. */
+#mesondefine NEED_REENTRANT 
+
+/* cpu-machine-OS */
+#mesondefine OS 
+
+/* Name of package */
+#mesondefine PACKAGE 
+
+/* Define to the address where bug reports for this package should be sent. */
+#mesondefine PACKAGE_BUGREPORT 
+
+/* Define to the full name of this package. */
+#mesondefine PACKAGE_NAME 
+
+/* Define to the full name and version of this package. */
+#mesondefine PACKAGE_STRING 
+
+/* Define to the one symbol short name of this package. */
+#mesondefine PACKAGE_TARNAME 
+
+/* Define to the version of this package. */
+#mesondefine PACKAGE_VERSION 
+
+/* a suitable file to read random data from */
+#mesondefine RANDOM_FILE 
+
+/* Define to the type of arg 1 for recvfrom. */
+#mesondefine RECVFROM_TYPE_ARG1 
+
+/* Define to the type pointed by arg 2 for recvfrom. */
+#mesondefine RECVFROM_TYPE_ARG2 
+
+/* Define to 1 if the type pointed by arg 2 for recvfrom is void. */
+#mesondefine RECVFROM_TYPE_ARG2_IS_VOID 
+
+/* Define to the type of arg 3 for recvfrom. */
+#mesondefine RECVFROM_TYPE_ARG3 
+
+/* Define to the type of arg 4 for recvfrom. */
+#mesondefine RECVFROM_TYPE_ARG4 
+
+/* Define to the type pointed by arg 5 for recvfrom. */
+#mesondefine RECVFROM_TYPE_ARG5 
+
+/* Define to 1 if the type pointed by arg 5 for recvfrom is void. */
+#mesondefine RECVFROM_TYPE_ARG5_IS_VOID 
+
+/* Define to the type pointed by arg 6 for recvfrom. */
+#mesondefine RECVFROM_TYPE_ARG6 
+
+/* Define to 1 if the type pointed by arg 6 for recvfrom is void. */
+#mesondefine RECVFROM_TYPE_ARG6_IS_VOID 
+
+/* Define to the function return type for recvfrom. */
+#mesondefine RECVFROM_TYPE_RETV 
+
+/* Define to the type of arg 1 for recv. */
+#mesondefine RECV_TYPE_ARG1 
+
+/* Define to the type of arg 2 for recv. */
+#mesondefine RECV_TYPE_ARG2 
+
+/* Define to the type of arg 3 for recv. */
+#mesondefine RECV_TYPE_ARG3 
+
+/* Define to the type of arg 4 for recv. */
+#mesondefine RECV_TYPE_ARG4 
+
+/* Define to the function return type for recv. */
+#mesondefine RECV_TYPE_RETV 
+
+/* Define as the return type of signal handlers (`int' or `void'). */
+#mesondefine RETSIGTYPE 
+
+/* Define to the type qualifier of arg 5 for select. */
+#mesondefine SELECT_QUAL_ARG5 
+
+/* Define to the type of arg 1 for select. */
+#mesondefine SELECT_TYPE_ARG1 
+
+/* Define to the type of args 2, 3 and 4 for select. */
+#mesondefine SELECT_TYPE_ARG234 
+
+/* Define to the type of arg 5 for select. */
+#mesondefine SELECT_TYPE_ARG5 
+
+/* Define to the function return type for select. */
+#mesondefine SELECT_TYPE_RETV 
+
+/* Define to the type qualifier of arg 2 for send. */
+#mesondefine SEND_QUAL_ARG2 
+
+/* Define to the type of arg 1 for send. */
+#mesondefine SEND_TYPE_ARG1 
+
+/* Define to the type of arg 2 for send. */
+#mesondefine SEND_TYPE_ARG2 
+
+/* Define to the type of arg 3 for send. */
+#mesondefine SEND_TYPE_ARG3 
+
+/* Define to the type of arg 4 for send. */
+#mesondefine SEND_TYPE_ARG4 
+
+/* Define to the function return type for send. */
+#mesondefine SEND_TYPE_RETV 
+
+/* The size of `int', as computed by sizeof. */
+#mesondefine SIZEOF_INT 
+
+/* The size of `short', as computed by sizeof. */
+#mesondefine SIZEOF_SHORT 
+
+/* The size of `long', as computed by sizeof. */
+#mesondefine SIZEOF_LONG 
+
+/* The size of `off_t', as computed by sizeof. */
+#mesondefine SIZEOF_OFF_T 
+
+/* The size of `curl_off_t', as computed by sizeof. */
+#mesondefine SIZEOF_CURL_OFF_T 
+
+/* The size of `size_t', as computed by sizeof. */
+#mesondefine SIZEOF_SIZE_T 
+
+/* The size of `time_t', as computed by sizeof. */
+#mesondefine SIZEOF_TIME_T 
+
+/* The size of `void*', as computed by sizeof. */
+#mesondefine SIZEOF_VOIDP 
+
+/* Define to 1 if you have the ANSI C header files. */
+#mesondefine STDC_HEADERS 
+
+/* Define to the type of arg 3 for strerror_r. */
+#mesondefine STRERROR_R_TYPE_ARG3 
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#mesondefine TIME_WITH_SYS_TIME 
+
+/* Define if you want to enable c-ares support */
+#mesondefine USE_ARES 
+
+/* Define if you want to enable POSIX threaded DNS lookup */
+#mesondefine USE_THREADS_POSIX 
+
+/* Define if you want to enable WIN32 threaded DNS lookup */
+#mesondefine USE_THREADS_WIN32 
+
+/* Define to disable non-blocking sockets. */
+#mesondefine USE_BLOCKING_SOCKETS 
+
+/* if GnuTLS is enabled */
+#mesondefine USE_GNUTLS 
+
+/* if PolarSSL is enabled */
+#mesondefine USE_POLARSSL 
+
+/* if DarwinSSL is enabled */
+#mesondefine USE_DARWINSSL 
+
+/* if mbedTLS is enabled */
+#mesondefine USE_MBEDTLS 
+
+/* if libSSH2 is in use */
+#mesondefine USE_LIBSSH2 
+
+/* If you want to build curl with the built-in manual */
+#mesondefine USE_MANUAL 
+
+/* if NSS is enabled */
+#mesondefine USE_NSS 
+
+/* if you want to use OpenLDAP code instead of legacy ldap implementation */
+#mesondefine USE_OPENLDAP 
+
+/* if OpenSSL is in use */
+#mesondefine USE_OPENSSL 
+
+/* to enable NGHTTP2  */
+#mesondefine USE_NGHTTP2 
+
+/* if Unix domain sockets are enabled  */
+#mesondefine USE_UNIX_SOCKETS
+
+/* Define to 1 if you are building a Windows target with large file support. */
+#mesondefine USE_WIN32_LARGE_FILES 
+
+/* to enable SSPI support */
+#mesondefine USE_WINDOWS_SSPI 
+
+/* to enable Windows SSL  */
+#mesondefine USE_SCHANNEL 
+
+/* Define to 1 if using yaSSL in OpenSSL compatibility mode. */
+#mesondefine USE_YASSLEMUL 
+
+/* Version number of package */
+#mesondefine VERSION 
+
+/* Define to 1 if OS is AIX. */
+#ifndef _ALL_SOURCE
+#  undef _ALL_SOURCE
+#endif
+
+/* Number of bits in a file offset, on hosts where this is settable. */
+#mesondefine _FILE_OFFSET_BITS 
+
+/* Define for large files, on AIX-style hosts. */
+#mesondefine _LARGE_FILES 
+
+/* define this if you need it to compile thread-safe code */
+#mesondefine _THREAD_SAFE 
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#mesondefine const 
+
+/* Type to use in place of in_addr_t when system does not provide it. */
+#mesondefine in_addr_t 
+
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
+#undef inline
+#endif
+
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#mesondefine size_t 
+
+/* the signed version of size_t */
+#mesondefine ssize_t 
+
+/* Define to 1 if you have the mach_absolute_time function. */
+#mesondefine HAVE_MACH_ABSOLUTE_TIME 

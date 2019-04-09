@@ -118,7 +118,10 @@ class VisitorGroup : public mccmsg::CmdVisitor
 {
 public:
     VisitorGroup(GroupHandler* self, CmdPtr&& cmd);
-    void visit(const mccmsg::CmdGroupNew* msg) override { msg; }
+
+    using mccmsg::CmdVisitor::visit;
+
+    void visit(const mccmsg::CmdGroupNew* msg) override { (void)msg; assert(false); }
     void visit(const mccmsg::CmdGroupDelete* msg) override { _self->execute(std::move(_cmd), *msg); }
     void visit(const mccmsg::CmdGroupAttach* msg) override { _self->execute(std::move(_cmd), *msg); }
     void visit(const mccmsg::CmdGroupDetach* msg) override { _self->execute(std::move(_cmd), *msg); }
@@ -251,7 +254,7 @@ caf::behavior GroupHandler::make_behavior()
             {
                 if (id.device() == i.first)
                     continue;
-                auto d = i.first;
+                //auto d = i.first;
             }
         }
       , [this](timerAtom)

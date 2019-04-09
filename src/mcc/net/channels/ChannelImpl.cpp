@@ -1,6 +1,6 @@
 #include <caf/error.hpp>
 #include <fmt/format.h>
-#include <asio/io_service.hpp>
+#include <asio/io_context.hpp>
 #include <asio/steady_timer.hpp>
 #include <bmcl/Logging.h>
 #include "mcc/msg/obj/Channel.h"
@@ -11,7 +11,7 @@ namespace mccnet {
 
 struct ChannelImpl::Timer
 {
-    Timer(asio::io_service& s, const bmcl::Option<std::chrono::seconds>& reconnect)
+    Timer(asio::io_context& s, const bmcl::Option<std::chrono::seconds>& reconnect)
         : _timer(s)
         , _isEnabled(false)
         , _isAuto(reconnect.isSome())
@@ -54,13 +54,13 @@ caf::error ChannelError::make_error()
     return mccmsg::make_error(_e, std::move(_text));
 }
 
-ChannelImpl::ChannelImpl(asio::io_service& io_service, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings)
+ChannelImpl::ChannelImpl(asio::io_context& io_context, ChannelId id, ExchangerPtr&& exch, const mccmsg::ChannelDescription& settings)
     : Channel(id)
-    , _io_service(io_service)
+    , _io_context(io_context)
     , _exch(std::move(exch))
     , _stats(settings->name())
 {
-    _reconnectTimer = std::make_shared<Timer>(io_service, settings->reconnect());
+    _reconnectTimer = std::make_shared<Timer>(io_context, settings->reconnect());
     _rcvStarted = false;
     _exch->changeLog(settings->log(), false);
     setState(false);
@@ -76,25 +76,25 @@ void ChannelImpl::send(std::size_t req_id, mccmsg::PacketPtr&& pkt)
 {
     auto self = shared_from_this();
     auto handler = [this, req_id, pkt, self](caf::error && err) mutable { _exch->onSent(req_id, std::move(pkt), std::move(err)); };
-    _io_service.post([this, handler, pkt]() mutable { data_send_(std::move(pkt), std::move(handler)); });
+    _io_context.post([this, handler, pkt]() mutable { data_send_(std::move(pkt), std::move(handler)); });
 }
 
 void ChannelImpl::connect(OpCompletion&& f)
 {
     auto self = shared_from_this();
-    _io_service.post([this, self, f]() mutable { _reconnectTimer->_isEnabled.store(true); connect_(std::move(f)); });
+    _io_context.post([this, self, f]() mutable { _reconnectTimer->_isEnabled.store(true); connect_(std::move(f)); });
 }
 
 void ChannelImpl::disconnect(OpCompletion&& f)
 {
     auto self = shared_from_this();
-    _io_service.post([this, self, f]() mutable { _reconnectTimer->_isEnabled.store(false); disconnect_(std::move(f), bmcl::None); });
+    _io_context.post([this, self, f]() mutable { _reconnectTimer->_isEnabled.store(false); disconnect_(std::move(f), bmcl::None); });
 }
 
 void ChannelImpl::update(const mccmsg::ChannelDescription& settings)
 {
     auto self = shared_from_this();
-    _io_service.post
+    _io_context.post
     (
         [this, self, settings]()
         {

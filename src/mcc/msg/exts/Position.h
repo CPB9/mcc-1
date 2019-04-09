@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "mcc/Config.h"
 #include "mcc/geo/Position.h"
 #include "mcc/msg/exts/ITmExtension.h"
@@ -14,8 +14,8 @@ public:
     ~TmPosition() override;
     static const TmExtension& id();
     static const char* info();
-    bmcl::Option<mccgeo::Position> position() const;
-    bmcl::Option<double> positionAccuracy() const;
+    const bmcl::Option<mccgeo::Position>& position() const;
+    const bmcl::Option<double>& positionAccuracy() const;
     void set(bmcl::SystemTime t, const bmcl::Option<mccgeo::Position>& v, bmcl::Option<double> acc = bmcl::None);
 private:
     bmcl::Option<double> _positionAccuracy;
