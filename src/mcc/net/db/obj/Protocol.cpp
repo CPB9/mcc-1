@@ -128,7 +128,7 @@ void Protocol::updatePlugins(const mccmsg::ProtocolController* pc)
         auto tmp = getId(i->name());
         if (tmp.isSome())
         {
-            BMCL_WARNING() << fmt::format("Протокол {} уже зарегистрирован", i->name().toStdString());
+            //BMCL_WARNING() << fmt::format("Протокол {} уже зарегистрирован", i->name().toStdString());
             continue;
         }
 

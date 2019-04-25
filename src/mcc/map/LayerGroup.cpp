@@ -35,6 +35,7 @@ void LayerGroup::insertLayer(Layer* l, std::size_t pos)
     _layers.insert(_layers.begin() + pos, layer.get());
     if (_activeLayer.isNone()) {
         _activeLayer = std::size_t(0);
+        layer->setActive(true);
     } else {
         if (pos <= _activeLayer.unwrap()) {
             _activeLayer.unwrap()++;
@@ -45,9 +46,7 @@ void LayerGroup::insertLayer(Layer* l, std::size_t pos)
             _activatedLayer.unwrap()++;
         }
     }
-    connect(layer.get(), &Layer::sceneUpdated, this, [this]() {
-        emit sceneUpdated();
-    });
+    connect(layer.get(), &Layer::sceneUpdated, this, &LayerGroup::sceneUpdated);
     connect(layer.get(), &Layer::activated, this, [this, layer]() {
         if (!_catchUpdates) {
             return;

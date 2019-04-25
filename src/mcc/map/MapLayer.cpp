@@ -140,9 +140,12 @@ void MapLayer::enableTileDownloading(bool flag)
 {
     _downloadEnabled = flag && _hasOnlineTiles;
     _manager->setDownloadEnabled(_downloadEnabled);
+
     if (_downloadEnabled) {
         auto queue = _cache.reloadCache();
         sendTiles(queue);
+    } else {
+        _manager->clear();
     }
 }
 

@@ -40,7 +40,7 @@ void UavUiController::onUavDescriptionUpdated(const mccuav::Uav* uav)
     const auto& description = uav->deviceDescription();
     if (description->ui().isNone())
     {
-        //TODO: ���������� �������������� ��������� (���� �� ����)
+        //TODO: подчистить неиспользуемый интерфейс (если он есть)
         emit openUi(uav->device(), bmcl::None);
         return;
     }
@@ -56,17 +56,47 @@ void UavUiController::onUavDescriptionUpdated(const mccuav::Uav* uav)
 
 void UavUiController::updateUi(mccmsg::Device device, const mccmsg::DeviceUiDescription& description)
 {
+    if(description->data().isEmpty())
+    {
+//        assert(false);
+        BMCL_WARNING() << "Получен файл с нулевым размером";
+        return;
+    }
     saveUi(device, description->name().toQString(), description->data());
 }
 
 void UavUiController::saveUi(mccmsg::Device device, const QString& filename, const bmcl::SharedBytes& data)
 {
+    auto existsFile = this->ui(device);
+    if(existsFile.isSome() && existsFile->name() == filename)
+        return;
+
     bmcl::Rc<UavUi> ui = new UavUi(_tempDir, filename);
-    if (!ui->extractAndValidate(filename, data))
+    auto res = ui->extractAndValidate(filename, data);
+    if (res.isErr())
     {
+        auto err = res.takeErr();
+        switch(err)
+        {
+        case UiExtractError::BadZipArchive:
+            _uavController->onLog(bmcl::LogLevel::Critical, device, "Ошибка при открытии архива с интерфейсом");
+            break;
+        case UiExtractError::BrokenZipArchive:
+            _uavController->onLog(bmcl::LogLevel::Critical, device, "Ошибка при распаковке архива с интерфейсом");
+            break;
+        case UiExtractError::MainFileNotFound:
+            _uavController->onLog(bmcl::LogLevel::Critical, device, "В архиве с интерфейсом отсутствует файл main.qml");
+            break;
+        }
+        emit openUi(device, bmcl::None);
         return;
     }
-    ui->setType(UavUi::Type::Onboard);
+
+    if(ui->localCopyExists())
+        ui->setType(UavUi::Type::LocalCopy);
+    else
+        ui->setType(UavUi::Type::Onboard);
+
     _uis[device] = ui;
     emit openUi(device, ui);
 }

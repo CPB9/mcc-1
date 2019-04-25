@@ -210,12 +210,10 @@ void RoutesListWidget::updateButtons(mccuav::Route* route)
 
 bmcl::OptionPtr<mccuav::Route> RoutesListWidget::currentRoute() const
 {
-    auto uav = _uavController->selectedUav();
-    assert(uav);
-    if (!uav)
-        return bmcl::None;
-    QModelIndex currentIndex = _routesView->selectionModel()->currentIndex();
-    return uav->findRoute(_model->data(_filterModel->mapToSource(currentIndex), RouteListModel::RouteId).toInt());
+    auto r = _routesController->selectedRoute();
+    if(r)
+        return r;
+    return bmcl::None;
 }
 
 void RoutesListWidget::selectRoute(const QItemSelection &selected, const QItemSelection &deselected)
@@ -396,7 +394,6 @@ void RoutesListWidget::changeRouteDirection(mccuav::Route* route)
 void RoutesListWidget::loadFromDisk(mccuav::Route* route)
 {
     assert(route);
-
     auto routesDir = _routesDirWriter->read("").toString();
 
     QString fname = QFileDialog::getOpenFileName(this, "Открытие маршрута", routesDir, "Route files (*.route)");
@@ -404,7 +401,9 @@ void RoutesListWidget::loadFromDisk(mccuav::Route* route)
         return;
     _routesDirWriter->write(QFileInfo(fname).absolutePath());
     _routesController->startEditRoute();
-    route->load(fname, _pController);
+    assert(route->buffer());
+
+    route->buffer()->load(fname, _pController);
 }
 
 void RoutesListWidget::saveToDisk(mccuav::Route* route)
@@ -695,11 +694,10 @@ WaypointsEditorWidget::WaypointsEditorWidget(QWidget* parent, const mccmap::MapR
 
         if (_route)
         {
-            QModelIndexList selectedIndexes = _waypointsTable->selectionModel()->selectedIndexes();
+            QModelIndexList selectedIndexes = _waypointsTable->selectionModel()->selectedRows();
             std::vector<size_t> indexes;
             for (const auto& i : selectedIndexes)
                 indexes.emplace_back(i.row());
-
             _route->setSelectedPoints(indexes);
         }
     });

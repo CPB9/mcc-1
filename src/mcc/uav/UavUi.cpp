@@ -27,7 +27,7 @@ UavUi::~UavUi()
 
 }
 
-bool UavUi::extractAndValidate(const QString& name, const bmcl::SharedBytes& data)
+bmcl::Result<bool, UiExtractError> UavUi::extractAndValidate(const QString& name, const bmcl::SharedBytes& data)
 {
     _name = name;
     using kmlbase::ZipFile;
@@ -36,14 +36,14 @@ bool UavUi::extractAndValidate(const QString& name, const bmcl::SharedBytes& dat
     if (!f)
     {
         BMCL_CRITICAL() << "Ошибка при открытии Zip-архива!! ";
-        return false;
+        return UiExtractError::BadZipArchive;
     }
 
     std::vector<std::string> files;
     if (!f->GetToc(&files))
     {
         BMCL_CRITICAL() << "FAILED: f->GetToc(&subFiles) ";
-        return false;
+        return UiExtractError::BrokenZipArchive;
     }
 
     std::sort(files.begin(), files.end());
@@ -87,7 +87,7 @@ bool UavUi::extractAndValidate(const QString& name, const bmcl::SharedBytes& dat
     if (!mainFile.exists())
     {
         BMCL_CRITICAL() << "Не найден main.qml!!";
-        return false;
+        return UiExtractError::MainFileNotFound;
     }
     _originUi = bmcl::makeRc<UiFileInfo>();
     _originUi->set(mainFile.absoluteFilePath(), originFiles);
@@ -113,9 +113,12 @@ bool UavUi::isOnboard() const
     return _currentType == UavUi::Type::Onboard;
 }
 
-void UavUi::createLocalCopy()
+bmcl::Result<bool, QString> UavUi::createLocalCopy()
 {
-    mccui::copyRecursively(_originUi->rootDir(), localCopyDir());
+    auto res = mccui::copyRecursively(_originUi->rootDir(), localCopyDir());
+    if(res.isOk())
+        setupLocalCopy();
+    return res;
 }
 
 void UavUi::setupLocalCopy()
@@ -162,6 +165,11 @@ void UavUi::switchToOnboard()
 QString UavUi::localCopyDir() const
 {
     return mccpath::qGetUiPath() + "/" + _name;
+}
+
+QString UavUi::name() const
+{
+    return _name;
 }
 
 void UiFileInfo::set(const QString& mainFilePath, const std::vector<QString>& files)

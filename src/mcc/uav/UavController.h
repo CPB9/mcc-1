@@ -126,7 +126,7 @@ public:
     bool isUavSelected(const Uav* uav);
     void requestUavDescription(const mccmsg::Device& id);
     void requestUavUnregister(const mccmsg::Device& uav);
-    void requestUavUpdate(const mccmsg::Device& name, const bmcl::Option<bool>& regFirst, const bmcl::Option<std::string>& info, const bmcl::Option<bool>& logging);
+    void requestUavUpdate(const mccmsg::Device& name, const bmcl::Option<bool>& regFirst, const bmcl::Option<std::string>& info, const bmcl::Option<bool>& logging, const bmcl::Option<std::string>& settings);
     void requestUavRegister(const QString& info, const mccmsg::ProtocolId& id, QWidget* parent);
     void requestUavConnect(const mccmsg::Device& uav, const mccmsg::Channel& channel, bool state);
     void requestUavActivate(const mccmsg::Device& uav, bool isActive);

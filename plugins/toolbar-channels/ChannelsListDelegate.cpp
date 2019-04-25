@@ -12,6 +12,7 @@
 ChannelsListDelegate::ChannelsListDelegate(QObject* parent)
     : QStyledItemDelegate(parent)
     , _font(QApplication::font())
+    , _scaleFactor(qApp->devicePixelRatio())
 {
     _font.setPixelSize(11);
 }
@@ -38,8 +39,8 @@ void ChannelsListDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     if(statWidget != nullptr)
     {
         QPoint offset = painter->deviceTransform().map(option.rect.topLeft());
-        offset.setX(offset.x() + defaultOffset());
-        offset.setY(offset.y() + defaultOffset());
+        offset.setX(offset.x()/_scaleFactor + defaultOffset());
+        offset.setY(offset.y()/_scaleFactor + defaultOffset());
         statWidget->render(painter,
                            offset,
                            QRegion());

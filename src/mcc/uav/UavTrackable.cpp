@@ -41,7 +41,9 @@ void UavTrackable::connectUav(mccuav::Uav* uav)
         return;
     }
     connect(uav, &mccuav::Uav::positionChanged, this, [uav, this]() {
-        emit positionUpdated(uav->position()->latLon());
+        auto pos = uav->position();
+        if(pos.isSome())
+            emit positionUpdated(pos->latLon());
     });
 
     connect(uav, &mccuav::Uav::signalBad, this, &UavTrackable::trackingStopped);

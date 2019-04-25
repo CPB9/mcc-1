@@ -21,6 +21,10 @@
 
 #include "mcc/ide/view/MainWindow.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 using namespace mccui;
 using namespace mccui;
 
@@ -119,6 +123,9 @@ bmcl::Rc<mccplugin::PluginCacheWriter> processArgs(int argc, char* argv[], QAppl
 
     bool isConsole = consoleArg.getValue();
     if (!isConsole) {
+#ifdef _WIN32
+        FreeConsole();
+#endif
         redirectStreamsToFile();
     }
 
@@ -163,6 +170,12 @@ int main(int argc, char* argv[])
     mcccrashdump::installProcessCrashHandlers();
     mcccrashdump::installThreadCrashHandlers();
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    QApplication::setAttribute(Qt::AA_DisableHighDpiScaling, false);
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+#endif
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps, true);
+
     int c = 1;
     QApplication app(c, argv);
     app.setApplicationName("Npu");
@@ -170,6 +183,7 @@ int main(int argc, char* argv[])
     app.thread()->setObjectName("mcc.ui");
     QDir().mkpath(mccpath::qGetDataPath());
     QDir().mkpath(mccpath::qGetLogsPath());
+    QDir().mkpath(mccpath::qGetUiPath());
     int result = -1;
     {
         std::unique_ptr<QSplashScreen> splash;

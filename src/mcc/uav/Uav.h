@@ -162,6 +162,8 @@ public:
     const bmcl::Option<const mccgeo::Attitude&> attitude() const;
     const bmcl::Option<double> speed() const;
     const bmcl::Option<const mccgeo::Position&> velocity() const;
+
+    mccuav::UavController* uavController() const;
 signals:
     void activatedChanged();
     void groupIdChanged();
@@ -192,7 +194,7 @@ signals:
 
     void userParamAdded(const UserParamPtr& poi);
     void userParamRemoved(const UserParamPtr& poi);
-    
+
     void protocolIdUpdated();
     void newTmParamAvailable(const std::string& param);
 
@@ -202,6 +204,8 @@ signals:
 
     void positionChanged();
     void orientationChanged();
+
+    void isRegisteredChanged(bool isRegistered);
 public slots:
     void processRouteState(const mccmsg::TmRoutePtr& route);
     void processRoutesList(const mccmsg::TmRoutesListPtr& routesList);

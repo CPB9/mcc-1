@@ -88,7 +88,8 @@
     },
     {
       "subproject": "caf",
-      "dep_var": "libcaf_core_dep",
+      "dep_var": ["libcaf_core_dep", "libcaf_io_dep"],
+      "default_options": ["log_level=-1"],
       "ignore_dirs": ["doc", "examples"]
     },
     {

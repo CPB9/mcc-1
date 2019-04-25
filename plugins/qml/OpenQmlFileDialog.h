@@ -19,7 +19,7 @@ public:
     OpenQmlFileDialog(const mccui::Rc<mccuav::UavController>& uavController, const QString& startPath, QWidget* parent);
 
     QString path() const;
-
+    QString directory() const;
     bmcl::OptionPtr<mccuav::Uav> uav() const;
 
 private:

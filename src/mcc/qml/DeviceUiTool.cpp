@@ -21,6 +21,8 @@
 
 #include "mcc/map/drawables/Flag.h"
 
+#include "mcc/ui/Settings.h"
+
 #include "mcc/msg/Cmd.h"
 #include "mcc/msg/ParamList.h"
 #include "mcc/msg/Error.h"
@@ -29,8 +31,9 @@
 
 namespace mccqml {
 
-DeviceUiTool::DeviceUiTool(mccui::UserNotifier* userNotifier, mccuav::UavController* uavController, mccuav::UavUiController* uiController, mccuav::GroupsController* groupsController, QWidget* parent)
+DeviceUiTool::DeviceUiTool(mccui::Settings* settings, mccui::UserNotifier* userNotifier, mccuav::UavController* uavController, mccuav::UavUiController* uiController, mccuav::GroupsController* groupsController, QWidget* parent)
     : QWidget(parent)
+    , _settings(settings)
     , _userNotifier(userNotifier)
     , _uavController(uavController)
     , _uiController(uiController)
@@ -38,7 +41,7 @@ DeviceUiTool::DeviceUiTool(mccui::UserNotifier* userNotifier, mccuav::UavControl
 {
     _uiDir = new QTemporaryDir;
     setObjectName("DeviceUiTool");
-    setWindowTitle("Интерфейс аппарата");
+    setWindowTitle("QML интерфейс аппарата");
     setWindowIcon(QIcon(":/qml/icon.png"));
 
     _layout = new QStackedLayout();
@@ -82,10 +85,16 @@ void DeviceUiTool::deviceUiUpdated(mccmsg::Device name, const bmcl::OptionRc<mcc
     if (ui.isNone())
         return;
 
-    auto deviceExtension = new DeviceUiWidget(_userNotifier, _groupsController, _uavController, _uiController, this);
+    auto deviceExtension = new DeviceUiWidget(_settings.get(), _userNotifier, _groupsController, _uavController, _uiController, this);
     deviceExtension->setDevice(device->device());
     deviceExtension->setEnableSwitchLocalOnboard(true);
-    if (!deviceExtension->load(QUrl::fromLocalFile(ui->originPath())))
+    QString path;
+    if(ui->isOnboard())
+        path = ui->originPath();
+    else
+        path = ui->localPath();
+    deviceExtension->setLocalCopy(ui->currentType() == mccuav::UavUi::Type::LocalCopy);
+    if (!deviceExtension->load(QUrl::fromLocalFile(path)))
     {
         BMCL_DEBUG() << "Ошибка при создании окна QML: " << deviceExtension->errorString().toStdString();
         //QMessageBox::warning(this, "Ошибка при открытии интерфейса аппарата: " + QString::fromStdString(device->deviceDescription()._device_info), "Ошибка при открытии интерфейса: " + deviceExtension->errorString());

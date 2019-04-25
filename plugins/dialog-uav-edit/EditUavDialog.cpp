@@ -14,6 +14,9 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QGroupBox>
+#include <QComboBox>
+#include <QSpinBox>
 
 constexpr const char* colorTemplate = "border: 1px solid #000000;"
                                       "border-radius: 5px;"
@@ -46,6 +49,39 @@ EditUavDialog::EditUavDialog(mccuav::UavController* uavController, QWidget* pare
     gridLayout->addWidget(new QLabel("Журналирование:"), 2, 0);
     gridLayout->addWidget(_uavLogging, 2, 1);
 
+    QGroupBox* trackSettingsGroupBox = new QGroupBox("Трек аппарата", this);
+    QGridLayout* l1 = new QGridLayout();
+    trackSettingsGroupBox->setLayout(l1);
+    _trackMode = new QComboBox(this);
+    _trackMode->addItem("Весь", QVariant::fromValue(mccuav::TrackMode::All));
+    _trackMode->addItem("Расстояние", QVariant::fromValue(mccuav::TrackMode::Distance));
+    _trackMode->addItem("Время", QVariant::fromValue(mccuav::TrackMode::Time));
+    _trackMode->addItem("Не отображать", QVariant::fromValue(mccuav::TrackMode::None));
+
+    _trackValue = new QSpinBox(this);
+    _trackValue->setMinimum(1);
+    _trackValue->setMaximum(10000);
+    l1->addWidget(new QLabel("Режим:", this), 0, 0);
+    _trackValueLabel = new QLabel("Значение:", this);
+    l1->addWidget(_trackValueLabel, 1, 0);
+    l1->addWidget(_trackMode, 0, 1);
+    l1->addWidget(_trackValue, 1, 1);
+    mainLayout->addWidget(trackSettingsGroupBox);
+
+    connect(_trackMode, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+            [this]()
+            {
+                _trackSettings->setMode(_trackMode->currentData().value<mccuav::TrackMode>());
+                updateTrackWidgets();
+            }
+    );
+
+    connect(_trackValue, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this,
+            [this](int value)
+            {
+                _trackSettings->setValue(_trackValue->value());
+            }
+    );
     mainLayout->addStretch();
 
     QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel, this);
@@ -74,7 +110,8 @@ void EditUavDialog::setUav(const mccmsg::Device& deviceId)
         _uavColor = QColor();
         return;
     }
-
+    _trackSettings = uav->trackSettings();
+    updateTrackWidgets();
     _name->setText(uav->getName());
     _uavColor = uav->color();
     _colorSelector->setStyleSheet(QString(colorTemplate).arg(_uavColor.rgb(), 6, 16, QLatin1Char('0')));
@@ -138,6 +175,39 @@ void EditUavDialog::accept()
     if (_uavLogging->isChecked() != uav->deviceDescription()->log())
         updatedLogging = _uavLogging->isChecked();
 
-    _uavController->requestUavUpdate(uav->device(), bmcl::None, updatedName, updatedLogging);
+    _uavController->requestUavUpdate(uav->device(), bmcl::None, updatedName, updatedLogging, bmcl::None);
     uav->setColor(_uavColor);
+    uav->setTrackSettings(_trackSettings->mode(), _trackSettings->seconds(), _trackSettings->meters());
+    uav->saveSettings();
+}
+
+void EditUavDialog::updateTrackWidgets()
+{
+    int idx = _trackMode->findData(QVariant::fromValue(_trackSettings->mode()));
+    _trackMode->blockSignals(true);
+    _trackMode->setCurrentIndex(idx);
+    _trackMode->blockSignals(false);
+    switch(_trackSettings->mode())
+    {
+    case mccuav::TrackMode::All:
+    case mccuav::TrackMode::None:
+        _trackValueLabel->setVisible(false);
+        _trackValue->setVisible(false);
+        break;
+    case mccuav::TrackMode::Distance:
+        _trackValueLabel->setVisible(true);
+        _trackValue->setVisible(true);
+        _trackValue->setSuffix(" м");
+        break;
+    case mccuav::TrackMode::Time:
+        _trackValueLabel->setVisible(true);
+        _trackValue->setVisible(true);
+        _trackValue->setSuffix(" с");
+        break;
+    }
+
+    if(_trackSettings.isSome())
+    {
+        _trackValue->setValue(_trackSettings->value());
+    }
 }

@@ -13,6 +13,7 @@ MapWidgetAnimator::MapWidgetAnimator(MapWidget* parent)
     , _parent(parent)
     , _registerPosTimer(new QTimer(this))
     , _animateTimer(new QTimer(this))
+    , _timeout(16)
 {
     connect(_registerPosTimer.get(), &QTimer::timeout, this, &MapWidgetAnimator::setPosition);
     auto period = std::chrono::high_resolution_clock::period();
@@ -63,7 +64,20 @@ void MapWidgetAnimator::startManual(const QPointF& speed, double decrement)
     _decrement = decrement * ratio * 10;
     _accumulator = QPointF(0, 0);
     _registerPosTimer->stop();
-    _animateTimer->start(16);
+    _animateTimer->start(_timeout);
+}
+
+void MapWidgetAnimator::setTimeout(int ms)
+{
+    bool isActive = _animateTimer->isActive();
+    if (isActive) {
+        stop();
+        _timeout = ms;
+        start();
+    } else {
+        _timeout = ms;
+    }
+
 }
 
 void MapWidgetAnimator::start()
@@ -72,7 +86,7 @@ void MapWidgetAnimator::start()
     _speed = _startSpeed;
     _accumulator = QPointF(0, 0);
     _registerPosTimer->stop();
-    _animateTimer->start(16);
+    _animateTimer->start(_timeout);
 }
 
 void MapWidgetAnimator::stop()
@@ -80,6 +94,10 @@ void MapWidgetAnimator::stop()
     _animateTimer->stop();
     _startSpeed = QPointF(0, 0);
     _pos = QCursor::pos();
-    _registerPosTimer->start(10);
+    if (_timeout <= 1) {
+        _registerPosTimer->start(1);
+    } else {
+        _registerPosTimer->start(_timeout / 2);
+    }
 }
 }

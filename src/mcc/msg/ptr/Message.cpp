@@ -100,7 +100,6 @@ template class RequestImpl<EventTmpl<device::ObjName, EventKind::Activated>, dev
 template class NoteImpl<device::ConnectedObj>;
 template class RequestImpl<device::ConnectObj, device::Connect_Request_Tag, device::Connect_Response_Tag>; template class ResponseImpl<device::Connect_Response_Tag>;
 
-template class RequestImpl<tm::DumpObj, tm::Dump_Request_Tag, tm::Dump_Response_Tag>; template class ResponseImpl<mccmsg::tm::Dump_Response_Tag>;
 template class NoteImpl<tm::LogObj>;
 template class NoteImpl<tm::TmAnyPtr>;
 
@@ -130,7 +129,6 @@ void ReqVisitor::visit(const channel::Activate_Request* req) { _handler(req); }v
 void ReqVisitor::visit(const device::Connect_Request* req) { _handler(req); }
 #undef REQ_VISIT
 
-void ReqVisitor::visit(const tm::Dump_Request* req) { _handler(req); }
 void ReqVisitor::visit(const advanced::ChannelAndDeviceRegister_Request* req) { _handler(req); }
 
 

@@ -90,6 +90,8 @@ void RegionViewer::setRegion(const Region* region)
     _region.reset(region);
     _anglePath.clear();
     _selectedProfile = bmcl::None;
+    const ViewParams& params = region->params();
+    _maxDistance = std::max(params.maxBeamDistance, params.maxHitDistance) * (params.additionalDistancePercent / 100.0 + 1.0);
     for (const auto& curve : _region->curves()) {
         _paths.emplace_back();
         QPainterPath& path = _paths.back();
@@ -166,7 +168,7 @@ bmcl::Option<std::size_t> RegionViewer::findProf(const QPointF& mousePos)
     QPointF pos = toPolar(calcTransform(this).inverted().map(mousePos));
 
     if (isRegionView()) {
-        if (pos.y() > _region->maxDistance()) {
+        if (pos.y() > _maxDistance) {
             return bmcl::None;
         }
     } else {
@@ -238,7 +240,7 @@ void RegionViewer::updatePosLabel(const QPoint& mousePos)
 {
     QPointF pos = toPolar(calcTransform(this).inverted().map(QPointF(mousePos)));
     if (isRegionView()) {
-        if (pos.y() > _region->maxDistance()) {
+        if (pos.y() > _maxDistance) {
             _positionText.clear();
             return;
         }
@@ -263,7 +265,7 @@ QTransform RegionViewer::calcTransform(const QPaintDevice* dev) const
     double _deltax;
 
     if (isRegionView()) {
-        double r = _region->maxDistance();
+        double r = _maxDistance;
         auto ticks = Ticks::fromMinMax(r * 0.02, r);
         r = ticks.max;
         _deltay = r * 2.0;
@@ -324,7 +326,7 @@ void RegionViewer::paintMain(QPainter* p, const RenderConfig& cfg)
 
     double maxr;
     if (isRegionView()) {
-        maxr = _region->maxDistance();
+        maxr = _maxDistance;
     } else {
         maxr = _angleTicks.max - _angleTicks.min;
     }
@@ -507,7 +509,7 @@ void RegionViewer::paintSelection(QPainter* p)
 {
     double maxr;
     if (isRegionView()) {
-        maxr = _region->maxDistance();
+        maxr = _maxDistance;
     } else {
         maxr = _angleTicks.max - _angleTicks.min;
     }

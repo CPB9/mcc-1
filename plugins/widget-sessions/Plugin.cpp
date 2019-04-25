@@ -1,6 +1,8 @@
 #include "SessionsWidget.h"
+#include "SettingsPage.h"
 
 #include "mcc/ui/WidgetPlugin.h"
+#include "mcc/ui/Settings.h"
 #include "mcc/uav/ExchangeService.h"
 #include "mcc/plugin/PluginCache.h"
 
@@ -31,20 +33,21 @@ public:
     }
     bool init(mccplugin::PluginCache* cache) override
     {
+        auto settingsData = cache->findPluginData<mccui::SettingsPluginData>();
         auto serviceData = cache->findPluginData<mccuav::ExchangeServicePluginData>();
         auto uavData = cache->findPluginData<mccuav::UavControllerPluginData>();
         auto channelsData = cache->findPluginData<mccuav::ChannelsControllerPluginData>();
-        if (bmcl::anyNone(serviceData, uavData, channelsData)) {
+        if (bmcl::anyNone(settingsData, serviceData, uavData, channelsData)) {
             return false;
         }
 
         if (_dock && _toolbar)
         {
-            auto p = new SessionsWidget(serviceData->service(), uavData->uavController(), channelsData->channelsController());
-            //_toolbar->setWidget(p);
-            _dock->setWidget(p);
-            _toolbar.reset();
-            _dock.reset();
+            auto p = new SessionsWidget(settingsData->settings(), serviceData->service(), uavData->uavController(), channelsData->channelsController());
+            _toolbar->setWidget(p);
+            //_dock->setWidget(p);
+            //_toolbar.reset();
+            //_dock.reset();
         }
         return true;
     }
@@ -62,6 +65,7 @@ static void create(mccplugin::PluginCacheWriter* cache)
     cache->addPlugin(toolbar);
     cache->addPlugin(dock);
     cache->addPlugin(starter);
+    cache->addPlugin(std::make_shared<RecorderSettingsPagePlugin>());
 }
 
 MCC_INIT_PLUGIN(create);

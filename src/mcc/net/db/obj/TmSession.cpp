@@ -119,11 +119,13 @@ bmcl::Option<mccmsg::Error> TmSession::removeDir(const mccmsg::TmSession& sessio
 TmSession::TmSession(DbObjInternal* db)
     : QueryObject(db, "tm_session", "folder, started, finished", TmSession::get, std::bind(&TmSession::insert, this, std::placeholders::_1, std::placeholders::_2))
     , _unregister(db->db())
-    , _update(db->db())
+    , _updateInfo(db->db())
+    , _updateFinish(db->db())
     , _closeSessions(db->db())
 {
     sql_prepare(_unregister, "delete from tm_session where name=:name;");
-    sql_prepare(_update, "update tm_session set info=:info where name=:name");
+    sql_prepare(_updateInfo, "update tm_session set info=:info where id=:id");
+    sql_prepare(_updateFinish, "update tm_session set finished=:finished where id=:id");
     sql_prepare(_closeSessions, "update tm_session set finished=:finished where finished is NULL");
 
     sync(getDirs());
@@ -213,21 +215,73 @@ caf::result<mccmsg::tmSession::UnRegister_ResponsePtr> TmSession::execute(const 
     return mccmsg::make<mccmsg::tmSession::UnRegister_Response>(&request);
 }
 
+bmcl::Result<bool, std::string> TmSession::updateInfo(ObjectId session_id, const mccmsg::TmSessionDescription& old, const std::string& info)
+{
+    if (old->info() == info)
+        return false;
+
+    _updateInfo.reset();
+    print(binds(&_updateInfo, ":id", session_id));
+    print(binds(&_updateInfo, ":info", bmcl::StringView(info), sqlite3pp::nocopy));
+    auto r = print(exec(&_updateInfo));
+    if (r.isSome())
+        return r.take();
+    return true;
+}
+
+bmcl::Result<bool, std::string> TmSession::updateFinalTime(ObjectId session_id, const mccmsg::TmSessionDescription& old, const bmcl::Option<bmcl::SystemTime>& finished)
+{
+    if (old->finished().isSome() || finished.isNone())
+        return false;
+
+    _updateFinish.reset();
+    print(binds(&_updateFinish, ":id", session_id));
+    print(binds(&_updateFinish, ":finished", bmcl::StringView(serializeTime(finished.unwrap())), sqlite3pp::copy));
+    auto r = print(exec(&_updateFinish));
+    if (r.isSome())
+        return r.take();
+    return true;
+}
+
 caf::result<mccmsg::tmSession::Update_ResponsePtr> TmSession::execute(const mccmsg::tmSession::Update_Request& request)
 {
-    const mccmsg::TmSessionDescription& dscr = request.data().dscr();
-    _update.reset();
-    print(binds(&_update, ":name", dscr->name().toStringRepr().view(), sqlite3pp::copy));
-    print(binds(&_update, ":info", bmcl::StringView(dscr->info()), sqlite3pp::nocopy));
-    auto r = print(exec(&_update));
-    if (r.isSome())
-        return mccmsg::make_error(mccmsg::Error::CantUpdate, r.take());
+    const mccmsg::TmSessionDescription& d = request.data().dscr();
+    ObjectId session_id;
+    auto r = getOne(d->name(), &session_id);
+    if (r.isErr())
+        return r.takeErr();
+    mccmsg::TmSessionDescription old = r.take();
 
-    auto v = updated(dscr->name());
-    if (v.isNone())
-        return mccmsg::make_error(mccmsg::Error::CantUpdate);
+    sqlite3pp::transaction transaction(_db->db(), false);
+    bool changed = false;
+    for (auto i : request.data().fields())
+    {
+        bmcl::Result<bool, std::string> res = false;
+        switch (i)
+        {
+        case mccmsg::Field::Info: res = updateInfo(session_id, old, d->info()); break;
+        case mccmsg::Field::FinalTime: res = updateFinalTime(session_id, old, bmcl::SystemClock::now()); break;
+        default:
+            return mccmsg::make_error(mccmsg::Error::CantUpdate);
+            break;
+        }
 
-    return mccmsg::make<mccmsg::tmSession::Update_Response>(&request, v.take());
+        if (res.isErr())
+            return mccmsg::make_error(mccmsg::Error::CantUpdate, res.takeErr());
+        if (res.unwrap())
+            changed = true;
+    }
+
+    if (changed)
+    {
+        transaction.commit();
+        auto v = updated(d->name());
+        if (v.isNone())
+            return mccmsg::make_error(mccmsg::Error::CantUpdate);
+        _db->setTmSession(std::string());
+    }
+
+    return mccmsg::make<mccmsg::tmSession::Update_Response>(&request/*, v.take()*/);
 }
 
 caf::result<mccmsg::tmSession::List_ResponsePtr> TmSession::execute(const mccmsg::tmSession::List_Request& request)

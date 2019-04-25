@@ -29,9 +29,10 @@ static inline double circleArea(double r, double angle)
 }
 
 struct RegionBuilder {
-    explicit RegionBuilder(double angleStep)
+    explicit RegionBuilder(double angleStep, bool isSegment)
         : dirIndex(0)
         , angleStep(angleStep)
+        , isSegment(isSegment)
     {
     }
 
@@ -40,22 +41,7 @@ struct RegionBuilder {
     std::vector<PointVector> finishedPolygons;
     std::size_t dirIndex;
     double angleStep;
-
-    std::size_t nextIndex(std::size_t index)
-    {
-        if (index != (allIntervals.size() - 1)) {
-            return index + 1;
-        }
-        return 0;
-    }
-
-    std::size_t prevIndex(std::size_t index)
-    {
-        if (index != 0) {
-            return index - 1;
-        }
-        return allIntervals.size() - 1;
-    }
+    bool isSegment;
 
     bool skipToFirstNonEmpty()
     {
@@ -105,9 +91,23 @@ struct RegionBuilder {
     {
         while (true) {
             if (isForward) {
-                dirIndex = nextIndex(dirIndex);
+                if (dirIndex != (allIntervals.size() - 1)) {
+                    dirIndex = dirIndex + 1;
+                } else {
+                    if (isSegment) {
+                        return;
+                    }
+                    dirIndex = 0;
+                }
             } else {
-                dirIndex = prevIndex(dirIndex);
+                if (dirIndex != 0) {
+                    dirIndex = dirIndex - 1;
+                } else {
+                    if (isSegment) {
+                        return;
+                    }
+                    dirIndex = allIntervals.size() - 1;
+                }
             }
             if (dirIndex == startDirIndex) {
                 return;
@@ -198,15 +198,11 @@ Region::Region(std::vector<Rc<Profile>>&& slices, const ViewParams& params)
 
 void Region::updateData()
 {
-    assert(std::is_sorted(_profiles.begin(), _profiles.end(), [&](const Rc<Profile>& left, const Rc<Profile>& right) {
-        return left->direction() < right->direction();
-    }));
-
     double viewArea = 0;
     double hitArea = 0;
 
-    RegionBuilder viewBuilder(_params.angleStep);
-    RegionBuilder hitBuilder(_params.angleStep);
+    RegionBuilder viewBuilder(_params.angleStep, !_params.isBidirectional);
+    RegionBuilder hitBuilder(_params.angleStep, !_params.isBidirectional);
 
     for (const Rc<Profile>& prof : _profiles) {
         _maxDistance = std::max(std::max(_maxDistance, prof->maxViewDistance()), prof->maxHitDistance());

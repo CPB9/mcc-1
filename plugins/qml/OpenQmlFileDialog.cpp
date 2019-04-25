@@ -13,6 +13,7 @@
 #include <QFileDialog>
 #include <QPushButton>
 #include <QToolButton>
+#include <QFileInfo>
 
 Q_DECLARE_METATYPE(mccmsg::Device);
 
@@ -74,6 +75,11 @@ OpenQmlFileDialog::OpenQmlFileDialog(const mccui::Rc<mccuav::UavController>& uav
 QString OpenQmlFileDialog::path() const
 {
     return _path->text();
+}
+
+QString OpenQmlFileDialog::directory() const
+{
+    return QFileInfo(_path->text()).absoluteDir().absolutePath();
 }
 
 bmcl::OptionPtr<mccuav::Uav> OpenQmlFileDialog::uav() const

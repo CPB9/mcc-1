@@ -29,6 +29,7 @@
 #include <QSize>
 #include <QPrintPreviewDialog>
 #include <QPrinter>
+#include <QTimer>
 
 #ifdef MCC_USE_OPENGL
 #include <QSurfaceFormat>
@@ -47,6 +48,7 @@ constexpr const char* lonKey = "map/longitude";
 constexpr const char* mapModeKey = "map/mapMode";
 constexpr const char* zoomLevelKey = "map/zoom";
 constexpr const char* staticMapTypeKey = "map/staticMapType";
+constexpr const char* updateTimeoutKey = "map/updateRate";
 
 MapWidget::MapWidget(MapRect* mapRect,
                      const mccui::CoordinateSystemController* csController,
@@ -54,6 +56,7 @@ MapWidget::MapWidget(MapRect* mapRect,
                      QWidget* parent)
     : MCC_MAP_WIDGET_BASE(parent)
     , _rect(mapRect)
+    , _frameLimitTimer(new QTimer)
     , _currentMousePos(0, 0)
     , _openingContext(false)
     , _isMovingViewport(false)
@@ -69,6 +72,19 @@ MapWidget::MapWidget(MapRect* mapRect,
     , _csController(csController)
     , _settings(settings)
 {
+    _animator.reset(new MapWidgetAnimator(this));
+    _animator->setTimeout(_updateTimeout);
+    _followAnimator.reset(new FollowAnimator(this));
+    _followAnimator->setTimeout(_updateTimeout);
+
+    setUpdateRate(settings->read(updateTimeoutKey, 60).toInt());
+    settings->onChange(updateTimeoutKey, [this](const QVariant& value) {
+        setUpdateRate(value.toInt());
+    });
+
+    _frameLimitTimer->setSingleShot(true);
+    _frameLimitTimer->setInterval(_updateTimeout);
+    _frameLimitTimer->start();
     _latWriter = settings->acquireUniqueWriter(latKey, 55.7558).unwrap();
     _lonWriter = settings->acquireUniqueWriter(lonKey, 37.6173).unwrap();
     _mapModeWriter = settings->acquireUniqueWriter(mapModeKey, static_cast<uint>(_mapMode)).unwrap();
@@ -101,24 +117,44 @@ MapWidget::MapWidget(MapRect* mapRect,
 
     setMouseTracking(true);
     setMinimumSize(400, 300);
-    _animator.reset(new MapWidgetAnimator(this));
-    _followAnimator.reset(new FollowAnimator(this));
 
     createStack();
 
     _layers = new LayerGroup(mapRect);
     _layers->insertLayer(_mapLayer.get(), 0);
 
-    connect(_layers.get(), &Layer::sceneUpdated, this, [this]() { updateMap(); });
+    connect(_layers.get(), &Layer::sceneUpdated, this, &MapWidget::updateMap);
 
     createMapWidgets();
 
 #if MCC_USE_OPENGL
     connect(this, &MapWidget::mapNeedsUpdate, this, [this]() { update(); }, Qt::QueuedConnection);
+#else
+    connect(_frameLimitTimer, &QTimer::timeout, this, [this]() {
+        if (_needsUpdate) {
+            _needsUpdate = false;
+            update();
+            _frameLimitTimer->start();
+        }
+    });
 #endif
 
     resize(size());
     adjustChildren();
+}
+
+void MapWidget::setUpdateRate(int rate)
+{
+    if (rate == 0) {
+        rate = 1;
+    }
+    _updateTimeout = 1000 / rate;
+    if (_updateTimeout <= 1) {
+        _updateTimeout = 1;
+    }
+    _frameLimitTimer->setInterval(_updateTimeout);
+    _followAnimator->setTimeout(_updateTimeout);
+    _animator->setTimeout(_updateTimeout);
 }
 
 void MapWidget::loadPlugins(const mccplugin::PluginCache* cache)
@@ -160,7 +196,10 @@ void MapWidget::updateMap()
 #if MCC_USE_OPENGL
     emit mapNeedsUpdate();
 #else
-    update();
+    _needsUpdate = true;
+    if (!_frameLimitTimer->isActive()) {
+        _frameLimitTimer->start();
+    }
 #endif
 }
 
@@ -259,7 +298,7 @@ void MapWidget::setOnlineCache(const std::string& fullName)
     //adjustChildren();
     _followAnimator->stop();
     OnlineCache* cache = _cacheStackModel->onlineMapByName(fullName);
-    onCacheChanged(cache, true);
+    onCacheChanged(cache, _mapMode == mccui::MapMode::Online);
     _cacheStackModel->selectOnlineMap(fullName);
     _staticMapType = fullName;
     adjustChildren();

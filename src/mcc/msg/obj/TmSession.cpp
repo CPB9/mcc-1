@@ -100,6 +100,11 @@ bmcl::Option<CfgName> nameToUuid(bmcl::StringView text)
     return CfgName(uuid.unwrap(), str1, str4, bmcl::SystemClock::now());
 }
 
+std::string TmSessionDescriptionObj::genVideoFile()
+{
+    return uuidToName("video", bmcl::Uuid::createNil());
+}
+
 std::string TmSessionDescriptionObj::genTmSessionFile(const mccmsg::TmSession& session)
 {
     return uuidToName("session", session);

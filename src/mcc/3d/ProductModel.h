@@ -95,6 +95,8 @@ public:
     VasnecovFigure *addFigure(const QString &name,
                               const VasnecovAbstractElement *element = nullptr);
 
+    const VasnecovProduct* mainModel() const {return _model;}
+
 protected:
     bool hasWorkModel() const {return hasTools() && _model;}
 

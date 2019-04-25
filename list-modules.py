@@ -26,6 +26,8 @@ elif command == 'modules':
         sub_name = m.get('subproject', '')
         dep_name = m.get('dependency', '')
         dvar = m.get('dep_var', '')
+        if isinstance(dvar, list):
+            dvar = ','.join(dvar)
         try:
             libs = ','.join(m['libs'])
         except KeyError:
@@ -39,6 +41,7 @@ elif command == 'modules':
         except KeyError:
             opts = ''
         print('|'.join([dep_name, sub_name, dvar, libs, tools, opts]))
+
 elif command == 'resources':
         resources = mods.get('replace_resources', {})
         print(json.dumps(resources))

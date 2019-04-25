@@ -193,6 +193,7 @@ void PlotWidget::removeCurve(const QString& title)
     _curves.erase(title);
     delete c;
     replot();
+    emit requestSave();
 }
 
 void PlotWidget::clearCurves()
@@ -234,7 +235,6 @@ void PlotWidget::showCurveContextMenu(QwtPlotCurve* curve, const QPoint& pos)
         auto it = std::find_if(_curves.begin(), _curves.end(), [curve](const std::pair<QString, Curve*>& itr) { return itr.second->qwtCurve() == curve; });
         if(it == _curves.end())
         {
-            assert(false);
             return;
         }
         removeCurve(it->first);

@@ -6,8 +6,10 @@
 
 #include <QRgb>
 
+#include <type_traits>
 #include <cstddef>
 #include <cmath>
+#include <cassert>
 
 namespace mccui {
 
@@ -39,7 +41,11 @@ public:
     T b;
 };
 
-template <typename T, typename S, std::size_t schemeSize>
+using Rgb8 = Rgb<std::uint8_t>;
+using Rgbf = Rgb<float>;
+using Rgbd = Rgb<double>;
+
+template <typename T, typename S, std::size_t schemeSize, typename F>
 class EqualDistanceGradient {
 public:
     EqualDistanceGradient(T minValue, T maxValue, const std::array<Rgb<S>, schemeSize>& scheme)
@@ -47,6 +53,8 @@ public:
         , _maxValue(maxValue)
         , _scheme(scheme)
     {
+        assert(_maxValue > _minValue);
+        static_assert(std::is_floating_point<F>::value, "F must be floating point");
         static_assert(schemeSize >= 2, "invalid scheme size");
     }
 
@@ -57,19 +65,21 @@ public:
         } else if (value >= _maxValue) {
             return _scheme[schemeSize - 1];
         }
-        double loc = (schemeSize - 1) * double(value) / (_maxValue - _minValue);
-        double integral;
-        double frac = std::modf(loc, &integral);
-        int i = (int)integral;
-        return Rgb<T>(getChannel(_scheme[i].r, _scheme[i + 1].r, frac),
-                      getChannel(_scheme[i].g, _scheme[i + 1].g, frac),
-                      getChannel(_scheme[i].b, _scheme[i + 1].b, frac));
+        F loc = (schemeSize - 1) * F(value) / (_maxValue - _minValue);
+        F integral;
+        F frac = std::modf(loc, &integral);
+        std::size_t i = integral;
+        const Rgb<S>& s1 = _scheme[i];
+        const Rgb<S>& s2 = _scheme[i + 1];
+        return Rgb<T>(getChannel(s1.r, s2.r, frac),
+                      getChannel(s1.g, s2.g, frac),
+                      getChannel(s1.b, s2.b, frac));
     }
 
 private:
-    inline T getChannel(S c1, S c2, double frac) const
+    inline T getChannel(S c1, S c2, F frac) const
     {
-        return std::fma<double>(c2 - c1, frac, c1);
+        return std::fma<F>(c2 - c1, frac, c1);
     }
 
     T _minValue;
@@ -77,7 +87,7 @@ private:
     std::array<Rgb<S>, schemeSize> _scheme;
 };
 
-using MapGradient = EqualDistanceGradient<double, uint8_t, 14>;
+using MapGradient = EqualDistanceGradient<float, std::uint8_t, 12, float>;
 
 MCC_UI_DECLSPEC const MapGradient& getSpectralMapGradient();
 }

@@ -42,6 +42,7 @@
         <file alias="poi/rotator.png">@IDE_RC_DIR@/poi/rotator.png</file>
         <file alias="poi/runway.svg">@IDE_RC_DIR@/poi/runway.svg</file>
         <file alias="poi/target.svg">@IDE_RC_DIR@/poi/target.svg</file>
+        <file alias="poi/antenna.svg">@IDE_RC_DIR@/poi/antenna.svg</file>
         <file alias="qml.png">@IDE_RC_DIR@/qml.png</file>
         <file alias="save.png">@IDE_RC_DIR@/save.png</file>
         <file alias="slider/black.png">@IDE_RC_DIR@/slider/black.png</file>

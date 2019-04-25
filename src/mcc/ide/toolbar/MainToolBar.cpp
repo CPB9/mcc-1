@@ -73,7 +73,7 @@ void MainToolBar::addUserWidget(QWidget* widget, bool left)
     int w = blockMinimumSize().width();
     if(widget->minimumWidth() < w)
         widget->setMinimumWidth(w);
-
+    widget->setParent(this);
     widget->setMaximumHeight(h);
 
     widget->installEventFilter(this);
@@ -88,6 +88,8 @@ void MainToolBar::addUserWidget(QWidget* widget, bool left)
 
     if(widget->isHidden())
         line->hide();
+
+    line->setStyleSheet("QWidget:hover{color: #909090;background-color: #404040;}");
 }
 
 void MainToolBar::addStretch(int stretch)

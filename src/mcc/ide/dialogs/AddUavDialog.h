@@ -5,6 +5,7 @@
 #include "mcc/uav/Rc.h"
 #include "mcc/ui/Dialog.h"
 
+class QAbstractButton;
 class QCheckBox;
 class QComboBox;
 class QIntValidator;
@@ -43,25 +44,26 @@ private:
     size_t findProtocolId() const;
 
 private:
-    QComboBox*      _devicesList;
-    QWidget*        _devicesDetails;
-    QLineEdit*      _deviceName;
-    QLabel*         _protocolIcon;
-    QComboBox*      _protocolName;
-    QLineEdit*      _protocolId;
-    QIntValidator*  _protocolIdValidator;
-    QLineEdit*      _channelName;
+    QComboBox*          _devicesList;
+    QWidget*            _devicesDetails;
+    QLineEdit*          _deviceName;
+    QLabel*             _protocolIcon;
+    QComboBox*              _protocolName;
+    QLineEdit*          _protocolId;
+    QIntValidator*      _protocolIdValidator;
+    QLineEdit*          _channelName;
 
-    QComboBox*      _channelsList;
+    QComboBox*          _channelsList;
 
-    QWidget*        _channelsDetails;
-    QComboBox*      _connectionType;
+    QWidget*            _channelsDetails;
+    QComboBox*          _connectionType;
     std::map<QString, AbstractConnectionWidget*> _connectionProperties;
 
-    QCheckBox*      _logExchange;
-    QSpinBox*       _manualTimeout;
-    QCheckBox*      _automaticTimeout;
-    QCheckBox*      _readOnly;
+    QCheckBox*          _logExchange;
+    QSpinBox*           _manualTimeout;
+    QCheckBox*          _automaticTimeout;
+    QCheckBox*          _readOnly;
+    QAbstractButton*    _okButton;
 
     std::map<mccmsg::Protocol, QPixmap>     _protocolIcons;
 

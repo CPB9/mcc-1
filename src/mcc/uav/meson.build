@@ -16,7 +16,8 @@ headers = [
   'WaypointSettings.h',
   'UavUi.h',
   'UavUiController.h',
-  'UserParam.h'
+  'UserParam.h',
+  'PlotController.h'
 ]
 
 src = [
@@ -43,7 +44,8 @@ src = [
   'WaypointSettings.cpp',
   'UavUi.cpp',
   'UavUiController.cpp',
-  'UserParam.cpp'
+  'UserParam.cpp',
+  'PlotController.cpp'
 ]
 
 processed = qt5_mod.preprocess(

@@ -37,6 +37,7 @@ public:
     const Channels& channels() const;
     bool hasScreenRecord() const;
 
+    static std::string genVideoFile();
     static std::string genTmSessionFile(const mccmsg::TmSession&);
     static std::string genDeviceFile(const mccmsg::Device&);
     static std::string genChannelFile(const mccmsg::Channel&);

@@ -2,6 +2,8 @@
 #include "mcc/ui/CoordinateSystemController.h"
 #include "mcc/ui/Settings.h"
 #include "mcc/uav/Structs.h"
+#include "mcc/uav/Uav.h"
+#include "mcc/uav/UavController.h"
 #include "mcc/ui/LatLonEditor.h"
 #include "mcc/ui/FastEditDoubleSpinBox.h"
 #include "mcc/uav/Route.h"
@@ -413,63 +415,37 @@ WaypointSettings::WaypointSettings(mccuav::Uav* device,
         if (!_route->canInsertWaypoint())
             return;
         mccgeo::LatLon latLon;
-
         const mccmsg::Waypoints& lst = _route->waypointsList();
         int count = _route->waypointsCount();
-        double offset = nextPointDistance();
-        bool isLastPoint = false;
-
-        mccgeo::Geod wgs84(mccgeo::wgs84a<double>(), mccgeo::wgs84f<double>());
-
-        if (count == 0)
+        int offset = 40;
+        if(count == 0)
         {
             latLon = initialLatLon();
         }
-        else if (count == 1)
+        else if(count == 1)
         {
-            const mccgeo::LatLon first = lst[0].position.latLon();
-            wgs84.direct(first, 90, offset, &latLon, 0);
+            latLon = latLonOnLine(lst.front().position, 0, offset);
         }
         else
         {
-            isLastPoint = count == _idx + 1;
-
-            const mccmsg::Waypoint& wp1 = _route->waypointAt(_idx);
-            const mccmsg::Waypoint& wp2 = _route->waypointAt(_idx + 1);
-
-            double d = 0;
-            double a = 0;
-            wgs84.inverse(wp1.position, wp2.position, &d, &a, 0);
-            if (!std::isnormal(d)) {
-                return;
-            }
-            double dx = d / 2;
-
-            wgs84.direct(wp1.position, a, dx, &latLon, 0);
-
+            double angle =angleBetween(lst[lst.size() - 2].position, lst.back().position);
+            latLon = latLonOnLine(lst.back().position, angle, offset);
         }
-
         mccmsg::Waypoint wp;
         wp.position.latitude() = latLon.latitude();
         wp.position.longitude() = latLon.longitude();
-        if (!lst.empty())
+        if(!lst.empty())
         {
-            const auto& lastWp = lst[lst.size()-1];
-
+            const auto& lastWp = lst.back();
             wp.position.altitude() = lastWp.position.altitude();
             wp.speed = lastWp.speed;
         }
-
-        if (isLastPoint)
-        {
-            _route->addWaypoint(wp);
-            _route->setSelectedPoint(_idx + 1);
-        }
         else
         {
-            _route->insertWaypoint(wp, _idx);
-            _route->setSelectedPoint(_idx + 1);
+            wp.position.altitude() = _uav->uavController()->calcWaypointAltitudeAt(latLon);
         }
+        _route->addWaypoint(wp);
+        _route->setSelectedPoint(_route->waypointsCount() - 1);
     }
     );
 

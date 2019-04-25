@@ -75,7 +75,7 @@ Uav::Uav(UavController* manager, const mccmsg::DeviceDescription& id)
 {
     //setColor(Qt::yellow);
 
-    setTrackSettings(TrackMode::None, bmcl::None, bmcl::None);
+    setTrackSettings(TrackMode::Distance, 100, 1000);
 
     _execCommands = new UavExecCommands();
     _errors = new UavErrors();
@@ -93,6 +93,7 @@ Uav::Uav(UavController* manager, const mccmsg::DeviceDescription& id)
 
 Uav::~Uav()
 {
+    saveSettings();
     for (Route* route : _routes) {
         delete route;
     }
@@ -241,11 +242,13 @@ void Uav::saveSettings()
 
     QJsonDocument doc(settingsObj);
     QString cfg = doc.toJson();
-    emit _manager->updateUavSettings(device(), cfg.toStdString());
+    emit _manager->requestUavUpdate(device(), bmcl::None, bmcl::None, bmcl::None, cfg.toStdString());
 }
 
 void Uav::setTrackSettings(mccuav::TrackMode mode, const bmcl::Option<int>& seconds, const bmcl::Option<int>& meters)
 {
+    if(seconds.isSome() && meters.isSome() && _trackSettings.mode() == mode && _trackSettings.seconds() == seconds.unwrap() && _trackSettings.meters() == meters.unwrap())
+        return;
     _trackSettings.setMode(mode);
     if(seconds.isSome())
         _trackSettings.setSeconds(*seconds);
@@ -319,13 +322,18 @@ const bmcl::Option<const mccgeo::Position&> Uav::velocity() const
     return ext->velocity().unwrap();
 }
 
+mccuav::UavController* Uav::uavController() const
+{
+    return _manager;
+}
+
 void Uav::processRouteState(const mccmsg::TmRoutePtr& routeState)
 {
     Route* route = findRouteById(routeState->route().properties.name);
     if (!route)
     {
         const mccmsg::RouteProperties& props = routeState->route().properties;
-        route = new Route(QString::fromStdString(props.info), props.name, props.maxWaypoints);
+        route = new Route(this, QString::fromStdString(props.info), props.name, props.maxWaypoints);
         addRoute(route);
         route->update(routeState->route());
         return;
@@ -358,7 +366,7 @@ void Uav::processRoutesList(const mccmsg::TmRoutesListPtr& routesList)
         auto route = findRouteById(props.name);
         if (!route)
         {
-            addRoute(new Route(QString::fromStdString(props.info), props.name, props.maxWaypoints));
+            addRoute(new Route(this, QString::fromStdString(props.info), props.name, props.maxWaypoints));
         }
     }
 
@@ -431,6 +439,16 @@ void Uav::processSetTmView(const bmcl::Rc<const mccmsg::ITmView>& view)
         auto handler = [this]() {positionChanged(); };
         _tmStorage->getExtension<mccmsg::TmPosition>()->addHandler(std::move(handler), true).takeId();
     }
+    else
+        emit positionChanged();
+
+    if(_tmStorage->getExtension<mccmsg::TmAttitude>().isSome())
+    {
+        auto handler = [this]() {orientationChanged(); };
+        _tmStorage->getExtension<mccmsg::TmAttitude>()->addHandler(std::move(handler), true).takeId();
+    }
+    else
+        emit orientationChanged();
 }
 
 void Uav::processUpdateTmStatusView(const bmcl::Rc<const mccmsg::ITmViewUpdate>& update)

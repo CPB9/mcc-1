@@ -19,6 +19,11 @@ public slots:
 
 protected:
     Vasnecov::Line mousePositionLine(const QPointF &mousePosition);
+    // Point under mouse cursor at the same plane (vertical or horizontal) with basePoint
+    QVector3D mousePositionFromPoint(const QPointF &mouseAtScreen,
+                                     const QVector3D& basePoint,
+                                     const QVector3D& limits = QVector3D(),
+                                     bool horizontalPlane = true);
 
     VasnecovWorld* _world;
 

@@ -5,10 +5,13 @@
 #include "mcc/uav/Rc.h"
 #include "mcc/ui/Dialog.h"
 #include "mcc/ui/Fwd.h"
+#include "mcc/uav/Structs.h"
 
 class QLineEdit;
 class QLabel;
 class QCheckBox;
+class QSpinBox;
+class QComboBox;
 
 class EditUavDialog : public mccui::Dialog
 {
@@ -30,12 +33,20 @@ public slots:
     void accept() override;
 
 private:
+    void updateTrackWidgets();
+
     mccuav::Rc<mccuav::UavController>   _uavController;
     mccmsg::Device                      _deviceId;
+
+    bmcl::Option<mccuav::TrackSettings> _trackSettings;
 
     QLineEdit*                          _name;
     QLabel*                             _colorSelector;
     QColor                              _uavColor;
     QCheckBox*                          _uavLogging;
+    QComboBox*                          _trackMode;
+    QLabel*                             _trackValueLabel;
+    QSpinBox*                           _trackValue;
+
     Q_DISABLE_COPY(EditUavDialog)
 };

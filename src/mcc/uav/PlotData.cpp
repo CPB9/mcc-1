@@ -3,6 +3,9 @@
 #include <bmcl/Buffer.h>
 #include <bmcl/MemReader.h>
 #include <bmcl/FileUtils.h>
+#include <bmcl/Result.h>
+
+#include "mcc/msg/obj/Device.h"
 
 #include <QMimeData>
 
@@ -10,6 +13,11 @@ namespace mccuav {
 
 PlotData::PlotData(const mccmsg::Device& device, const std::string& trait, const std::string& varId, const std::string& description)
     : _device(device), _trait(trait), _varId(varId), _description(description)
+{
+
+}
+
+PlotData::PlotData()
 {
 
 }
@@ -48,11 +56,13 @@ QMimeData* PlotData::packMimeData(PlotData* data, const QString& mimeTypeStr)
 bmcl::Option<mccuav::PlotData*> PlotData::unpackMimeData(const QMimeData* data, const QString& mimeStr)
 {
     QByteArray d = data->data(mimeStr);
-    if (d.size() != 16) {
+    if(d.size() != 16)
+    {
         return bmcl::None;
     }
     bmcl::MemReader reader((const uint8_t*)d.data(), d.size());
-    if (reader.readUint64Le() != bmcl::applicationPid()) {
+    if(reader.readUint64Le() != bmcl::applicationPid())
+    {
         return bmcl::None;
     }
     uint64_t addr = reader.readUint64Le(); //unsafe
@@ -64,5 +74,11 @@ const char* PlotData::mimeDataStr()
 {
     return "mcc/plot_data";
 }
+
+bool PlotData::operator==(const PlotData& other)
+{
+    return device() == other.device() && trait() == other.trait() && varId() == other.varId() && description() == other.description();
+}
+
 
 }

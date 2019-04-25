@@ -1,3 +1,5 @@
+subdir('caf/detail')
+
 src = [
   'src/abstract_actor.cpp',
   'src/abstract_channel.cpp',
@@ -119,14 +121,8 @@ src = [
   'src/uri_impl.cpp',
   'src/work_sharing.cpp',
   'src/work_stealing.cpp',
+  build_config,
 ]
-
-subdir('caf/detail')
-
-#libtype = 'shared_library'
-#if system == 'windows'
-  libtype = 'static_library'
-#endif
 
 libcaf_core_lib = build_target('caf_core',
   name_prefix : 'lib',
@@ -142,6 +138,6 @@ libcaf_core_dep = declare_dependency(
   dependencies : shared_deps,
   include_directories : include_directories('.', is_system : true),
   compile_args : cflags,
-  version : '0.16.0',
+  version : '0.16.3',
 )
 

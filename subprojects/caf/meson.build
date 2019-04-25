@@ -1,4 +1,4 @@
-project('caf', 'cpp', default_options : ['cpp_std=c++11'], version : '0.16.0')
+project('caf', 'cpp', default_options : ['cpp_std=c++11'], version : '0.16.3')
 
 cc = meson.get_compiler('cpp')
 
@@ -28,4 +28,10 @@ if system == 'windows'
                   cc.find_library('psapi')]
 endif
 
+#libtype = 'shared_library'
+#if system == 'windows'
+  libtype = 'static_library'
+#endif
+
 subdir('libcaf_core')
+subdir('libcaf_io')

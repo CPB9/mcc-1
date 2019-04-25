@@ -46,12 +46,12 @@ GpsSettingsPage::~GpsSettingsPage()
 
 QString GpsSettingsPage::pageTitle() const
 {
-    return "GPS";
+    return "Положение МПУ по GPS";
 }
 
 QString GpsSettingsPage::pagePath() const
 {
-    return "GPS";
+    return "Положение МПУ по GPS";
 }
 
 QIcon GpsSettingsPage::pageIcon() const

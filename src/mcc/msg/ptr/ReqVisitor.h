@@ -34,7 +34,6 @@ public:
     virtual void visit(const device::Activate_Request*);
     virtual void visit(const device::Connect_Request*);
 
-    virtual void visit(const tm::Dump_Request*);
     virtual void visit(const advanced::ChannelAndDeviceRegister_Request*);
 
     MCC_DELETE_COPY_MOVE_CONSTRUCTORS(ReqVisitor);

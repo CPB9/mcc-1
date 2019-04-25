@@ -91,6 +91,8 @@ public:
     QMenu* layersMenu() const {return _layersMenu;}
     LayerGroup* layers() const {return _layers.get();}
 
+    const std::vector<UserWidget*>& userWidgets() const {return _userWidgets;}
+
 signals:
     void mapNeedsUpdate();
     void latLonChanged(const bmcl::Option<mccgeo::LatLon>& latLon);
@@ -119,6 +121,7 @@ private slots:
     void updateMap();
 
 private:
+    void setUpdateRate(int rate);
     void resizeLayersNoEmit(const QSize& oldSize, const QSize& newSize);
     void renderNoResize(QPaintDevice* dev);
     void setOnlineCache(const std::string& name);
@@ -154,6 +157,7 @@ private:
     QAction*                            _stackAction;
     QActionGroup*                       _onlineActions;
     QMenu*                              _onlineMenu;
+    QTimer*                             _frameLimitTimer;
 
     std::unique_ptr<MapWidgetAnimator>  _animator;
     std::unique_ptr<FollowAnimator>     _followAnimator;
@@ -167,6 +171,7 @@ private:
     bool                                _isCursorOverWidget;
     bool                                _positionLoaded;
     std::string                         _staticMapType;
+    bool                                _needsUpdate;
     std::unique_ptr<mccui::Trackable>   _trackable;
     Rc<MapLayer>                        _mapLayer;
 
@@ -176,7 +181,7 @@ private:
     bool                                _isTrackingActivated;
     bool                                _isTrackingAllowed;
 
-    std::vector<UserWidget *>           _userWidgets;
+    std::vector<UserWidget*>            _userWidgets;
     Rc<const mccui::CoordinateSystemController> _csController;
     Rc<mccui::Settings>                 _settings;
     Rc<mccui::SettingsWriter>           _latWriter;
@@ -184,6 +189,7 @@ private:
     Rc<mccui::SettingsWriter>           _mapModeWriter;
     Rc<mccui::SettingsWriter>           _zoomLevelWriter;
     Rc<mccui::SettingsWriter>           _staticMapTypeWriter;
+    int _updateTimeout;
 };
 
 inline const MapRect* MapWidget::mapRect() const

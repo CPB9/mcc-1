@@ -4,6 +4,7 @@
 #include "mcc/ui/Fwd.h"
 #include "mcc/uav/Fwd.h"
 #include "mcc/msg/Objects.h"
+#include "mcc/ui/Settings.h"
 
 #include <bmcl/Fwd.h>
 
@@ -24,6 +25,7 @@ class MCC_QML_DECLSPEC QmlToolWindow : public QWidget
 
 public:
     QmlToolWindow(unsigned windowCount,
+                  mccui::Settings* settings,
                   mccui::UserNotifier* userNotifier,
                   mccuav::GroupsController* groupsController,
                   mccuav::UavController* uavController,
@@ -32,6 +34,7 @@ public:
                   QWidget* parent = 0);
 
     QmlToolWindow(unsigned windowCount,
+                  mccui::Settings* settings,
                   mccui::UserNotifier* userNotifier,
                   mccuav::GroupsController* groupsController,
                   mccuav::UavController* uavController,
@@ -54,6 +57,7 @@ private slots:
 
 private:
     void init(unsigned windowCount, 
+              mccui::Settings* settings,
               mccui::UserNotifier* userNotifier,
               mccuav::GroupsController* groupsController,
               mccuav::UavController* uavController,

@@ -69,6 +69,7 @@ private:
     std::vector<QPointF> _anglePath;
     double _minViewAngle;
     double _maxViewAngle;
+    double _maxDistance;
     Ticks _angleTicks;
     QPoint _mousePos;
     QPoint _drawDelta;

@@ -10,6 +10,14 @@ TrackSettings::TrackSettings()
 {
 }
 
+TrackSettings::TrackSettings(const TrackSettings& other)
+{
+    _show = other._show;
+    _mode = other._mode;
+    _seconds = other._seconds;
+    _meters = other._meters;
+}
+
 TrackMode TrackSettings::mode() const
 {
     if (_show)

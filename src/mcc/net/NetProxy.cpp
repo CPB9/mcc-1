@@ -3,6 +3,7 @@
 #include <caf/actor_system_config.hpp>
 #include <caf/actor_ostream.hpp>
 #include <caf/send.hpp>
+#include <caf/io/middleman.hpp>
 #include <QtGlobal>
 #include <bmcl/MakeRc.h>
 
@@ -92,25 +93,83 @@ bmcl::Rc<mccmsg::ProtocolController> createController(mccplugin::PluginCache* ca
     return bmcl::makeRc<ProtocolControllerImpl>(std::move(ps), std::move(dscrs));
 }
 
-NetProxy::NetProxy(bool isConsole, bmcl::Option<uint16_t> maxThreads) : _qtLog(false), _bmclLog(false)
+NetProxy::NetProxy(bool isConsole, bmcl::Option<uint16_t> maxThreads, mccplugin::PluginCache* cache, bmcl::Option<uint16_t> port) : _qtLog(false), _bmclLog(false), _internal(true)
 {
     _cfg = std::make_unique<caf::actor_system_config>();
+    _cfg->set("logger.file-verbosity", caf::atom("quiet"));
+    _cfg->set("logger.console-verbosity", caf::atom("quiet"));
+    _cfg->set("logger.console", caf::atom("colored"));
+    _cfg->load<caf::io::middleman>();
+
     if (maxThreads.isSome())
         _cfg->set("scheduler.max-threads", maxThreads.unwrap());
 
     _sys = std::make_unique<caf::actor_system>(*_cfg);
     mccmsg::add_renderer(*_cfg);
     caf::actor_ostream::redirect_all(*_sys, ":log");
-    _logger = std::make_unique<caf::actor>(_sys->spawn <mccnet::Logger, caf::detached>(isConsole));
-    _loader = std::make_unique<caf::actor>(_sys->spawn<mccnet::NetLoader>(*_logger));
+    _logger = _sys->spawn <mccnet::Logger, caf::detached>(isConsole);
+    _loader = _sys->spawn<mccnet::NetLoader>(_logger);
+
+    setBmclLogHandler();
+    setQtLogHandler();
+    loadPlugins(cache);
+
+    if (port.isSome())
+    {
+        auto r = _sys->middleman().publish(_loader, port.unwrap());
+        if (!r.engaged())
+        {
+            assert(false);
+            BMCL_DEBUG() << "unable to bind port " << port.unwrap();
+            return;
+        }
+    }
+}
+
+NetProxy::NetProxy(bool isConsole, bmcl::Option<uint16_t> maxThreads, mccplugin::PluginCache* cache, const std::string& host, uint16_t port) : _qtLog(false), _bmclLog(false), _internal(false)
+{
+    _cfg = std::make_unique<caf::actor_system_config>();
+    _cfg->set("logger.file-verbosity", caf::atom("quiet"));
+    _cfg->set("logger.console-verbosity", caf::atom("quiet"));
+    _cfg->set("logger.console", caf::atom("colored"));
+    _cfg->load<caf::io::middleman>();
+
+    if (maxThreads.isSome())
+        _cfg->set("scheduler.max-threads", maxThreads.unwrap());
+
+    _sys = std::make_unique<caf::actor_system>(*_cfg);
+    mccmsg::add_renderer(*_cfg);
+//     caf::actor_ostream::redirect_all(*_sys, ":log");
+
+//     setBmclLogHandler();
+//     setQtLogHandler();
+    loadPlugins(cache);
+
+    auto r = _sys->middleman().remote_actor(host, port);
+    if (!r.engaged())
+    {
+        BMCL_DEBUG() << "unable to connect to remote core: " << _sys->render(r.cerror());
+        return;
+    }
+
+    const caf::actor& core = r.cvalue();
+    if (!core)
+    {
+        assert(false);
+        BMCL_DEBUG() << "unable to connect to remote core";
+        return;
+    }
+
+    _loader = core;
+    _logger = core;
 }
 
 NetProxy::~NetProxy()
 {
-    if (_loader) caf::anon_send_exit(*_loader, caf::exit_reason::user_shutdown);
+    if (_internal && _loader) caf::anon_send_exit(_loader, caf::exit_reason::user_shutdown);
     //if (_ui) caf::anon_send_exit(*_ui, caf::exit_reason::user_shutdown);
-    _loader.reset();
-    _logger.reset();
+    destroy(_loader);
+    destroy(_logger);
     if (_sys) _sys->await_all_actors_done();
 
     if (_qtLog) qInstallMessageHandler(0);
@@ -126,17 +185,18 @@ void NetProxy::loadPlugins(mccplugin::PluginCache* cache)
 {
     auto r = createController(cache);
     cache->addPluginData(std::make_unique<mccmsg::ProtocolControllerPluginData>(r.get()));
-    caf::anon_send(*_loader, caf::atom("pluginload"), bmcl::wrapRc<const mccplugin::PluginCache>(cache), bmcl::wrapRc<const mccmsg::ProtocolController>(r.get()));
+    if (_internal)
+        caf::anon_send(_loader, caf::atom("pluginload"), bmcl::wrapRc<const mccplugin::PluginCache>(cache), bmcl::wrapRc<const mccmsg::ProtocolController>(r.get()));
 }
 
 const caf::actor& NetProxy::core() const
 {
-    return *_loader;
+    return _loader;
 }
 
 const caf::actor& NetProxy::logger() const
 {
-    return *_logger;
+    return _logger;
 }
 
 const caf::actor_system& NetProxy::actor_system() const
@@ -178,7 +238,7 @@ void NetProxy::setBmclLogHandler()
 {
     caf::weak_actor_ptr a;
     if (_logger)
-        a = caf::actor_cast<caf::weak_actor_ptr>(*_logger);
+        a = caf::actor_cast<caf::weak_actor_ptr>(_logger);
     auto r = [a](bmcl::LogLevel level, const char* msg)
     {
         auto t = caf::actor_cast<caf::actor>(a);

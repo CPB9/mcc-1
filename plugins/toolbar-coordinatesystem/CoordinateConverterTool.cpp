@@ -272,88 +272,36 @@ void CoordinateConverterTool::copyToClipboard()
     // It's more useful format for conversations
     mccui::AngularFormat coordFormat = mccui::AngularFormat::Degrees;
 
-    QAction *act = qobject_cast<QAction *>(sender());
+    QAction* act = qobject_cast<QAction *>(sender());
     if(act)
     {
         coordFormat = static_cast<mccui::AngularFormat>(act->data().toInt());
     }
 
-    //QMimeData* mData = _csController->makeShortMimeData(mccgeo::LatLon(_secondLatitude->value(), _secondLongitude->value()),
-    //                                               static_cast<mccui::CoordinateSystem>(_secondSystem->currentData().toInt()),
-    //                                               coordFormat);
-    //
-    //QApplication::clipboard()->setMimeData(mData);
+    const mccui::CoordinateSystem& cs = _csController->systems()[_secondSystem->currentIndex()];
+    bool isAngular = cs.hasAngularUnits();
+    mccui::CoordinateFormatter formatter;
+    formatter.setVFormat(mccui::CoordinateFormat(cs.vunits()));
+    if (isAngular) {
+        formatter.setFormat(mccui::CoordinateFormat(coordFormat));
+    } else {
+        formatter.setFormat(mccui::CoordinateFormat(cs.units()));
+    }
+
+    QMimeData* data = formatter.makeMimeData(cs.converter(), cs.shortName(), _secondPosition);
+    QApplication::clipboard()->setMimeData(data);
 }
 
 void CoordinateConverterTool::pasteFromClipboard()
 {
+    auto coord = mccui::CoordinateFormatter::decodeFromMimeData(QApplication::clipboard()->mimeData());
+    if (coord.isNone()) {
+        return;
+    }
     //HACK
-    bmcl::Option<mccgeo::LatLon> latLonOption = bmcl::None;//_csController->getLatLonFromClipboard();
-
-    if(latLonOption.isSome())
-    {
-        _firstPosition.setLatLon(latLonOption.unwrap());
-        _firstLatitude->setValue(_firstPosition.latitude());
-        _firstLongitude->setValue(_firstPosition.longitude());
-
-        recalculateFirstCoordinates();
-    }
-    else // Try to read text data
-    {
-        // It's enough 32 symbols. But we're getting it with a small reserve
-        QString inputText = QApplication::clipboard()->text().left(256);
-        if(!inputText.isEmpty())
-        {
-            inputText = inputText.simplified().replace("′", "'").replace("″", "\"");
-            QStringList values = inputText.split(QRegularExpression(";|\\,|\\s+"));
-
-            for(int i = 0; i<values.size();++i)
-            {
-                values[i].remove(QRegularExpression("[^0-9-+.'\"°sSwW]")); // only for minus sign
-
-                QRegularExpression re("([sSwW]+$)|(^[sSwW]+)");
-                if(re.match(values[i]).hasMatch())
-                {
-                    values[i] = "-" + values[i];
-                }
-                values[i].remove(QRegularExpression("[sSwW]"));
-            }
-
-                        values.removeAll(QString()); // Remove all empty lines
-
-            if(values.size() > 0)
-            {
-                bmcl::Option<double> val = parseCoordinate(values[0]);
-                if(val.isSome())
-                {
-                    if(_isLatitudeFirst)
-                        _firstLatitude->setValue(val.unwrap());
-                    else
-                        _firstLongitude->setValue(val.unwrap());
-                }
-            }
-            if(values.size() > 1)
-            {
-                bmcl::Option<double> val = parseCoordinate(values[1]);
-                if(val.isSome())
-                {
-                    if(_isLatitudeFirst)
-                        _firstLongitude->setValue(val.unwrap());
-                    else
-                        _firstLatitude->setValue(val.unwrap());
-                }
-            }
-            if(values.size() > 2 && _firstAltitude->isEnabled())
-            {
-                bool ok(true);
-                double val = values[2].toDouble(&ok);
-                if(ok)
-                    _firstAltitude->setValue(val);
-            }
-
-            recalculateFirstCoordinates();
-        }
-    }
+    _firstLatitude->setValue(coord.unwrap().y());
+    _firstLongitude->setValue(coord.unwrap().x());
+    _firstAltitude->setValue(coord.unwrap().z());
 }
 
 void CoordinateConverterTool::updateSettings()

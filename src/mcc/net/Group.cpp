@@ -121,7 +121,7 @@ public:
 
     using mccmsg::CmdVisitor::visit;
 
-    void visit(const mccmsg::CmdGroupNew* msg) override { (void)msg; assert(false); }
+    void visit(const mccmsg::CmdGroupNew* msg) override { /*(void)msg; assert(false);*/ }
     void visit(const mccmsg::CmdGroupDelete* msg) override { _self->execute(std::move(_cmd), *msg); }
     void visit(const mccmsg::CmdGroupAttach* msg) override { _self->execute(std::move(_cmd), *msg); }
     void visit(const mccmsg::CmdGroupDetach* msg) override { _self->execute(std::move(_cmd), *msg); }

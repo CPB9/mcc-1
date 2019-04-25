@@ -9,6 +9,7 @@
 #include "mcc/uav/UavController.h"
 #include "mcc/uav/UavUiController.h"
 #include "mcc/uav/UavsTracker.h"
+#include "mcc/uav/PlotController.h"
 #include "mcc/ui/Settings.h"
 #include "mcc/uav/ExchangeService.h"
 #include "mcc/hm/HmStackReader.h"
@@ -37,7 +38,7 @@ public:
             _userNotifier = new mccui::UserNotifier(_settings.get());
             _actions = new mccuav::GlobalActions;
             _routesController = new mccuav::RoutesController;
-
+            _plotController = new mccuav::PlotController(_settings.get());
             QVariant vpath = _settings->read("map/heightMapCachePath");
             QString path;
             if (!vpath.isValid()) {
@@ -57,6 +58,7 @@ public:
             cache->addPluginData(bmcl::makeUnique<mccuav::RoutesControllerPluginData>(_routesController.get()));
             cache->addPluginData(bmcl::makeUnique<mccui::HmControllerPluginData>(_hmController.get()));
             cache->addPluginData(bmcl::makeUnique<mccui::UserNotifierPluginData>(_userNotifier.get()));
+            cache->addPluginData(bmcl::makeUnique<mccuav::PlotControllerPluginData>(_plotController.get()));
             _baseInitialized = true;
         }
 
@@ -105,6 +107,7 @@ private:
     Rc<mcchm::HmStackReader> _hmReader;
     Rc<mccui::HeightmapController> _hmController;
     Rc<mccui::UserNotifier> _userNotifier;
+    Rc<mccuav::PlotController> _plotController;
     bool _baseInitialized;
 };
 

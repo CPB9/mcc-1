@@ -37,6 +37,8 @@ public:
 
     std::vector<Curve*> curves() const;
     void showCurveContextMenu(QwtPlotCurve* curve, const QPoint& pos);
+signals:
+    void requestSave();
 public slots:
     void curveValueChanged(const QString& curve, double x, double y);
     void setAutoUpdate(bool update);

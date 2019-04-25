@@ -39,6 +39,7 @@ public:
     ~CoordinateFormatter();
 
     int precision() const;
+    int vPrecision() const;
 
     const CoordinateFormat& format() const;
     const CoordinateFormat& vformat() const;
@@ -47,6 +48,7 @@ public:
     CoordinateFormat& vformat();
 
     void setPrecision(int precision);
+    void setVPrecision(int precision);
     void setFormat(const CoordinateFormat& fmt);
     void setVFormat(const CoordinateFormat& vfmt);
     void setFormatsFromSystemAndAngular(const CoordinateSystem& system, AngularFormat angular);
@@ -76,6 +78,7 @@ private:
     CoordinateFormat _format;
     CoordinateFormat _vformat;
     int _precision;
+    int _vPrecision;
 };
 }
 

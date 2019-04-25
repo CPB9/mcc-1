@@ -36,14 +36,14 @@ public:
 protected:
     virtual void generateText();
     virtual void redrawText();
-    void drawText(bool bold = false, int size = 0);
+    void drawText(bool bold = false, int size = 11);
 
     VasnecovLabel*  _label;
     QColor          _color;
     bool            _isVisible;
     QString         _valueText;
     bool            _isRounded;
-
+    float           _scaleFactor;
 private:
     Q_DISABLE_COPY(TextInformer)
 };

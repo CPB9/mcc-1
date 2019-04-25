@@ -17,6 +17,8 @@ class Group;
 class WaypointSettings;
 struct Waypoint;
 class UserParam;
+class UavErrors;
+class UavErrorsFilteredModel;
 
 enum class WaypointType;
 }

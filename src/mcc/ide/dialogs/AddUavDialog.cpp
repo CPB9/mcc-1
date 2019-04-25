@@ -39,6 +39,7 @@ AddUavDialog::AddUavDialog(mccuav::ChannelsController* chanController,
                                    mccuav::UavController* uavController,
                                    QWidget* parent)
     : mccui::Dialog(parent)
+    , _okButton(nullptr)
     , _protocolIcon(new QLabel(this))
     , _chanController(chanController)
     , _routesController(routesController)
@@ -162,6 +163,7 @@ AddUavDialog::AddUavDialog(mccuav::ChannelsController* chanController,
     QDialogButtonBox* buttons = new QDialogButtonBox(this);
     buttons->addButton(QDialogButtonBox::StandardButton::Ok);
     buttons->buttons().back()->setIcon(mccres::loadIcon(mccres::ResourceKind::OkButtonIcon));
+    _okButton = buttons->buttons().back();
     buttons->addButton(QDialogButtonBox::StandardButton::Cancel);
     buttons->buttons().back()->setIcon(mccres::loadIcon(mccres::ResourceKind::CancelButtonIcon));
 
@@ -263,6 +265,9 @@ void AddUavDialog::updateProtocols()
 
 void AddUavDialog::addDevice()
 {
+    if(_channelsList->currentIndex() == 0)
+        return;
+
     _routesController->stopEditRoute();
 
     auto protocol = _protocolName->currentData().value<mccmsg::ProtocolDescription>()->name();
@@ -353,8 +358,9 @@ void AddUavDialog::updateDevicesList()
 void AddUavDialog::updateChannelsList()
 {
     auto currentProtocol = _protocolName->currentData().value<mccmsg::ProtocolDescription>()->name();
-    auto lastSelectedChannel = _channelsList->currentData().value<mccmsg::Channel>();
+//    auto lastSelectedChannel = _channelsList->currentData().value<mccmsg::Channel>();
     _channelsList->clear();
+    _channelsList->addItem("— Выберите действие —");
     _channelsList->addItem("<Добавить канал обмена>", QVariant::fromValue(mccmsg::Channel()));
     for (const auto& channel : _chanController->channelInformations())
     {
@@ -365,14 +371,17 @@ void AddUavDialog::updateChannelsList()
         _channelsList->addItem(name, QVariant::fromValue(channel.channel()));
     }
 
-    int newSelectedIndex = _channelsList->findData(QVariant::fromValue(lastSelectedChannel));
+    int newSelectedIndex = 0; //_channelsList->findData(QVariant::fromValue(lastSelectedChannel));
     if (newSelectedIndex != -1)
         _channelsList->setCurrentIndex(newSelectedIndex);
 }
 
 void AddUavDialog::updateChannelsDetails()
 {
-    bool isVisible = (_channelsList->currentIndex() == 0);
+    if(_okButton != nullptr)
+        _okButton->setEnabled(_channelsList->currentIndex() != 0);
+
+    bool isVisible = (_channelsList->currentIndex() == 1);
     _channelsDetails->setVisible(isVisible);
     auto currentProtocol = _protocolName->currentData().value<mccmsg::ProtocolDescription>();
     auto currentId = _protocolId->text();

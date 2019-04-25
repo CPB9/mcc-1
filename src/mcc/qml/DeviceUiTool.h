@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mcc/Config.h"
+#include "mcc/ui/Rc.h"
 #include "mcc/ui/Fwd.h"
 #include "mcc/uav/Fwd.h"
 #include "mcc/msg/Objects.h"
@@ -19,7 +20,7 @@ class MCC_QML_DECLSPEC DeviceUiTool : public QWidget
     Q_OBJECT
 
 public:
-    DeviceUiTool(mccui::UserNotifier* userNotifier, mccuav::UavController* uavController, mccuav::UavUiController* uiController, mccuav::GroupsController* groupsController, QWidget* parent = nullptr);
+    DeviceUiTool(mccui::Settings* settings, mccui::UserNotifier* userNotifier, mccuav::UavController* uavController, mccuav::UavUiController* uiController, mccuav::GroupsController* groupsController, QWidget* parent = nullptr);
     ~DeviceUiTool();
 
 private slots:
@@ -33,6 +34,7 @@ private:
     QTemporaryDir * _uiDir;
     QStackedLayout* _layout;
 
+    mccui::Rc<mccui::Settings>          _settings;
     mccuav::UavController* _uavController;
     mccuav::UavUiController* _uiController;
     mccuav::GroupsController* _groupsController;

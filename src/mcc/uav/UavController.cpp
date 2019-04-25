@@ -142,8 +142,6 @@ UavController::UavController(mccui::Settings* settings,
 
     connect(this, &UavController::selectionChanged, routesController, &RoutesController::acceptUavSelection);
     connect(this, &UavController::uavRemoved, routesController, &RoutesController::acceptUavRemoving);
-
-    connect(this, &UavController::showUavAlert, this, [](Uav* uav, const QString& message) { BMCL_DEBUG() << "Потерялася я! Ахтунг!"; });
 }
 
 void UavController::updateUavChannels()
@@ -346,7 +344,7 @@ ResponseHandle::~ResponseHandle()
 {
     if (!_sent)
     {
-        BMCL_DEBUG() << "ответ не обрабатывается";
+        //BMCL_DEBUG() << "ответ не обрабатывается";
         auto r = _service->requestXX(_r.get()).then([](const mccmsg::CmdRespAnyPtr &) {});
     }
 }
@@ -406,15 +404,15 @@ void UavController::requestUavDescription(const mccmsg::Device& id)
     _deviceDescriptionRequested.push_back(id);
 }
 
-void UavController::requestUavUpdate(const mccmsg::Device& name, const bmcl::Option<bool>& regFirst, const bmcl::Option<std::string>& info, const bmcl::Option<bool>& logging)
+void UavController::requestUavUpdate(const mccmsg::Device& name, const bmcl::Option<bool>& regFirst, const bmcl::Option<std::string>& info, const bmcl::Option<bool>& logging, const bmcl::Option<std::string>& settings)
 {
-    auto d = bmcl::makeRc<const mccmsg::DeviceDescriptionObj>(name, info.unwrapOr(""), "", mccmsg::ProtocolId(), bmcl::None,
+    auto d = bmcl::makeRc<const mccmsg::DeviceDescriptionObj>(name, info.unwrapOr(""), settings.unwrapOr(""), mccmsg::ProtocolId(), bmcl::None,
                                                               bmcl::SharedBytes(), bmcl::None, regFirst.unwrapOr(false), logging.unwrapOr(false));
     mccmsg::Fields fs;
-    if (regFirst.isSome()) fs.push_back(mccmsg::Field::RegFirst);
-    if (info.isSome()) fs.push_back(mccmsg::Field::Info);
-    if (logging.isSome()) fs.push_back(mccmsg::Field::Log);
-
+    if(regFirst.isSome()) fs.push_back(mccmsg::Field::RegFirst);
+    if(info.isSome()) fs.push_back(mccmsg::Field::Info);
+    if(logging.isSome()) fs.push_back(mccmsg::Field::Log);
+    if(settings.isSome()) fs.push_back(mccmsg::Field::Settings);
     _exchangeService->requestXX(new mccmsg::device::Update_Request(mccmsg::device::Updater(std::move(d), std::move(fs)))).then
     (
         [](const mccmsg::device::Update_ResponsePtr& rep)

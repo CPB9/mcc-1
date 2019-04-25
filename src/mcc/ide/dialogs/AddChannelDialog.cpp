@@ -6,16 +6,17 @@
 #include "mcc/msg/obj/Protocol.h"
 #include "mcc/uav/ChannelsController.h"
 
-#include <QLineEdit>
-#include <QLabel>
-#include <QSpinBox>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QPushButton>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QSpinBox>
 #include <QVBoxLayout>
-#include <QGridLayout>
 
 Q_DECLARE_METATYPE(mccmsg::Protocol);
 Q_DECLARE_METATYPE(mccmsg::ProtocolDescription);
@@ -136,6 +137,23 @@ AddChannelDialog::AddChannelDialog(mccuav::ChannelsController* channelsControlle
             _channelsController->requestChannelUpdate(netAddress(_channel.unwrap()), this);
         }
     });
+
+    connect(_readOnly, &QCheckBox::pressed, this,
+            [this]()
+    {
+        if(_channel.isNone())
+            return;
+
+        if(_readOnly->checkState() == Qt::Unchecked)
+            return;
+
+        if(QMessageBox::question(this, "Режим «Только чтение»", "Действительно выключить режим «Только чтение» для данного канала?") == QMessageBox::Yes)
+        {
+            _readOnly->blockSignals(true);
+            _readOnly->setChecked(false);
+            _readOnly->blockSignals(false);
+        }
+    });
 }
 
 AddChannelDialog::~AddChannelDialog()
@@ -165,24 +183,22 @@ void AddChannelDialog::show(const mccmsg::Channel& channel)
 {
     if(channel.isNil())
     {
-        setDefaultName(QString("Канал %1").arg(_channelsController->channelsCount() + 1));
-
         if(_channel.isSome())
             _channel.clear();
+
+        setDefaultName(QString("Канал %1").arg(_channelsController->channelsCount() + 1));
+        _readOnly->setChecked(false);
     }
     else
     {
-        if(_channel != channel)
-        {
-            _channel = channel;
+        _channel = channel;
 
-            auto chInfo = _channelsController->channelInformation(channel);
-            if (chInfo.isNone() || chInfo->channelDescription().isNone())
-                return;
+        auto chInfo = _channelsController->channelInformation(channel);
+        if (chInfo.isNone() || chInfo->channelDescription().isNone())
+            return;
 
-            auto& description = chInfo->channelDescription().unwrap();
-            setChannelDescription(description);
-        }
+        auto& description = chInfo->channelDescription().unwrap();
+        setChannelDescription(description);
     }
 
     _protocol->setEnabled(!_channel.isSome());

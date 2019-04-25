@@ -36,6 +36,8 @@ AbstractPropertiesWidget::AbstractPropertiesWidget(QWidget* parent)
     , _lastItem()
     , _cornerRadius(8)
 {
+    setObjectName("AbstractPropertiesWidget");
+
     setMinimumWidth(210);
 
     // For Unity-theme (toolTips)
@@ -240,6 +242,11 @@ void AbstractPropertiesWidget::addOptionWidget(QWidget* widget, QLabel* labelWid
     addWidgetToGrid(optionsLayout(), widget, labelWidget);
 }
 
+void AbstractPropertiesWidget::addOptionWidget(QWidget* widget, QWidget* labelWidget)
+{
+    addWidgetToGrid(optionsLayout(), widget, labelWidget);
+}
+
 void AbstractPropertiesWidget::addInfoWidget(QWidget* widget, const QString& labelText, Qt::Orientation orientation)
 {
     addWidgetToGrid(infoLayout(), widget, labelText, orientation);
@@ -307,7 +314,7 @@ void AbstractPropertiesWidget::setWidgetVisible(QWidget* widget, bool visible)
         return;
 
     widget->setVisible(visible);
-    QLabel* l = widgetLabel(widget);
+    QWidget* l = widgetLabelContainer(widget);
     if(l != nullptr)
         l->setVisible(visible);
 
@@ -324,6 +331,12 @@ void AbstractPropertiesWidget::setWidgetColor(QWidget* widget, const QColor& col
 }
 
 QLabel* AbstractPropertiesWidget::widgetLabel(QWidget* widget) const
+{
+    QWidget* cont = widgetLabelContainer(widget);
+    return qobject_cast<QLabel*>(cont);
+}
+
+QWidget* AbstractPropertiesWidget::widgetLabelContainer(QWidget* widget) const
 {
     if(widget == nullptr)
         return nullptr;
@@ -375,7 +388,7 @@ void AbstractPropertiesWidget::addWidgetToGrid(QGridLayout* layout, QWidget* wid
     addWidgetToGrid(layout, widget, new QLabel(labelText), orientation);
 }
 
-void AbstractPropertiesWidget::addWidgetToGrid(QGridLayout* layout, QWidget* widget, QLabel* labelWidget, Qt::Orientation orientation)
+void AbstractPropertiesWidget::addWidgetToGrid(QGridLayout* layout, QWidget* widget, QWidget* labelWidget, Qt::Orientation orientation)
 {
     if(widget == nullptr || layout == nullptr || labelWidget == nullptr)
         return;
@@ -433,7 +446,7 @@ void AbstractPropertiesWidget::replaceWidgetInGrid(QGridLayout* layout, QWidget*
     auto i = _labels.find(oldWidget);
     if (i != _labels.end())
     {
-        QLabel* label(i->second);
+        QWidget* label(i->second);
         _labels.erase(i);
 
         _labels.emplace(newWidget, label);

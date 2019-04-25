@@ -94,9 +94,14 @@ public:
     void on_exit() override;
 private:
     void make_visitor_call(const mccmsg::DbRequestPtr& req);
+    void sendNotes()
+    {
+        if (!_notes.empty())
+            qApp->postEvent(_self, new EventNote(std::move(_notes)));
+    }
     CafService* _self;
     std::string _name;
-    caf::actor _core;
+    caf::actor  _core;
 
     std::vector<mccmsg::NotificationPtr> _notes;
 };
@@ -157,8 +162,7 @@ caf::behavior ReqRepHelper::make_behavior()
         }
       , [this](const caf::atom_constant<caf::atom("tick")>&)
         {
-            if (!_notes.empty())
-                qApp->postEvent(_self, new EventNote(std::move(_notes)));
+            sendNotes();
             delayed_send(this, std::chrono::milliseconds(100), caf::atom("tick"));
         }
       , [this](const mccmsg::DevReqPtr& req)
@@ -167,11 +171,12 @@ caf::behavior ReqRepHelper::make_behavior()
             (
                 [this, req](const mccmsg::CmdRespAnyPtr& rep) mutable
                 {
+                    sendNotes();
                     qApp->postEvent(_self, new EventRep(std::move(req), rep));
                 }
               , [this, req](const caf::error& err) mutable
                 {
-                    std::string s = system().render(err);
+                    sendNotes();
                     qApp->postEvent(_self, new EventErr(std::move(req), err));
                 }
             );
@@ -215,10 +220,12 @@ public:
         (
             [s, req](typename T::ResponsePtr& rep) mutable
             {
+                s->sendNotes();
                 qApp->postEvent(s->_self, new EventRep(std::move(req), std::move(rep)));
             }
           , [s, req](caf::error& err) mutable
             {
+                s->sendNotes();
                 qApp->postEvent(s->_self, new EventErr(std::move(req), std::move(err)));
             }
         );
@@ -246,7 +253,6 @@ public:
     VISIT_METHOD(mccmsg::channel::Activate_Request);
     VISIT_METHOD(mccmsg::device::Activate_Request);
     VISIT_METHOD(mccmsg::device::Connect_Request);
-    VISIT_METHOD(mccmsg::tm::Dump_Request);
 
 #undef VISIT_SET
 #undef VISIT_METHOD
@@ -330,6 +336,13 @@ public:
 
 void CafService::setCore(const caf::actor& core)
 {
+    if (!core)
+    {
+        destroy(_core);
+        destroy(_helper);
+        return;
+    }
+
     _core = core;
     _helper = core->home_system().spawn<ReqRepHelper>(core, "ui.reqrep", this);
 }

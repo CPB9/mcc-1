@@ -15,7 +15,8 @@ namespace mccui {
 CoordinateFormatter::CoordinateFormatter()
     : _format("")
     , _vformat("")
-    , _precision(6)
+    , _precision(8)
+    , _vPrecision(6)
 {
 }
 
@@ -26,6 +27,11 @@ CoordinateFormatter::~CoordinateFormatter()
 int CoordinateFormatter::precision() const
 {
     return _precision;
+}
+
+int CoordinateFormatter::vPrecision() const
+{
+    return _vPrecision;
 }
 
 const CoordinateFormat& CoordinateFormatter::format() const
@@ -51,6 +57,11 @@ CoordinateFormat& CoordinateFormatter::vformat()
 void CoordinateFormatter::setPrecision(int precision)
 {
     _precision = precision;
+}
+
+void CoordinateFormatter::setVPrecision(int precision)
+{
+    _vPrecision = precision;
 }
 
 void CoordinateFormatter::setFormat(const CoordinateFormat& fmt)
@@ -137,7 +148,7 @@ CoordinateFormatter::Formatted2Dim CoordinateFormatter::convertAndFormat(const m
         x = to.x();
         y = to.y();
     }
-    return {formatValue(x, _format), formatValue(y, _format)};
+    return {formatValue(x, _format, _precision), formatValue(y, _format, _precision)};
 }
 
 CoordinateFormatter::Formatted3Dim CoordinateFormatter::convertAndFormat(const mccgeo::CoordinateConverter* conv, const mccgeo::Position& coord) const
@@ -152,7 +163,9 @@ CoordinateFormatter::Formatted3Dim CoordinateFormatter::convertAndFormat(const m
         x = to.x();
         y = to.y();
     }
-    return {formatValue(x, _format), formatValue(y, _format), formatValue(to.z(), _vformat)};
+    return {formatValue(x, _format, _precision),
+            formatValue(y, _format, _precision),
+            formatValue(to.z(), _vformat, _vPrecision)};
 }
 
 CoordinateFormatter::Formatted4Dim CoordinateFormatter::convertAndFormat(const mccgeo::CoordinateConverter* conv, const mccgeo::Coordinate& coord) const
@@ -168,9 +181,9 @@ CoordinateFormatter::Formatted4Dim CoordinateFormatter::convertAndFormat(const m
         y = to.y();
     }
     return {
-        formatValue(x, _format),
-        formatValue(y, _format),
-        formatValue(to.z(), _vformat),
+        formatValue(x, _format, _precision),
+        formatValue(y, _format, _precision),
+        formatValue(to.z(), _vformat, _vPrecision),
         formatValue(to.t(), CoordinateFormat("")),
     };
 }

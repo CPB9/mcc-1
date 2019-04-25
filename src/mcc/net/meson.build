@@ -80,7 +80,7 @@ mcc_net_lib = shared_library('mcc-net',
   #extra_files : ['meson.build'],
   link_with : [mcc_plugin_net_lib, mcc_db_lib],
   include_directories : mcc_inc,
-  dependencies : [bmcl_dep, mcc_msg_dep, mcc_error_dep, fmt_dep, mcc_msg_dep, mcc_plugin_dep, mcc_path_dep, libcaf_core_dep],
+  dependencies : [bmcl_dep, mcc_msg_dep, mcc_error_dep, fmt_dep, mcc_msg_dep, mcc_plugin_dep, mcc_path_dep, libcaf_core_dep, libcaf_io_dep],
   cpp_args : '-DBUILDING_MCC_NET',
 )
 

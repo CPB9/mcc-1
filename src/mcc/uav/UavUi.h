@@ -37,6 +37,13 @@ private:
     Hash _hash;
 };
 
+enum class UiExtractError
+{
+    BadZipArchive,
+    BrokenZipArchive,
+    MainFileNotFound,
+};
+
 class MCC_UAV_DECLSPEC UavUi : public mccui::QObjectRefCountable<QObject>
 {
     Q_OBJECT
@@ -50,11 +57,11 @@ public:
     UavUi(const QTemporaryDir& dir, const QString& name);
     ~UavUi();
 
-    bool extractAndValidate(const QString& name, const bmcl::SharedBytes& data);
+    bmcl::Result<bool, UiExtractError> extractAndValidate(const QString& name, const bmcl::SharedBytes& data);
     bool hasLocalChanges() const;
     bool localCopyExists() const;
     bool isOnboard() const;
-    void createLocalCopy();
+    bmcl::Result<bool, QString> createLocalCopy();
     void setupLocalCopy();
     QString originPath() const;
     QString localPath() const;
@@ -63,6 +70,7 @@ public:
     void switchToLocalCopy();
     void switchToOnboard();
     QString localCopyDir() const;
+    QString name() const;
 signals:
     void typeChanged();
     void localHashChanged();

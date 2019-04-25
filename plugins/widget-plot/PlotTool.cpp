@@ -22,11 +22,14 @@
 
 PlotTool::~PlotTool()
 {
+    saveState();
 }
 
-PlotTool::PlotTool(mccuav::UavController* uavController, QWidget* parent /*= 0*/)
+PlotTool::PlotTool(mccui::Settings* settings, mccuav::UavController* uavController, mccuav::PlotController* plotController, QWidget* parent /*= 0*/)
     : QWidget(parent)
+    , _settings(settings)
     , _uavController(uavController)
+    , _plotController(plotController)
 {
     setObjectName("Графики");
     setWindowTitle("Графики");
@@ -46,6 +49,64 @@ PlotTool::PlotTool(mccuav::UavController* uavController, QWidget* parent /*= 0*/
     setLayout(mainLayout);
 
     _plot->setAutoUpdate(true);
+
+    connect(plotController, &mccuav::PlotController::plotAdded, this,
+            [this](const mccuav::PlotData& plotData)
+            {
+                addCurve(plotData);
+                emit _plotController->requestSubscription(plotData);
+            }
+    );
+
+    connect(uavController, &mccuav::UavController::uavTmStorageUpdated, this,
+            [this](mccuav::Uav* uav)
+            {
+                if(uav->tmStorage() == nullptr)
+                    return;
+
+                auto it = _pendingCurves.begin();
+                while(it != _pendingCurves.end())
+                {
+                    if(it->device() == uav->device())
+                    {
+                        _plotController->addPlot(*it);
+                        it = _pendingCurves.erase(it);
+                    }
+                    else
+                        ++it;
+                }
+            }
+    );
+    connect(uavController, &mccuav::UavController::uavRemoved, this,
+            [this](mccuav::Uav* uav)
+            {
+                std::vector<QString> toRemove;
+                for(const auto& it : _plot->curves())
+                {
+                    if(it->variable().device() == uav->device())
+                        toRemove.push_back(it->name());
+                }
+                for(const auto& n : toRemove)
+                {
+                    _plot->removeCurve(n);
+                }
+            }
+    );
+
+    connect(_plot, &PlotWidget::requestSave, this, &PlotTool::saveState);
+
+    _pendingCurves = _settings->read("plot/curves").value<QList<mccuav::PlotData>>();
+}
+
+void PlotTool::saveState()
+{
+    QList<mccuav::PlotData> cfg;
+    cfg.reserve(_plot->curves().size());
+    for(const auto& c : _plot->curves())
+    {
+        cfg.push_back(c->variable());
+    }
+    _settings->tryWrite("plot/curves", QVariant::fromValue(cfg));
 }
 
 QColor PlotTool::findFreeColor() const
@@ -83,6 +144,19 @@ QColor PlotTool::findFreeColor() const
     return colors[_plot->curves().size() % numColors];
 }
 
+void PlotTool::addCurve(const mccuav::PlotData& data)
+{
+    const auto& curves = _plot->curves();
+    auto it = std::find_if(curves.begin(), curves.end(), [data](const Curve* c) {return c->variable() == data; });
+    if(it != curves.end())
+        return;
+    _plot->addCurve(QString::fromStdString(data.varId()),
+                    QString::fromStdString(data.description()),
+                    findFreeColor(),
+                    data);
+    saveState();
+}
+
 void PlotTool::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->hasFormat(mccuav::PlotData::mimeDataStr()))
@@ -98,9 +172,6 @@ void PlotTool::dropEvent(QDropEvent *event)
         return;
     }
 
-    _plot->addCurve(QString::fromStdString((*plotData)->varId()),
-                    QString::fromStdString((*plotData)->description()),
-                    findFreeColor(),
-                    *plotData.unwrap());
+    addCurve(*plotData.take());
     event->acceptProposedAction();
 }

@@ -14,6 +14,8 @@
 #include <QMessageBox>
 #include <QQuickItem>
 #include <QQmlProperty>
+#include <QMenu>
+#include <QWidgetAction>
 
 #include <fmt/format.h>
 
@@ -27,10 +29,12 @@
 #include "mcc/res/Resource.h"
 #include "mcc/ui/WidgetUtils.h"
 #include "mcc/ui/UserNotifier.h"
+#include "mcc/ui/Settings.h"
 
 namespace mccqml {
 
-DeviceUiWidget::DeviceUiWidget(mccui::UserNotifier* notifier,
+DeviceUiWidget::DeviceUiWidget(mccui::Settings* settings, 
+                               mccui::UserNotifier* notifier,
                                mccuav::GroupsController* groupsController,
                                mccuav::UavController* uavController,
                                mccuav::UavUiController* uiController,
@@ -42,6 +46,7 @@ DeviceUiWidget::DeviceUiWidget(mccui::UserNotifier* notifier,
     , _isLoaded(false)
     , _isCustom(false)
 {
+    _showToolbarWriter = settings->acquireSharedWriter("qml/toolbar/show", true).unwrap();
     _dataConverter = new QmlDataConverter;
     _view = new QQuickView();
     _view->engine()->addImportPath(QCoreApplication::applicationDirPath() + "/qml");
@@ -62,22 +67,25 @@ DeviceUiWidget::DeviceUiWidget(mccui::UserNotifier* notifier,
 //     splitter->setOrientation(Qt::Vertical);
 //     splitter->addWidget(_rootWidget);
 //     splitter->addWidget(_warningsView);
-    auto toolbar = new QToolBar();
-    toolbar->setIconSize(QSize(32, 32));
-    toolbar->setFixedHeight(32);
-    _killAction = toolbar->addAction("Выгрузить");
+
+    _toolbar = new QToolBar();
+    _toolbar->setIconSize(QSize(32, 32));
+    _toolbar->setFixedHeight(32);
+    _currentUavName = new QLabel(this);
+    _toolbar->addWidget(_currentUavName);
+
+    _killAction = _toolbar->addAction("Выгрузить");
     _killAction->setIcon(mccres::loadIcon(mccres::ResourceKind::CancelButtonIcon));
     _killAction->setToolTip("Закрыть текущее окно");
 
     connect(_killAction, &QAction::triggered, this, &DeviceUiWidget::killMe);
 
-    _showInFolder = toolbar->addAction("Расположение копии");
+    _showInFolder = _toolbar->addAction("Расположение копии");
     _showInFolder->setIcon(mccres::loadIcon(mccres::ResourceKind::FolderLocation));
     connect(_showInFolder, &QAction::triggered, this, [this]() { mccui::showInGraphicalShell(_view->source().toLocalFile()); });
 
-    _switchLocalOnboard = toolbar->addAction("Локальная копия");
-    _switchLocalOnboard->setCheckable(true);
-    _switchLocalOnboard->setIcon(mccres::loadIcon(mccres::ResourceKind::OnboardFile));
+    _switchLocalOnboard = _toolbar->addAction("Локальная копия");
+    setLocalCopy(false);
     connect(_switchLocalOnboard, &QAction::triggered, this,
             [this]()
             {
@@ -94,15 +102,19 @@ DeviceUiWidget::DeviceUiWidget(mccui::UserNotifier* notifier,
                 }
                 if (ui->isOnboard())
                 {
-                    if (!ui->localCopyExists() && QMessageBox::question(mccui::findMainWindow(), "Интерфейс аппарата", "Локальная копия интерфейса не существует.\nСоздать локальную копию интерфейса?") == QMessageBox::Yes)
+                    if (!ui->localCopyExists() && QMessageBox::question(mccui::findMainWindow(), "QML интерфейс аппарата", "Локальная копия интерфейса QML не существует.\nСоздать локальную копию интерфейса?") == QMessageBox::Yes)
                     {
-                        ui->createLocalCopy();
+                        auto res = ui->createLocalCopy();
+                        if(res.isErr())
+                        {
+                            _uavController->onLog(bmcl::LogLevel::Critical, fmt::format("Ошибка при создании локальной копии QML: {}", res.takeErr().toStdString()));
+                        }
                     }
                     if (ui->localCopyExists())
                     {
                         ui->switchToLocalCopy();
                         reload(QUrl::fromLocalFile(ui->localPath()));
-                        _switchLocalOnboard->setIcon(mccres::loadIcon(mccres::ResourceKind::UserFile));
+                        setLocalCopy(true);
                         connect(ui.unwrap().get(), &mccuav::UavUi::localHashChanged, this, &DeviceUiWidget::onLocalHashChanged);
                     }
                 }
@@ -110,20 +122,18 @@ DeviceUiWidget::DeviceUiWidget(mccui::UserNotifier* notifier,
                 {
                     disconnect(ui.unwrap().get(), &mccuav::UavUi::localHashChanged, this, &DeviceUiWidget::onLocalHashChanged);
                     ui->switchToOnboard();
-                    _switchLocalOnboard->setIcon(mccres::loadIcon(mccres::ResourceKind::OnboardFile));
+                    setLocalCopy(false);
                     reload(QUrl::fromLocalFile(ui->originPath()));
                 }
             });
 
-    _currentUavName = new QLabel(this);
-    toolbar->addWidget(_currentUavName);
-    _reloadAction = toolbar->addAction("Перезагрузить...");
+    _reloadAction = _toolbar->addAction("Перезагрузить...");
     connect(_reloadAction, &QAction::triggered, this, [this]() { _reloadAction->setVisible(false); reload(); });
     _reloadAction->setVisible(false);
     _reloadAction->setIcon(mccres::loadIcon(mccres::ResourceKind::ReloadActiveIcon));
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(toolbar);
+    layout->addWidget(_toolbar);
     layout->addWidget(_rootWidget, 1);
     setLayout(layout);
 
@@ -162,6 +172,16 @@ DeviceUiWidget::DeviceUiWidget(mccui::UserNotifier* notifier,
     );
 
     setEnableSwitchLocalOnboard(false);
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, &QWidget::customContextMenuRequested, this, &DeviceUiWidget::showContextMenu);
+    _rootWidget->installEventFilter(this);
+    _view->installEventFilter(this);
+
+    _toolbar->setVisible(_showToolbarWriter->read().toBool());
+    settings->onChange(_showToolbarWriter->key(), this, [this](const QVariant& value) {
+        _toolbar->setVisible(value.toBool());
+    });
 }
 
 DeviceUiWidget::~DeviceUiWidget()
@@ -275,11 +295,41 @@ void DeviceUiWidget::setDevice(mccmsg::Device device)
     _device = device;
 }
 
+void DeviceUiWidget::setLocalCopy(bool localCopy)
+{
+    if(localCopy)
+    {
+        _switchLocalOnboard->setText("Переключить на бортовой QML");
+        _switchLocalOnboard->setIcon(mccres::loadIcon(mccres::ResourceKind::UserFile));
+    }
+    else
+    {
+        _switchLocalOnboard->setText("Переключить на пользовательский QML");
+        _switchLocalOnboard->setIcon(mccres::loadIcon(mccres::ResourceKind::OnboardFile));
+    }
+}
+
 void DeviceUiWidget::setEnableSwitchLocalOnboard(bool enabled)
 {
     _killAction->setVisible(!enabled);
     _switchLocalOnboard->setVisible(enabled);
     _isCustom = !enabled;
+}
+
+bool DeviceUiWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    if(watched != _view)
+        return QWidget::eventFilter(watched, event);
+
+    if(event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent* mouseEvent = (QMouseEvent*)event;
+        if(mouseEvent->button() == Qt::RightButton)
+        {
+            showContextMenu(mouseEvent->pos());
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 void DeviceUiWidget::updateTitle()
@@ -333,6 +383,35 @@ void DeviceUiWidget::onLocalHashChanged()
 {
     updateTitle();
     _reloadAction->setVisible(true);
+}
+
+void DeviceUiWidget::showContextMenu(const QPoint& pos)
+{
+    QMenu menu;
+    auto title = new QLabel(&menu);
+    title->setText(_currentUavName->text());
+    title->setAlignment(Qt::AlignCenter);
+    QWidgetAction* titleAction = new QWidgetAction(&menu);
+    titleAction->setDefaultWidget(title);
+    menu.addAction(titleAction);
+    menu.addSeparator();
+    auto showToolBarAction = menu.addAction("Панель инструментов");
+    showToolBarAction->setCheckable(true);
+    showToolBarAction->setChecked(_toolbar->isVisible());
+    connect(showToolBarAction, &QAction::triggered, this,
+            [this]()
+            {
+                bool showToolbar = !_toolbar->isVisible();
+                _showToolbarWriter->write(showToolbar);
+                _toolbar->setVisible(showToolbar);
+            }
+    );
+    menu.addSeparator();
+    menu.addAction(_showInFolder);
+    menu.addAction(_switchLocalOnboard);
+    menu.addAction(_killAction);
+    menu.addAction(_reloadAction);
+    menu.exec(_view->mapToGlobal(pos));
 }
 
 }

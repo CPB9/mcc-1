@@ -58,6 +58,17 @@ bmcl::Option<bool> ChannelsController::isChannelActive(const mccmsg::Channel& ch
     return it->isActive();
 }
 
+bmcl::Option<bool> ChannelsController::isChannelReadOnly(const mccmsg::Channel& channel) const
+{
+    const auto it = std::find_if(_channels.begin(), _channels.end(), [&channel](const ChannelInformation& info) { return info.channel() == channel; });
+    if (it == _channels.end())
+        return bmcl::None;
+
+    if(it->channelDescription().isNone())
+        return bmcl::None;
+    return it->channelDescription()->isReadOnly();
+}
+
 void ChannelsController::reqAllChannels()
 {
     _exchangeService->requestXX(new mccmsg::channel::DescriptionList_Request).then
@@ -266,6 +277,7 @@ void ChannelsController::onChannelUnRegistered(const mccmsg::Channel& channel)
     if (it == _channels.end())
         return;
 
+    _unknowns.erase(channel);
     _channels.erase(it);
     emit channelsChanged();
     //TODO: remove later (it's for old ConnectionTool)
@@ -279,6 +291,21 @@ void ChannelsController::onChannelDescription(const mccmsg::ChannelDescription& 
         _channels.emplace_back(description->name(), description);
     else
         it->setChannelDescription(description);
+
+    {
+        const mccmsg::ProtocolIds& ids = description->connectedDevices();
+        auto& ch = _unknowns[description->name()];
+        for (const auto& j : ch)
+        {
+            auto found = std::find_if(ids.begin(), ids.end(), [&](const mccmsg::ProtocolId& id) { return id.id() == j; });
+            if (found == ids.end())
+            {
+                ch.erase(j);
+            }
+        }
+        if (ch.empty())
+            _unknowns.erase(description->name());
+    }
 
     emit channelDescription(description->name(), description);
 
@@ -306,6 +333,28 @@ void ChannelsController::onChannelState(const mccmsg::StatChannel& state)
     i->setStat(state);
     if (statusChanged)
         channelActiveChanged(i->channel(), i->stat()->_isActive);
+
+    if (state._isActive)
+    {
+        for (const auto& j : state._devices)
+        {
+            const mccmsg::ProtocolIds& ids = i->channelDescription()->connectedDevices();
+            auto found = std::find_if(ids.begin(), ids.end(), [&](const mccmsg::ProtocolId& id) { return id.id() == j.first; });
+            if (found == ids.end())
+            {
+                _unknowns[i->channel()].insert(j.first);
+            }
+            else
+            {
+                _unknowns[i->channel()].erase(j.first);
+            }
+        }
+    }
+    else
+    {
+        _unknowns.erase(i->channel());
+    }
+
     emit channelStatsUpdated(state._channel, state);
 }
 
@@ -314,6 +363,9 @@ void ChannelsController::updateChannelActivation(const mccmsg::Channel& channel,
     const auto it = std::find_if(_channels.begin(), _channels.end(), [&channel](const ChannelInformation& info) { return info.channel() == channel; });
     if(it == _channels.end())
         return;
+
+    if (!isActive)
+        _unknowns.erase(channel);
 
     it->setActive(isActive);
 
@@ -332,6 +384,11 @@ bool ChannelsController::isUavInChannel(const mccmsg::Device& device)
             return true;
     }
     return false;
+}
+
+const UnknownUavs& ChannelsController::uavUnknowns() const
+{
+    return _unknowns;
 }
 
 ChannelsControllerPluginData::ChannelsControllerPluginData(ChannelsController* channelsController)

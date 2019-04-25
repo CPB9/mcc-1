@@ -166,7 +166,9 @@ foreach line : mod_str.stdout().strip().split('\n')
     mod_name = sub_name + '_mod'
     set_variable(mod_name, subproject(sub_name, default_options: opts))
     if var != ''
-      set_variable(var, get_variable(mod_name).get_variable(var))
+      foreach v : var.split(',')
+        set_variable(v, get_variable(mod_name).get_variable(v))
+      endforeach
     endif
 
     foreach l : lib_str.strip().split(',')

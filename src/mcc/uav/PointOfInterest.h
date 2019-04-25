@@ -36,7 +36,8 @@ public:
             ParachuteWithPayload, // парашют с грузом
             Bomb,                 // бомба
             Missile,              // ракета
-            CruiseMissile         // крылатая ракета
+            CruiseMissile,        // крылатая ракета
+            Antenna,              // Антенна
     };
 
     PointOfInterest();
@@ -74,6 +75,7 @@ public:
     void            setEditable(bool editable);
     void            setVisible(bool visible);
 
+    void            setUseBaseColor(bool use);
     const mccgeo::LatLon& latLon() const;
     mccgeo::LatLon& latLon();
 
@@ -104,6 +106,8 @@ signals:
     void infoChanged();
     void editableChanged();
     void visibleChanged();
+    void updated();
+    void showEditor();
 private:
     double _altitude;
     double _azimuth;
@@ -124,6 +128,7 @@ private:
     QColor  _baseColor;
     QString _info;
     Type    _kind;
+    bool _useBaseColor;
 };
 
 using PointOfInterestPtr = bmcl::Rc<PointOfInterest>;

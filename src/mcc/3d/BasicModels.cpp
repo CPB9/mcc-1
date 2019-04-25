@@ -1,4 +1,5 @@
 #include "mcc/3d/BasicModels.h"
+#include <QApplication>
 #include <VasnecovUniverse>
 #include <VasnecovFigure>
 #include <VasnecovProduct>
@@ -16,7 +17,7 @@ SimplestModel::SimplestModel(VasnecovUniverse *universe, VasnecovWorld *world) :
     _world(world)
 {}
 
-MetricsModel::MetricsModel(VasnecovUniverse *u, VasnecovWorld *w) :
+MetricsModel::MetricsModel(VasnecovUniverse *u, VasnecovWorld *w, const QString& texturePath) :
     SimplestModel(u, w),
     _labels()
 {
@@ -29,7 +30,7 @@ MetricsModel::MetricsModel(VasnecovUniverse *u, VasnecovWorld *w) :
 
         for(int i = 0; i < 5; ++i)
         {
-            label = universe()->addLabel("metric-10x", world(), 32, 16, "metric_labels");
+            label = universe()->addLabel("metric-10x", world(), 32, 16, texturePath);
             if(label)
             {
                 label->setCoordinates(10 + 10 * i, 0, 0);
@@ -37,7 +38,7 @@ MetricsModel::MetricsModel(VasnecovUniverse *u, VasnecovWorld *w) :
                 _labels.push_back(label);
             }
 
-            label = universe()->addLabel("metric-10y", world(), 32, 16, "metric_labels");
+            label = universe()->addLabel("metric-10y", world(), 32, 16, texturePath);
             if(label)
             {
                 label->setCoordinates(0, 10 + 10 * i, 0);
@@ -48,7 +49,7 @@ MetricsModel::MetricsModel(VasnecovUniverse *u, VasnecovWorld *w) :
 
         for(int i = 0; i < 9; ++i)
         {
-            label = universe()->addLabel("metric-1x", world(), 24, 16, "metric_labels");
+            label = universe()->addLabel("metric-1x", world(), 24, 16, texturePath);
             if(label)
             {
                 label->setCoordinates(1 + 1 * i, 0, 0);
@@ -56,7 +57,7 @@ MetricsModel::MetricsModel(VasnecovUniverse *u, VasnecovWorld *w) :
                 _labels.push_back(label);
             }
 
-            label = universe()->addLabel("metric-1y", world(), 24, 16, "metric_labels");
+            label = universe()->addLabel("metric-1y", world(), 24, 16, texturePath);
             if(label)
             {
                 label->setCoordinates(0, 1 + 1 * i, 0);
@@ -79,75 +80,78 @@ MetricsModel::~MetricsModel()
     }
 }
 
-AxisModel::AxisModel(VasnecovUniverse *u, VasnecovWorld *w, float axisLength) :
+AxisModel::AxisModel(VasnecovUniverse *u, VasnecovWorld *w, float axisLength, bool withArrows) :
     SimplestModel(u, w),
     _figures(),
     _products()
 {
     if(universe() != nullptr && world() != nullptr)
     {
-        VasnecovProduct *axis = universe()->addAssembly("Axis", world());
-        if(axis)
+        if(withArrows)
         {
-            _products.push_back(axis);
+            VasnecovProduct *axis = universe()->addAssembly("Axis", world());
+            if(axis)
+            {
+                _products.push_back(axis);
 
-            axis->setScale(0.1f);
+                axis->setScale(0.1f);
 
-            // Child products will be removed by axis-product
-            VasnecovProduct *axisX = universe()->addPart("axisX", world(), "axis_arrow", axis);
-            if(axisX)
-            {
-                axisX->setColor(0xFF0000);
-                axisX->setCoordinates(5, 0, 0);
-                axisX->setAngles(0, 90, 0);
-            }
-            VasnecovProduct *axisY = universe()->addPart("axisY", world(), "axis_arrow", axis);
-            if(axisY)
-            {
-                axisY->setColor(0x00FF00);
-                axisY->setCoordinates(0, 5, 0);
-                axisY->setAngles(90, 0, 180);
-            }
-            VasnecovProduct *axisZ = universe()->addPart("axisZ", world(), "axis_arrow", axis);
-            if(axisZ)
-            {
-                axisZ->setColor(0x0000FF);
-                axisZ->setCoordinates(0, 0, 5);
-            }
+                // Child products will be removed by axis-product
+                VasnecovProduct *axisX = universe()->addPart("axisX", world(), "axis_arrow", axis);
+                if(axisX)
+                {
+                    axisX->setColor(0xFF0000);
+                    axisX->setCoordinates(5, 0, 0);
+                    axisX->setAngles(0, 90, 0);
+                }
+                VasnecovProduct *axisY = universe()->addPart("axisY", world(), "axis_arrow", axis);
+                if(axisY)
+                {
+                    axisY->setColor(0x00FF00);
+                    axisY->setCoordinates(0, 5, 0);
+                    axisY->setAngles(90, 0, 180);
+                }
+                VasnecovProduct *axisZ = universe()->addPart("axisZ", world(), "axis_arrow", axis);
+                if(axisZ)
+                {
+                    axisZ->setColor(0x0000FF);
+                    axisZ->setCoordinates(0, 0, 5);
+                }
 
-            VasnecovProduct *ball = universe()->addPart("axisBall", world(), "axis_ball", axis);
-            if(ball)
-            {
-                ball->setColor(0xFFFF00);
+                VasnecovProduct *ball = universe()->addPart("axisBall", world(), "axis_ball", axis);
+                if(ball)
+                {
+                    ball->setColor(0xFFFF00);
+                }
             }
+        }
 
-            // Lines
-            VasnecovFigure *figure = universe()->addFigure("aX", world());
-            if(figure)
-            {
-                figure->createLine(QVector3D(0.0, 0.0, 0.0), QVector3D(axisLength, 0.0, 0.0), QColor(255, 0, 0, 255));
-                figure->setScale(0.1f);
-                figure->setThickness(2);
-                _figures.push_back(figure);
-            }
+        // Lines
+        VasnecovFigure *figure = universe()->addFigure("aX", world());
+        if(figure)
+        {
+            figure->createLine(QVector3D(0.0, 0.0, 0.0), QVector3D(axisLength, 0.0, 0.0), QColor(255, 0, 0, 255));
+            figure->setScale(0.1f);
+            figure->setThickness(2);
+            _figures.push_back(figure);
+        }
 
-            figure = universe()->addFigure("aX", world());
-            if(figure)
-            {
-                figure->createLine(QVector3D(0.0, 0.0, 0.0), QVector3D(0.0, axisLength, 0.0), QColor(0, 255, 0, 255));
-                figure->setScale(0.1f);
-                figure->setThickness(2);
-                _figures.push_back(figure);
-            }
+        figure = universe()->addFigure("aX", world());
+        if(figure)
+        {
+            figure->createLine(QVector3D(0.0, 0.0, 0.0), QVector3D(0.0, axisLength, 0.0), QColor(0, 255, 0, 255));
+            figure->setScale(0.1f);
+            figure->setThickness(2);
+            _figures.push_back(figure);
+        }
 
-            figure = universe()->addFigure("aX", world());
-            if(figure)
-            {
-                figure->createLine(QVector3D(0.0, 0.0, 0.0), QVector3D(0.0, 0.0, axisLength), QColor(0, 0, 255, 255));
-                figure->setScale(0.1f);
-                figure->setThickness(2);
-                _figures.push_back(figure);
-            }
+        figure = universe()->addFigure("aX", world());
+        if(figure)
+        {
+            figure->createLine(QVector3D(0.0, 0.0, 0.0), QVector3D(0.0, 0.0, axisLength), QColor(0, 0, 255, 255));
+            figure->setScale(0.1f);
+            figure->setThickness(2);
+            _figures.push_back(figure);
         }
     }
 }
@@ -193,7 +197,7 @@ void AxisModel::setLengthZ(float length, bool doubleDirection)
     _figures[2]->createLine(QVector3D(0.0, 0.0, doubleDirection ? -length : 0.0), QVector3D(0.0, 0.0, length), QColor(0, 0, 255, 255));
 }
 
-CompasModel::CompasModel(VasnecovUniverse *u, VasnecovWorld *w, float maxRadius, float minRadius) :
+CompasModel::CompasModel(VasnecovUniverse *u, VasnecovWorld *w, float maxRadius, float minRadius, const QString& texturePath) :
     SimplestModel(u, w),
     _figures(),
     _labels(),
@@ -219,28 +223,29 @@ CompasModel::CompasModel(VasnecovUniverse *u, VasnecovWorld *w, float maxRadius,
 
 
         _labels.reserve(4);
-
-        VasnecovLabel *label = universe()->addLabel("N", world(), 15, 15, "metric_labels");
+        float scaleFactor = qApp->devicePixelRatio();
+        VasnecovLabel *label = universe()->addLabel("N", world(), 15 * scaleFactor, 15 * scaleFactor, texturePath);
         if(label)
         {
             label->setCoordinates(0, minRadius + (maxRadius - minRadius)/2.0f, 0);
+            label->setTextureZone(0, 0, 15, 15);
             _labels.push_back(label);
         }
-        label = universe()->addLabel("E", world(), 16, 16, "metric_labels");
+        label = universe()->addLabel("E", world(), 16 * scaleFactor, 16 * scaleFactor, texturePath);
         if(label)
         {
             label->setCoordinates((minRadius + (maxRadius - minRadius)/2.0f), 0, 0);
             label->setTextureZone(0, 32, 16, 16);
             _labels.push_back(label);
         }
-        label = universe()->addLabel("S", world(), 16, 16, "metric_labels");
+        label = universe()->addLabel("S", world(), 16 * scaleFactor, 16 * scaleFactor, texturePath);
         if(label)
         {
             label->setCoordinates(0, - (minRadius + (maxRadius - minRadius)/2.0f), 0);
             label->setTextureZone(0, 16, 16, 16);
             _labels.push_back(label);
         }
-        label = universe()->addLabel("W", world(), 16, 16, "metric_labels");
+        label = universe()->addLabel("W", world(), 16 * scaleFactor, 16 * scaleFactor, texturePath);
         if(label)
         {
             label->setCoordinates(-(minRadius + (maxRadius - minRadius)/2.0f), 0, 0);

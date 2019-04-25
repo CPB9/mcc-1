@@ -17,6 +17,7 @@
 namespace mccqml {
 
 QmlToolWindow::QmlToolWindow(unsigned windowCount,
+                             mccui::Settings* settings,
                              mccui::UserNotifier* userNotifier,
                              mccuav::GroupsController* groupsController,
                              mccuav::UavController* uavController,
@@ -25,11 +26,12 @@ QmlToolWindow::QmlToolWindow(unsigned windowCount,
                              QWidget* parent /*= 0*/)
     : QWidget(parent)
 {
-    init(windowCount, userNotifier, groupsController, uavController, uiController);
+    init(windowCount, settings, userNotifier, groupsController, uavController, uiController);
     _uiExtension->setDevice(uav->device());
 }
 
 QmlToolWindow::QmlToolWindow(unsigned windowCount,
+                             mccui::Settings* settings,
                              mccui::UserNotifier* userNotifier,
                              mccuav::GroupsController* groupsController,
                              mccuav::UavController* uavController,
@@ -37,11 +39,12 @@ QmlToolWindow::QmlToolWindow(unsigned windowCount,
                              mccmsg::Device device,
                              QWidget* parent /*= 0*/)
 {
-    init(windowCount, userNotifier, groupsController, uavController, uiController);
+    init(windowCount, settings, userNotifier, groupsController, uavController, uiController);
     _uiExtension->setDevice(device);
 }
 
 void QmlToolWindow::init(unsigned windowCount,
+                         mccui::Settings* settings,
                          mccui::UserNotifier* userNotifier,
                          mccuav::GroupsController* groupsController,
                          mccuav::UavController* uavController,
@@ -50,7 +53,7 @@ void QmlToolWindow::init(unsigned windowCount,
     using mccuav::UavController;
     setWindowTitle(QString("Окно %1").arg(windowCount++));
     setObjectName(windowTitle());
-    _uiExtension = new DeviceUiWidget(userNotifier, groupsController, uavController, uiController, this);
+    _uiExtension = new DeviceUiWidget(settings, userNotifier, groupsController, uavController, uiController, this);
     setupUi();
     _fileWatcher = new QFileSystemWatcher(this);
     connect(_fileWatcher, &QFileSystemWatcher::fileChanged, this,

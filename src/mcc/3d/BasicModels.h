@@ -34,7 +34,8 @@ class MCC_3D_DECLSPEC MetricsModel : public SimplestModel
 {
 public:
     MetricsModel(VasnecovUniverse *universe,
-                 VasnecovWorld *world);
+                 VasnecovWorld *world,
+                 const QString& texturePath = "metric_labels");
     ~MetricsModel();
 
 private:
@@ -49,7 +50,8 @@ public:
     CompasModel(VasnecovUniverse *universe,
                 VasnecovWorld *world,
                 float maxRadius = 1.50f,
-                float minRadius = 1.35f);
+                float minRadius = 1.35f,
+                const QString& texturePath = "metric_labels");
     ~CompasModel();
     bool isVisible() const {return _isVisible;}
 
@@ -72,7 +74,7 @@ private:
 class MCC_3D_DECLSPEC AxisModel : public SimplestModel
 {
 public:
-    AxisModel(VasnecovUniverse *u, VasnecovWorld *w, float axisLength = 5.0f);
+    AxisModel(VasnecovUniverse *u, VasnecovWorld *w, float axisLength = 5.0f, bool withArrows = true);
     ~AxisModel();
     void setOverpainting(bool overpainting);
     void setLengthX(float length, bool doubleDirection = false);

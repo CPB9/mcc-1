@@ -20,6 +20,7 @@ class MCC_UAV_DECLSPEC TrackSettings
 {
 public:
     TrackSettings();
+    TrackSettings(const TrackSettings& other);
     TrackMode mode() const;
     TrackMode lastMode() const;
     void setMode(TrackMode mode);
@@ -35,5 +36,6 @@ private:
     int         _seconds;
     int         _meters;
 };
-
 }
+
+Q_DECLARE_METATYPE(mccuav::TrackMode);

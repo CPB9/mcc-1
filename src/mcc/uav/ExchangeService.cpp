@@ -26,7 +26,7 @@ void ReqItem::onsuccess(mccmsg::ResponsePtr&& r) const
 {
     if (!_onsuccess)
     {
-        BMCL_DEBUG() << "Не задан обработчик успешного ответа на запрос: " << _req->requestId();
+        //BMCL_DEBUG() << "Не задан обработчик успешного ответа на запрос: " << _req->requestId();
         return;
     }
     _onsuccess(r);
@@ -36,7 +36,7 @@ void ReqItem::onerror(mccmsg::ErrorDscr&& r) const
 {
     if (_onerror.isNone() && !_isSilent)
     {
-        BMCL_DEBUG() << "Не задан обработчик ошибочного ответа на запрос: " << _req->requestId() << r.full();
+        //BMCL_DEBUG() << "Не задан обработчик ошибочного ответа на запрос: " << _req->requestId() << r.full();
         return;
     }
     if(_onerror.isSome())
@@ -47,7 +47,7 @@ void ReqItem::onstate(mccmsg::Request_StatePtr&& r) const
 {
     if (_onstate.isNone() && !_isSilent)
     {
-        BMCL_DEBUG() << "Не задан обработчик состояния исполнения запроса: " << _req->requestId();
+        //BMCL_DEBUG() << "Не задан обработчик состояния исполнения запроса: " << _req->requestId();
         return;
     }
     if(_onstate.isSome())

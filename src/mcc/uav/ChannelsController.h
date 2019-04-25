@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <map>
+#include <set>
 #include <bmcl/OptionRc.h>
 
 #include "mcc/msg/obj/Channel.h"
@@ -46,6 +47,8 @@ private:
 };
 using ChannelInformations = std::vector<ChannelInformation>;
 
+using UnknownUavs = std::map<mccmsg::Channel, std::set<mccmsg::DeviceId>>;
+
 class MCC_UAV_DECLSPEC ChannelsController : public mccui::QObjectRefCountable<QObject>
 {
     Q_OBJECT
@@ -60,7 +63,9 @@ public:
     const ChannelInformations& channelInformations() const;
     const mccmsg::ProtocolDescriptions& protocols() const;
     bmcl::Option<bool> isChannelActive(const mccmsg::Channel& channel) const;
+    bmcl::Option<bool> isChannelReadOnly(const mccmsg::Channel& channel) const;
     bool isUavInChannel(const mccmsg::Device& device);
+    const UnknownUavs& uavUnknowns() const;
 
     void requestChannelUpdate(const mccmsg::ChannelDescription&, QWidget* parent);
     void requestChannelActivate(const mccmsg::Channel& channel, bool state, QWidget* parent);
@@ -80,6 +85,8 @@ signals:
 
     void uavConnected(const mccmsg::Channel& channel, const mccmsg::Device& device);
     void uavDisconnected(const mccmsg::Channel& channel, const mccmsg::Device& device, const QString& error);
+    void uavUnknownDetected();
+
 private slots:
     void connectSlots();
 
@@ -103,6 +110,7 @@ private:
     void onChannelDescription(const mccmsg::ChannelDescription& description);
     void updateChannelActivation(const mccmsg::Channel& channel, bool isActive);
 
+    UnknownUavs _unknowns;
     ChannelInformations _channels;
     mccmsg::ProtocolDescriptions    _protocols;
     Rc<mccuav::ExchangeService>     _exchangeService;

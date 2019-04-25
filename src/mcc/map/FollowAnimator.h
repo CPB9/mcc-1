@@ -30,6 +30,7 @@ public:
 
     void updateAircraftPosition(const QPointF& pos);
     void stop();
+    void setTimeout(int ms);
 
 private:
 
@@ -51,13 +52,13 @@ private:
     };
 
     ContainerType<TimeAndPosition> _timeAndPositions;
-    unsigned _history_len;
-    double _avg_dt;
-    QPointF _avg_dx;
+    unsigned _historyLen;
+    double _avgDt;
+    QPointF _avgDx;
 
-    ContainerType<QPointF> _drs_relative;
-    unsigned _drs_relative_len;
-    ContainerType<QPointF> _add_steps;
-    unsigned _add_steps_len;
+    ContainerType<QPointF> _drsRelative;
+    unsigned _drsRelativeLen;
+    ContainerType<QPointF> _addSteps;
+    unsigned _addStepsLen;
 };
 }

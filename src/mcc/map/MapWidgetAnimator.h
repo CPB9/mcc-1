@@ -23,6 +23,7 @@ public:
     void start();
     void stop();
     void startManual(const QPointF& speed, double decrement = 2);
+    void setTimeout(int ms);
 
 private slots:
     void setPosition();
@@ -39,6 +40,7 @@ private:
     double _minSpeed;
     double _decrement;
     double _decrement0;
+    int _timeout;
     std::chrono::high_resolution_clock::time_point _startTime;
 };
 }

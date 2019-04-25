@@ -6,7 +6,7 @@
 
 namespace mccmsg {
 
-enum class ControlOwner : uint8_t { undefined, me, other, joystick };
+enum class ControlOwner : uint8_t { undefined, me, other };
 
 class MCC_MSG_DECLSPEC TmControlOwner : public ITmSimpleExtension
 {

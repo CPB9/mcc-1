@@ -21,7 +21,7 @@ namespace mccmsg
 
     enum class Field : uint8_t
     {
-        All, Pixmap, Firmware, Info, RegFirst, Settings, Ui, Log
+        All, Pixmap, Firmware, Info, RegFirst, Settings, Ui, Log, FinalTime
     };
     using Fields = std::vector<Field>;
 

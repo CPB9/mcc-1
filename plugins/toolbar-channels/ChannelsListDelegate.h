@@ -22,6 +22,7 @@ public:
 
 private:
     QFont           _font;
+    qreal           _scaleFactor;
 
     Q_DISABLE_COPY(ChannelsListDelegate)
 };

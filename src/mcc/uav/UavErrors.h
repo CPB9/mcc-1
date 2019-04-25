@@ -11,7 +11,7 @@
 
 namespace mccuav {
 
-class UavErrors : public QAbstractListModel
+class MCC_UAV_DECLSPEC UavErrors : public QAbstractListModel
 {
 public:
     enum Roles
@@ -25,6 +25,7 @@ public:
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
+    void clearFilter();
 private:
     bmcl::OptionRc<mccmsg::IErrStorage> _errorsStorage;
     bmcl::Option<mccmsg::SubHolder> _handler;

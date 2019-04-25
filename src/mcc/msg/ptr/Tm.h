@@ -41,33 +41,10 @@ private:
     bmcl::SystemTime _time;
 };
 
-class MCC_MSG_DECLSPEC DumpObj {
-public:
-    DumpObj();
-    DumpObj(const Device& device, bmcl::StringView dir, const bmcl::Option<bmcl::SystemTime>& from,
-            const bmcl::Option<bmcl::SystemTime>& to, bool changesOnly);
-    ~DumpObj();
-
-    DumpObj(const DumpObj& other);
-    DumpObj(DumpObj&& other);
-    DumpObj& operator=(const DumpObj& other);
-    DumpObj& operator=(DumpObj&& other);
-
-    Device _device;
-    std::string _dir;
-    bmcl::Option<bmcl::SystemTime> _from;
-    bmcl::Option<bmcl::SystemTime> _to;
-    bool _changesOnly;
-};
-
-class MCC_MSG_DECLSPEC Dump_Response_Tag {
-};
-
 } // namespace tm
 
 MCC_MSG_DECLSPEC NotificationPtr makeTm(const TmAny*);
 
-MSG_DECLARE_REQ(tm, Dump_Request, DumpObj, Dump_Response, Dump_Response_Tag);
 MSG_DECLARE_NOT(tm, Item, tm::TmAnyPtr);
 MSG_DECLARE_NOT(tm, Log, tm::LogObj);
 

@@ -5,6 +5,7 @@
 #include <QFontMetricsF>
 #include <QFont>
 #include <QSize>
+#include <QApplication>
 
 #include <cassert>
 
@@ -21,11 +22,11 @@ TextInformer::TextInformer(VasnecovUniverse* u, VasnecovWorld* w, const QSize& l
     , _isVisible(true)
     , _valueText()
     , _isRounded(true)
+    , _scaleFactor(qApp->devicePixelRatio())
 {
     assert(u != nullptr);
     assert(w != nullptr);
-
-    _label = universe()->addLabel("Numerical label", world(), labelSize.width(), labelSize.height());
+    _label = universe()->addLabel("Numerical label", world(), labelSize.width() * _scaleFactor, labelSize.height() * _scaleFactor);
     assert(_label != nullptr);
 }
 
@@ -106,17 +107,17 @@ void TextInformer::setText(const QString& text)
 
 void TextInformer::setOffset(const QPointF& offset)
 {
-    _label->setOffset(offset);
+    _label->setOffset(offset * _scaleFactor);
 }
 
 void TextInformer::setOffset(float x, float y)
 {
-    _label->setOffset(x, y);
+    _label->setOffset(x * _scaleFactor, y * _scaleFactor);
 }
 
 QPointF TextInformer::offset() const
 {
-    return _label->offset().toPointF();
+    return _label->offset().toPointF() / _scaleFactor;
 }
 
 void TextInformer::generateText()
@@ -138,14 +139,13 @@ void TextInformer::drawText(bool bold, int size)
     image.fill(QColor(0, 0, 0, 0));
 
     QPainter painter(&image);
-
     QFont font("Roboto Condensed");
     if(bold)
         font.setStyleName("Bold");
     if(size == 0)
-        font.setPointSizeF(QApplication::font().pointSizeF() * 0.8);
+        font.setPointSizeF(QApplication::font().pointSizeF() * 0.8 * _scaleFactor);
     else
-        font.setPixelSize(size);
+        font.setPixelSize(size * _scaleFactor);
     painter.setFont(font);
 
     QFontMetricsF metrics(font);

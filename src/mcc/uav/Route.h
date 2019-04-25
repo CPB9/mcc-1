@@ -4,6 +4,7 @@
 #include <QVector>
 #include <QPen>
 
+#include "mcc/uav/Fwd.h"
 #include "mcc/uav/Structs.h"
 #include "mcc/uav/RouteStyle.h"
 
@@ -48,7 +49,7 @@ public:
         }
     };
 
-    Route(const QString& name, int id, size_t maxCount, bool isBuffer = false);
+    Route(mccuav::Uav* uav, const QString& name, int id, size_t maxCount, bool isBuffer = false);
     ~Route();
 
     void setMotionLimits(const UavMotionLimits& limits);
@@ -167,7 +168,9 @@ private:
 
     void syncActivePoint();
     void syncSelectedPoint();
+    void setDefaultProperties(mccmsg::Waypoint& wp);
 
+    mccuav::Uav*                  _uav;
     mccmsg::Waypoints             _points;
     bool                          _isRing;
     bool                          _showDetails;

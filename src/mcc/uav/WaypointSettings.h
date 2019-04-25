@@ -44,7 +44,8 @@ protected:
 
     virtual mccgeo::LatLon initialLatLon() const = 0;
     virtual double nextPointDistance() const = 0;
-
+    virtual double angleBetween(const mccgeo::LatLon& p1, const mccgeo::LatLon& p2) const = 0;
+    virtual mccgeo::LatLon latLonOnLine(const mccgeo::LatLon& p, double angle, double offset) const = 0;
 public slots:
     void apply();
 private slots:

@@ -69,4 +69,12 @@ QVariant UavErrors::data(const QModelIndex &index, int role /*= Qt::DisplayRole*
     return QVariant();
 }
 
+void UavErrors::clearFilter()
+{
+    if(_errorsStorage.isNone())
+        return;
+    for(const auto& a : _errorsStorage->hidden())
+        _errorsStorage->hide(a, false);
+}
+
 }

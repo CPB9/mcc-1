@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW 2018 (64-Bit) -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="48" height="48" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 541.86 541.86"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .str0 {stroke:#000077;stroke-width:8.46;stroke-miterlimit:22.9256}
+    .str1 {stroke:#806600;stroke-width:8.46;stroke-miterlimit:22.9256}
+    .str2 {stroke:#000077;stroke-width:8.47;stroke-miterlimit:22.9256}
+    .str3 {stroke:#000077;stroke-width:7.62;stroke-miterlimit:22.9256}
+    .str4 {stroke:#FFCC00;stroke-width:7.62;stroke-miterlimit:22.9256}
+    .fil0 {fill:none}
+    .fil5 {fill:#000077}
+    .fil1 {fill:#806600}
+    .fil3 {fill:#FFCC00}
+    .fil2 {fill:#FFCC00}
+    .fil4 {fill:#000077;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Слой_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <rect class="fil0" x="-0" y="-0.01" width="541.87" height="541.88"/>
+  <path class="fil1 str0" d="M8.46 260.68c0,88.33 117.52,159.94 262.47,159.94 144.95,0 262.47,-71.61 262.47,-159.94l-524.94 0z"/>
+  <ellipse class="fil2 str1" cx="270.93" cy="264.78" rx="262.47" ry="102.53"/>
+  <ellipse class="fil3 str2" cx="270.93" cy="253.39" rx="254.27" ry="99.32"/>
+  <ellipse class="fil0 str1" cx="270.93" cy="301.43" rx="242.15" ry="94.59"/>
+  <ellipse class="fil0 str1" cx="270.93" cy="319.89" rx="184.4" ry="72.03"/>
+  <path class="fil1 str3" d="M270.92 277.09c71.01,0 128.59,22.49 128.59,50.23 0,5.06 -1.92,9.94 -5.48,14.54 -37.1,7.84 -79.57,12.3 -124.7,12.3 -43.6,0 -84.69,-4.15 -120.88,-11.51 -3.95,-4.84 -6.1,-9.98 -6.1,-15.33 0,-27.74 57.58,-50.23 128.57,-50.23z"/>
+  <path class="fil4" d="M516.2 302.12c-3.13,25.96 -30.53,49.02 -73.24,65.7 -44.27,17.29 -105.36,27.99 -172.73,27.99 -67.33,0 -128.42,-10.7 -172.69,-27.99 -42.69,-16.68 -70.09,-39.74 -73.22,-65.7l8.27 0c3.31,22.32 28.65,42.74 67.94,58.08 43.35,16.94 103.36,27.42 169.7,27.42 66.37,0 126.4,-10.48 169.75,-27.42 39.3,-15.34 64.64,-35.75 67.96,-58.08l8.26 0z"/>
+  <rect class="fil5 str4" x="260.9" y="219.33" width="20.05" height="127.47"/>
+  <rect class="fil5 str4" transform="matrix(1.02538 -0.654583 0.592003 1.13377 301.131 214.625)" width="16.93" height="110.07"/>
+  <rect class="fil5 str4" transform="matrix(1.02538 0.654583 -0.592003 1.13377 223.357 203.534)" width="16.93" height="110.07"/>
+  <ellipse class="fil5 str4" cx="270.93" cy="160.04" rx="35.09" ry="38.8"/>
+ </g>
+</svg>

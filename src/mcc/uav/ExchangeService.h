@@ -91,7 +91,9 @@ public:
         ~ResponseHandle()
         {
             if (!_sent)
-                BMCL_DEBUG() << "ответ не обрабатывается";
+            {
+                //BMCL_DEBUG() << "ответ не обрабатывается";
+            }
         }
 
         ResponseHandle(ExchangeService* self, const R* r)

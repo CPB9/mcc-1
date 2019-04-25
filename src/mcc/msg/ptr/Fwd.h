@@ -114,10 +114,7 @@ MSG_STANDART_SET_FWD(tmSession);
 namespace tm
 {
     class LogObj;
-    class DumpObj;
-    class Dump_Response_Tag;
 }
-MSG_DECLARE_REQ_FWD(tm, Dump_Request, DumpObj, Dump_Response, Dump_Response_Tag);
 MSG_DECLARE_NOT_FWD(tm, Item, bmcl::Rc<const mccmsg::TmAny>);
 MSG_DECLARE_NOT_FWD(tm, Log, tm::LogObj);
 

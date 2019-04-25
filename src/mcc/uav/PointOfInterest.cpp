@@ -42,8 +42,14 @@ PointOfInterest::PointOfInterest()
     , _isEnabled(true)
     , _isMoving(false)
     , _baseColor(Qt::white)
+    , _useBaseColor(true)
 {
     connect(this, &PointOfInterest::uploadToUav, this, [this]() {_updatePending = true; emit pixmapChanged(); });
+    connect(this, &PointOfInterest::latLonChanged, this, &PointOfInterest::updated);
+    connect(this, &PointOfInterest::azimuthChanged, this, &PointOfInterest::updated);
+    connect(this, &PointOfInterest::elevationChanged, this, &PointOfInterest::updated);
+    connect(this, &PointOfInterest::altitudeChanged, this, &PointOfInterest::updated);
+    connect(this, &PointOfInterest::visibleChanged, this, &PointOfInterest::updated);
 }
 
 void PointOfInterest::setIcon(int icon)
@@ -75,6 +81,9 @@ void PointOfInterest::setIcon(int icon)
     case mccuav::PointOfInterest::CruiseMissile:
         iconPath = ":/poi/cruise_missile.svg";
         break;
+    case mccuav::PointOfInterest::Antenna:
+        iconPath = ":/poi/antenna.svg";
+        break;
     default:
         break;
     }
@@ -86,7 +95,8 @@ void PointOfInterest::setIcon(int icon)
     else
         _inactivePixmap = QApplication::style()->standardPixmap(QStyle::SP_TrashIcon);
 
-    _inactivePixmap = mccui::GraphicsEffectCreator::applyColorEffect(_inactivePixmap, _baseColor, 0.9f);
+    if(_useBaseColor)
+        _inactivePixmap = mccui::GraphicsEffectCreator::applyColorEffect(_inactivePixmap, _baseColor, 0.9f);
     createPixmaps();
     emit pixmapChanged();
 }
@@ -142,7 +152,8 @@ void PointOfInterest::createPixmaps()
 
 void PointOfInterest::setBaseColor(const QColor& color)
 {
-    _baseColor = color;
+    if(_useBaseColor)
+        _baseColor = color;
     setIcon(_icon);
 }
 
@@ -257,6 +268,11 @@ void PointOfInterest::setVisible(bool visible)
 {
     _visible = visible;
     emit visibleChanged();
+}
+
+void PointOfInterest::setUseBaseColor(bool use)
+{
+    _useBaseColor = use;
 }
 
 const mccgeo::LatLon& PointOfInterest::latLon() const

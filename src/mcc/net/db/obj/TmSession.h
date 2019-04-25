@@ -21,6 +21,9 @@ public:
     caf::result<mccmsg::tmSession::DescriptionList_ResponsePtr> execute(const mccmsg::tmSession::DescriptionList_Request& request);
     bmcl::Result<mccmsg::TmSession, caf::error> insert(const mccmsg::TmSessionDescription& r, ObjectId& id);
 private:
+    bmcl::Result<bool, std::string> updateInfo(ObjectId device_id, const mccmsg::TmSessionDescription& old, const std::string& info);
+    bmcl::Result<bool, std::string> updateFinalTime(ObjectId device_id, const mccmsg::TmSessionDescription& old, const bmcl::Option<bmcl::SystemTime>& finished);
+
     mccmsg::TmSessionDescriptions getDirs();
     bmcl::Option<mccmsg::Error> removeDir(const mccmsg::TmSession& session);
     void closeAllSessions();
@@ -28,7 +31,8 @@ private:
     static bmcl::Option<mccmsg::TmSessionDescription> get(const sqlite3pp::selecter::row& r);
 
     sqlite3pp::statement _unregister;
-    sqlite3pp::statement _update;
+    sqlite3pp::statement _updateInfo;
+    sqlite3pp::statement _updateFinish;
     sqlite3pp::statement _closeSessions;
 };
 

@@ -88,7 +88,7 @@ public:
     {
         QMenu* menu = new QMenu();
 
-        _toolsMenu = menu->addMenu("Польз. инструменты");
+        _toolsMenu = menu->addMenu("Инструменты QML");
         _toolsMenu->setIcon(QIcon(":/qml.png"));
         auto actionLoadCustomTool = _toolsMenu->addAction(QIcon(":/load2.png"), "Загрузить");
         //auto showManagerTool = _toolsMenu->addAction("Менеджер окон...");
@@ -115,13 +115,14 @@ public:
         if (dialog.exec() == QDialog::Accepted)
         {
             openQmlFile(dialog.path(), dialog.uav());
+            _qmlPathWriter->write(dialog.directory());
         }
      }
 
     void showWindowsManagerDialog()
     {
         QDialog dialog;
-        dialog.setWindowTitle("Менеджер пользовательских окон");
+        dialog.setWindowTitle("Менеджер инструментов QML");
         QHBoxLayout* layout = new QHBoxLayout();
         QTableView* windowsView = new QTableView();
         layout->addWidget(windowsView);
@@ -143,7 +144,7 @@ public:
 private:
     void openQmlFile(const QString& path, mccmsg::Device device)
     {
-        auto userTool = new mccqml::QmlToolWindow(_windowCount, _userNotifier.get(), _groupsController.get(), _uavController.get(), _uiController.get(), device, mccui::findMainWindow());
+        auto userTool = new mccqml::QmlToolWindow(_windowCount, _settings.get(), _userNotifier.get(), _groupsController.get(), _uavController.get(), _uiController.get(), device, mccui::findMainWindow());
         _windowCount++;
         if (!userTool->load(QUrl::fromLocalFile(path)))
         {
@@ -169,7 +170,7 @@ private:
 
     void openQmlFile(const QString& path, bmcl::OptionPtr<mccuav::Uav> uav = bmcl::None)
     {
-        auto userTool = new mccqml::QmlToolWindow(_windowCount, _userNotifier.get(), _groupsController.get(), _uavController.get(), _uiController.get(), uav, mccui::findMainWindow());
+        auto userTool = new mccqml::QmlToolWindow(_windowCount, _settings.get(), _userNotifier.get(), _groupsController.get(), _uavController.get(), _uiController.get(), uav, mccui::findMainWindow());
         _windowCount++;
         if (!userTool->load(QUrl::fromLocalFile(path)))
         {
@@ -286,18 +287,20 @@ protected:
         qRegisterMetaTypeStreamOperators<QmlEntity>("QmlEntity");
         qRegisterMetaTypeStreamOperators<QmlSettingsList>("QmlSettingsList");
 
+        auto settingsData = cache->findPluginData<mccui::SettingsPluginData>();
         auto uavControllerData = cache->findPluginData<mccuav::UavControllerPluginData>();
         auto groupControllerData = cache->findPluginData<mccuav::GroupsControllerPluginData>();
         auto uavUiControllerData = cache->findPluginData<mccuav::UavUiControllerPluginData>();
         auto userNotifierData = cache->findPluginData<mccui::UserNotifierPluginData>();
-        if (bmcl::anyNone(uavControllerData, groupControllerData, uavUiControllerData, userNotifierData))
+
+        if (bmcl::anyNone(settingsData, uavControllerData, groupControllerData, uavUiControllerData, userNotifierData))
             return false;
 
        _uavController = uavControllerData->uavController();
        _groupsController = groupControllerData->groupsController();
        _uavUiController = uavUiControllerData->uavUiController();
        _userNotifier = userNotifierData->userNotifier();
-        setWidget(new mccqml::DeviceUiTool(_userNotifier.get(), _uavController.get(), _uavUiController.get(), _groupsController.get()));
+        setWidget(new mccqml::DeviceUiTool(settingsData->settings(), _userNotifier.get(), _uavController.get(), _uavUiController.get(), _groupsController.get()));
         return true;
     }
 private:

@@ -51,49 +51,5 @@ LogObj& LogObj::operator=(LogObj&& other)
     return *this;
 }
 
-
-DumpObj::DumpObj() {}
-DumpObj::DumpObj(const Device& device, bmcl::StringView dir, const bmcl::Option<bmcl::SystemTime>& from, const bmcl::Option<bmcl::SystemTime>& to, bool changesOnly)
-    : _device(device), _dir(dir.toStdString()), _from(from), _to(to), _changesOnly(changesOnly) { }
-DumpObj::~DumpObj() {}
-
-DumpObj::DumpObj(const DumpObj& other)
-    : _device(other._device)
-    , _dir(other._dir)
-    , _from(other._from)
-    , _to(other._to)
-    , _changesOnly(other._changesOnly)
-{
-}
-
-DumpObj::DumpObj(DumpObj&& other)
-    : _device(std::move(other._device))
-    , _dir(std::move(other._dir))
-    , _from(std::move(other._from))
-    , _to(std::move(other._to))
-    , _changesOnly(std::move(other._changesOnly))
-{
-}
-
-DumpObj& DumpObj::operator=(const DumpObj& other)
-{
-    _device = other._device;
-    _dir = other._dir;
-    _from = other._from;
-    _to = other._to;
-    _changesOnly = other._changesOnly;
-    return *this;
-}
-
-DumpObj& DumpObj::operator=(DumpObj&& other)
-{
-    _device = std::move(other._device);
-    _dir = std::move(other._dir);
-    _from = std::move(other._from);
-    _to = std::move(other._to);
-    _changesOnly = std::move(other._changesOnly);
-    return *this;
-}
-
 }
 }

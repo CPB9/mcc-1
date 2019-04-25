@@ -1,3 +1,4 @@
+#include "mcc/uav/Uav.h"
 #include "mcc/uav/Route.h"
 #include "mcc/geo/Bbox.h"
 #include "mcc/msg/Route.h"
@@ -51,8 +52,9 @@ bool operator ==(const Route::WaypointHint& left, const Route::WaypointHint& rig
     return bmcl::doubleEq(left.distance, right.distance) && left.indexAfter == right.indexAfter && left.latLon == right.latLon;
 }
 
-Route::Route(const QString& name, int id, size_t maxCount, bool isBuffer)
+Route::Route(mccuav::Uav* uav, const QString& name, int id, size_t maxCount, bool isBuffer)
     : QObject()
+    , _uav(uav)
     , _isRing(true)
     , _showDetails(true)
     , _isSelected(false)
@@ -94,7 +96,7 @@ Route::Route(const QString& name, int id, size_t maxCount, bool isBuffer)
     _style->inactive.hasDetails = false;
 
     if (!isBuffer)
-        _buffer = new Route(name + "_buffer", id, _maxCount, true);
+        _buffer = new Route(uav, name + "_buffer", id, _maxCount, true);
 }
 
 Route::~Route()
@@ -150,7 +152,10 @@ void Route::addWaypointNoEmit(const mccmsg::Waypoint& waypoint)
     if (_points.size() >= _maxCount)
         return;
 
-    _points.push_back(waypoint);
+    mccmsg::Waypoint wp = waypoint;
+    if(wp.properties.values().empty())
+        setDefaultProperties(wp);
+    _points.push_back(wp);
 }
 
 bool Route::addWaypoint(const mccmsg::Waypoint& waypoint)
@@ -158,8 +163,11 @@ bool Route::addWaypoint(const mccmsg::Waypoint& waypoint)
     if (_points.size() >= _maxCount)
         return false;
 
-    _points.push_back(waypoint);
-    emit waypointInserted(waypoint, _points.size() - 1);
+    mccmsg::Waypoint wp = waypoint;
+    if(wp.properties.values().empty())
+        setDefaultProperties(wp);
+    _points.push_back(wp);
+    emit waypointInserted(wp, _points.size() - 1);
 
     syncActivePoint();
     return true;
@@ -194,9 +202,13 @@ bool Route::insertWaypoint(const mccmsg::Waypoint& waypoint, int afterIndex /*= 
     if (afterIndex == -1)
         afterIndex = _points.size();
 
-    _points.insert(_points.begin() + afterIndex, waypoint);
+    mccmsg::Waypoint wp = waypoint;
+    if(wp.properties.values().empty())
+        setDefaultProperties(wp);
 
-    emit waypointInserted(waypoint, afterIndex);
+    _points.insert(_points.begin() + afterIndex, wp);
+
+    emit waypointInserted(wp, afterIndex);
 
     setSelectedPoint(afterIndex);
     syncActivePoint();
@@ -810,6 +822,19 @@ void Route::syncSelectedPoint()
 //         }
 //     }
 //     setSelectedPoint(newSelected, true);
+}
+
+void Route::setDefaultProperties(mccmsg::Waypoint& wp)
+{
+    if(!_uav)
+        return;
+
+    if(_uav->firmwareDescription().isNone())
+        return;
+    for(auto p : _uav->firmwareDescription()->frm()->required())
+    {
+        wp.properties.add(p);
+    }
 }
 
 void Route::reverse()

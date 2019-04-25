@@ -67,6 +67,7 @@ CoordinateSystemController::CoordinateSystemController(Settings* settings)
     assert(wgs84rv.isOk());
     _descriptors.emplace_back(_wgs84Def.fullName, _wgs84Def.shortName, wgs84rv.unwrap().get());
     _formatter.setFormatsFromSystemAndAngular(_descriptors[0], _angularFormat);
+    _formatter.setVPrecision(1); //HACK: сделать настройку
 
     constexpr std::size_t numDefs = sizeof(_projDefs) / sizeof(_projDefs[0]);
     for (std::size_t i = 0; i < numDefs; i++) {

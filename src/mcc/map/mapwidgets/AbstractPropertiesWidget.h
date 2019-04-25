@@ -58,6 +58,7 @@ protected:
 
     void addOptionWidget(QWidget* widget, const QString& labelText);
     void addOptionWidget(QWidget* widget, QLabel* labelWidget);
+    void addOptionWidget(QWidget* widget, QWidget* labelWidget);
     void addInfoWidget(QWidget* widget, const QString& labelText, Qt::Orientation orientation = Qt::Horizontal);
     void addOptionLine(QFrame* line);
     void addInfoLine(QFrame* line);
@@ -74,6 +75,7 @@ protected:
     void setWidgetVisible(QWidget* widget, bool visible);
     void setWidgetColor(QWidget* widget, const QColor& color);
     QLabel* widgetLabel(QWidget* widget) const;
+    QWidget* widgetLabelContainer(QWidget* widget) const;
 
     mccui::ClickableLabel* nameLabel() const {return _nameLabel;}
     const QRect& lastListView() const {return _lastListView;}
@@ -84,29 +86,29 @@ private:
     void changePosition();
 
     void addWidgetToGrid(QGridLayout* layout, QWidget* widget, const QString& labelText, Qt::Orientation orientation = Qt::Horizontal);
-    void addWidgetToGrid(QGridLayout* layout, QWidget* widget, QLabel* labelWidget, Qt::Orientation orientation = Qt::Horizontal);
+    void addWidgetToGrid(QGridLayout* layout, QWidget* widget, QWidget* labelWidget, Qt::Orientation orientation = Qt::Horizontal);
     void addLineToGrid(QGridLayout* layout, QFrame* line);
     void replaceWidgetInGrid(QGridLayout* layout, QWidget* oldWidget, QWidget* newWidget);
 
-    bool                        _isEditMode;
-    bool                        _isPinnedMode;
-    QVBoxLayout*                _mainLayout;
-    QHBoxLayout*                _toolsLayout;
-    QGridLayout*                _optionsLayout;
-    QGridLayout*                _infoLayout;
-    QFrame*                     _hLine;
-    mccui::ClickableLabel*      _nameLabel;
+    bool                            _isEditMode;
+    bool                            _isPinnedMode;
+    QVBoxLayout*                    _mainLayout;
+    QHBoxLayout*                    _toolsLayout;
+    QGridLayout*                    _optionsLayout;
+    QGridLayout*                    _infoLayout;
+    QFrame*                         _hLine;
+    mccui::ClickableLabel*          _nameLabel;
 
-    std::map<QWidget*, QLabel*> _labels;
+    std::map<QWidget*, QWidget*>    _labels;
 
-    mccui::ClickableLabel*      _closeButton;
-    mccui::ClickableLabel*      _pinButton;
+    mccui::ClickableLabel*          _closeButton;
+    mccui::ClickableLabel*          _pinButton;
 
-    Qt::Alignment               _alignment;
-    QRect                       _lastListView;
-    QRect                       _lastItem;
+    Qt::Alignment                   _alignment;
+    QRect                           _lastListView;
+    QRect                           _lastItem;
 
-    double                      _cornerRadius;
+    double                          _cornerRadius;
 
     Q_DISABLE_COPY(AbstractPropertiesWidget)
 };
