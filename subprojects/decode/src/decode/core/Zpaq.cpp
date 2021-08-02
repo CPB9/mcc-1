@@ -11,7 +11,7 @@
 #include <bmcl/Buffer.h>
 #include <bmcl/MemReader.h>
 #include <bmcl/Result.h>
-
+#include <stdexcept>
 #include <libzpaq.h>
 
 void libzpaq::error(const char* msg)

@@ -11,7 +11,7 @@
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-
+#include <QPainterPath>
 #include <bmcl/Math.h>
 
 #include <chrono>

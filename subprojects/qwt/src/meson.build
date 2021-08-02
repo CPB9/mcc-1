@@ -157,4 +157,3 @@ qwt_dep = declare_dependency(
   include_directories : inc,
   compile_args : cpp_dep_args,
 )
-

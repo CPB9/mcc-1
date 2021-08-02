@@ -8,6 +8,8 @@
 
 #include <QWidget>
 #include <QPen>
+#include <QPainterPath>
+
 
 class QCheckBox;
 

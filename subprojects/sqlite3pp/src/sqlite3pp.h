@@ -34,6 +34,7 @@
 #include <string>
 #include <tuple>
 #include <cassert>
+#include <stdexcept>
 #include <bmcl/Option.h>
 #include <bmcl/Result.h>
 #include <bmcl/StringView.h>

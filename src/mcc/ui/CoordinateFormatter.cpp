@@ -9,6 +9,7 @@
 #include <QMimeData>
 
 #include <cstring>
+#include <cmath>
 
 namespace mccui {
 
